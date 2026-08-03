@@ -427,3 +427,4 @@ FodyWeavers.xsd
 *.msix
 *.msm
 *.msp
+/Inventory_And_Warehouse_Management/ERD & Mapping/.$ERD.drawio.bkp
