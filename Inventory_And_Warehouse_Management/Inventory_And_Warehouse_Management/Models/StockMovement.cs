@@ -10,7 +10,6 @@ namespace Inventory_And_Warehouse_Management.Models
     public class StockMovement
     {
         [Key]
-        [JsonIgnore]
         public int StockMovementId { get; set; }
         [Required]
         public int Quantity { get; set; }
