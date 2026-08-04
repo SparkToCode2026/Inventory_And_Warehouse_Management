@@ -9,8 +9,10 @@ namespace Inventory_And_Warehouse_Management.Models
         [Key]
         public int SalesOrderItemId { get; set; }
 
+        [ForeignKey("SalesOrderId")]
         public int SalesOrderId { get; set; }
 
+        [ForeignKey("ProductId")]
         public int ProductId { get; set; }
 
         public int Quantity { get; set; }
@@ -18,12 +20,5 @@ namespace Inventory_And_Warehouse_Management.Models
         public decimal UnitPrice { get; set; }
 
         public decimal TotalPrice { get; set; }
-
-        
-        [ForeignKey("SalesOrderId")]
-        public SalesOrder SalesOrder { get; set; }
-
-        [ForeignKey("ProductId")]
-        public Product Product { get; set; }
     }
 }
