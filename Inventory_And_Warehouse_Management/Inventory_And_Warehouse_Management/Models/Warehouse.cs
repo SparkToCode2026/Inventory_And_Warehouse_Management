@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Inventory_And_Warehouse_Management.Models
 {
-    internal class Warehouse
+    public class Warehouse
     {
         [Key]
         public int WarehouseId { get; set; }
