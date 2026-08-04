@@ -5,17 +5,15 @@ using System.Text;
 
 namespace Inventory_And_Warehouse_Management.Models
 {
-    public class Product
+    public class Customer
     {
         [Key]
-        public int ProductId { get; set; }
+        public int CustomerId { get; set; }
         public string Name { get; set; }
-        public decimal Price { get; set; }
-        public string Description { get; set; }
 
+        public string Phone { get; set; }
+        public string Email { get; set; }
+        public string Location { get; set; }
 
-        //Belongs to 
-        public int CategoryId { get; set; }
     }
-
 }
