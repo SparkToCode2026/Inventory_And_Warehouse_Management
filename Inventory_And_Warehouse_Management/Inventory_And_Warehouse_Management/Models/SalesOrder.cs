@@ -17,12 +17,10 @@ namespace Inventory_And_Warehouse_Management.Models
 
         public DateTime OrderDate { get; set; }
 
-
         [ForeignKey("CustomerId")]
         public int CustomerId { get; set; }
 
         [ForeignKey("UserId")]
         public int UserId { get; set; }
-
     }
 }
