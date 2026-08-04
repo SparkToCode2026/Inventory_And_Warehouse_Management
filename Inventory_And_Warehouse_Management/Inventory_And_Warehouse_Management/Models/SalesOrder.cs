@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Text;
 
 namespace Inventory_And_Warehouse_Management.Models
@@ -15,17 +17,10 @@ namespace Inventory_And_Warehouse_Management.Models
 
         public DateTime OrderDate { get; set; }
 
+        [ForeignKey("CustomerId")]
         public int CustomerId { get; set; }
 
-        public int UserId { get; set; }
-
-        
-        [ForeignKey("CustomerId")]
-        public Customer Customer { get; set; }
-
         [ForeignKey("UserId")]
-        public User User { get; set; }
-
-        public List<SalesOrderItem> SalesOrderItems { get; set; }
+        public int UserId { get; set; }
     }
 }
