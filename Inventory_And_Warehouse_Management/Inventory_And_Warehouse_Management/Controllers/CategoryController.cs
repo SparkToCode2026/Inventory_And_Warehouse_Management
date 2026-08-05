@@ -38,6 +38,22 @@ namespace Inventory_And_Warehouse_Management.Controllers
             }
         }
 
+        //A second distinct update case (e.g.update just the description)
+        public void UpdateCategoryDescription(int id, string description)
+        {
+            Category category = context.categories.FirstOrDefault(c => c.CategoryId == id);
+
+            if (category == null)
+            {
+
+            }
+            else
+            {
+                category.Description = description;
+                context.SaveChanges();
+            }
+        }
+
 
         //Delete a Category
         public void DeleteProduct(int id)
