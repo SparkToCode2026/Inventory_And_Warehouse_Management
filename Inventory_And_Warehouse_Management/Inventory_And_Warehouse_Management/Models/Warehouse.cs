@@ -14,6 +14,7 @@ namespace Inventory_And_Warehouse_Management.Models
         public string Location { get; set; }
         public string Phone { get; set; }
 
+        // --- Navigation Properties (relationship setup) ---
         public ICollection<User> Users { get; set; }
         public ICollection<StockMovement> StockMovements { get; set; }
         public ICollection<InventoryLevel> InventoryLevels { get; set; }
