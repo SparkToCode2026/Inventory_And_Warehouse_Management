@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 
-namespace Inventory_And_Warehouse_Management.Models
+namespace Inventory_And_Warehouse_Management
 {
     public class Program
     {
