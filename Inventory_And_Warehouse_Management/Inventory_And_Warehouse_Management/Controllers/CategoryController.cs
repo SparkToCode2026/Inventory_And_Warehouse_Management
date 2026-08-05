@@ -94,5 +94,12 @@ namespace Inventory_And_Warehouse_Management.Controllers
             List<Category> categories = context.categories.Where(c => c.Name.Contains(name)).Include(c => c.products).ToList();
             return categories;
         }
+
+        //SortCategory
+        public List<Category> SortCategoriesByNumOfProducts()
+        {
+            List<Category> categories = context.categories.OrderBy(c => c.products.Count()).ToList();
+            return categories;
+        }
     }
 }
