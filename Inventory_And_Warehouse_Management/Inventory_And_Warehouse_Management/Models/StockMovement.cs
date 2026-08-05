@@ -7,29 +7,25 @@ using System.Text.Json.Serialization;
 
 namespace Inventory_And_Warehouse_Management.Models
 {
-    public class User
+    public class StockMovement
     {
         [Key]
-        public int UserId { get; set; }
+        public int StockMovementId { get; set; }
         [Required]
-        public string Name { get; set; }
+        public int Quantity { get; set; }
         [Required]
-
-        public string Email { get; set; }
+        public DateTime MovementDate { get; set; }
         [Required]
-        public string PasswordHash { get; set; }
+        public string MovementType { get; set; }
+
+        //Records
+        [ForeignKey("ProductId")]
         [Required]
+        public int ProductId { get; set; }
 
-        public string Role { get; set; }
-        [Required]
-
-        public string Phone { get; set; }
-
-
-        //Work
+        //occurs at
         [ForeignKey("WarehouseId")]
         [Required]
         public int WarehouseId { get; set; }
-
     }
 }
