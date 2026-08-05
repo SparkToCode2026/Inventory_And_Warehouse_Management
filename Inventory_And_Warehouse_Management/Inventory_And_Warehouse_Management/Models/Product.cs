@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Text;
 
 namespace Inventory_And_Warehouse_Management.Models
@@ -14,8 +15,28 @@ namespace Inventory_And_Warehouse_Management.Models
         public string Description { get; set; }
 
 
-        //Belongs to 
+        //product has Category
+        [ForeignKey("category")]
         public int CategoryId { get; set; }
+        public Category category { get; set; }
+
+
+        //product records stockMovement 
+        [InverseProperty("product")]
+        public List<StockMovement> stockMovements { get; set; }
+
+
+        // Link back to InventoryLevel.
+        [InverseProperty("Product")]
+        public List<InventoryLevel> inventoryLevels { get; set; }
+
+        // Link back to PurchaseOrderItem.
+        [InverseProperty("Product")]
+        public List<PurchaseOrderItem> purchaseOrderItems { get; set; }
+
+        // Link back to SalesOrderItem.
+        [InverseProperty("Product")]
+        public List<SalesOrderItem> SalesOrderItem { get; set; }
     }
 
 }
