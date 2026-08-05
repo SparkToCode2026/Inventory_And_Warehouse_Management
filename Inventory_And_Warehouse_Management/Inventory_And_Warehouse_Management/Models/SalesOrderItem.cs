@@ -22,5 +22,10 @@ namespace Inventory_And_Warehouse_Management.Models
         public decimal UnitPrice { get; set; }
 
         public decimal TotalPrice { get; set; }
+
+        // Relationships
+        public SalesOrder SalesOrder { get; set; }
+
+        public Product Product { get; set; }
     }
 }
