@@ -26,7 +26,7 @@ namespace Inventory_And_Warehouse_Management.Models
 
         //Relationship between PurchaseOrder and PurchaseOrderItem
         [InverseProperty("purchaseOrder")]
-        public ICollection<PurchaseOrderItem> purchaseOrderItems { get; set; }
+        public List<PurchaseOrderItem> purchaseOrderItems { get; set; }
 
     }
 }

@@ -17,7 +17,7 @@ namespace Inventory_And_Warehouse_Management.Models
         public string Location { get; set; }
 
         // One Customer can have many SalesOrders.
-        [InverseProperty("category")]
+        [InverseProperty("customer")]
         public List<SalesOrder> salesOrders { get; set; }
 
     }

@@ -23,16 +23,17 @@ namespace Inventory_And_Warehouse_Management.Models
 
         // Relationship between SalesOrder and Customer
         [ForeignKey("customer")]
-        public Customer customer { get; set; }
         public int CustomerId { get; set; }
+        public Customer customer { get; set; }
+      
 
         // Relationship between SalesOrder and User
         [ForeignKey("User")]
         public int UserId { get; set; }
-        public User User { get; set; }
+        public User user { get; set; }
 
         // Relationship between SalesOrder and SalesOrderItem
-        [InverseProperty("category")]
+        [InverseProperty("salesOrder")]
         public List<SalesOrderItem> salesOrderItems { get; set; }
     }
 
