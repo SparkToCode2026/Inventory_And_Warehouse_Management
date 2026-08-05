@@ -24,11 +24,9 @@ namespace Inventory_And_Warehouse_Management
         public DbSet<ProductSupplier> productSuppliers { get; set; }
 
         //2- connect to database
-        protected override void OnConfiguring(DbContextOptionsBuilder options)
+        public ProjectContext(DbContextOptions<ProjectContext> options) : base(options)
         {
-            options.UseSqlServer(
-            "Server=Abdullah\\SQLEXPRESS;Database=Inventory_And_Warehouse_Management_DB;Trusted_Connection=True;TrustServerCertificate=True;"
-            );
         }
+
     }
 }
