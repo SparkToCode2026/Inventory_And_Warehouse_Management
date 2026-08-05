@@ -45,7 +45,12 @@ namespace Inventory_And_Warehouse_Management.Controllers
         }
 
 
-       
+        //Get a single Product by id
+        public Product GetProduct(int id)
+        {
+            Product product = context.products.FirstOrDefault(p => p.ProductId == id);
+            return product;
+        }
 
 
     }
