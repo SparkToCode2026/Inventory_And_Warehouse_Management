@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Text;
 
 namespace Inventory_And_Warehouse_Management.Models
@@ -16,6 +17,7 @@ namespace Inventory_And_Warehouse_Management.Models
         public string Location { get; set; }
 
         // One Customer can have many SalesOrders.
+        [InverseProperty("customer")]
         public List<SalesOrder> salesOrders { get; set; }
 
     }

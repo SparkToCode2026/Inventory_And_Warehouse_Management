@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Text;
 
 namespace Inventory_And_Warehouse_Management.Models
@@ -15,9 +16,18 @@ namespace Inventory_And_Warehouse_Management.Models
         public string Phone { get; set; }
 
         // --- Navigation Properties (relationship setup) ---
-        public ICollection<User> Users { get; set; }
-        public ICollection<StockMovement> StockMovements { get; set; }
-        public ICollection<InventoryLevel> InventoryLevels { get; set; }
+
+        //Warehouse and User
+        [InverseProperty("_warehouse")]
+        public ICollection<User> users { get; set; }
+
+        //Warehouse and StockMovement
+        [InverseProperty("_warehouse")]
+        public ICollection<StockMovement> stockMovements { get; set; }
+
+        //Warehouse and StockMovement
+        [InverseProperty("warehouse")]
+        public ICollection<InventoryLevel> inventoryLevels { get; set; }
 
     }
 }

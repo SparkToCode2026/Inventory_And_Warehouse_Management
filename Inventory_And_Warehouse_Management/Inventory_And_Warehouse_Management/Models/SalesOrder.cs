@@ -17,18 +17,24 @@ namespace Inventory_And_Warehouse_Management.Models
 
         public DateTime OrderDate { get; set; }
 
-        [ForeignKey("CustomerId")]
+       
+
+        
+
+        // Relationship between SalesOrder and Customer
+        [ForeignKey("customer")]
         public int CustomerId { get; set; }
+        public Customer customer { get; set; }
+      
 
-        [ForeignKey("UserId")]
+        // Relationship between SalesOrder and User
+        [ForeignKey("User")]
         public int UserId { get; set; }
+        public User user { get; set; }
 
-        // Relationship between SalesOrder and Customer, User, and SalesOrderItem
-        public Customer Customer { get; set; }
-
-        public User User { get; set; }
-
-        public List<SalesOrderItem> Items { get; set; }
+        // Relationship between SalesOrder and SalesOrderItem
+        [InverseProperty("salesOrder")]
+        public List<SalesOrderItem> salesOrderItems { get; set; }
     }
 
 }

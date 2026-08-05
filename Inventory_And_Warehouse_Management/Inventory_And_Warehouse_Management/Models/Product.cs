@@ -27,16 +27,20 @@ namespace Inventory_And_Warehouse_Management.Models
 
 
         // Link back to InventoryLevel.
-        [InverseProperty("Product")]
+        [InverseProperty("product")]
         public List<InventoryLevel> inventoryLevels { get; set; }
 
         // Link back to PurchaseOrderItem.
-        [InverseProperty("Product")]
+        [InverseProperty("product")]
         public List<PurchaseOrderItem> purchaseOrderItems { get; set; }
 
         // Link back to SalesOrderItem.
-        [InverseProperty("Product")]
+        [InverseProperty("product")]
         public List<SalesOrderItem> SalesOrderItem { get; set; }
+
+        // Link back to ProductSupplier
+        [InverseProperty("product")]
+        public List<ProductSupplier> productSuppliers { get; set; }
     }
 
 }
