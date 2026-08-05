@@ -1,5 +1,6 @@
 ﻿using Inventory_And_Warehouse_Management.Models;
 using Microsoft.EntityFrameworkCore;
+using static System.Net.WebRequestMethods;
 
 namespace Inventory_And_Warehouse_Management.Controllers
 {
@@ -85,6 +86,11 @@ namespace Inventory_And_Warehouse_Management.Controllers
             return product;
         }
 
-
+        //Filter Products by max price 
+        public List<Product> ProductsMaxPrice(decimal maxPrice)
+        {
+            List<Product> products = context.products.Where(p => p.Price <= maxPrice).ToList();
+            return products;
+        }
     }
 }
