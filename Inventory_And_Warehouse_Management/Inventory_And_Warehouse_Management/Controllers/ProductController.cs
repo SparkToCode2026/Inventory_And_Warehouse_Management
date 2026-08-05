@@ -92,5 +92,13 @@ namespace Inventory_And_Warehouse_Management.Controllers
             List<Product> products = context.products.Where(p => p.Price <= maxPrice).ToList();
             return products;
         }
+
+        //sort by price
+        public List<Product> SortProductsByPrice()
+        {
+            List<Product> products = context.products.OrderBy(p => p.Price).ToList();
+            return products;
+        }
+
     }
 }
