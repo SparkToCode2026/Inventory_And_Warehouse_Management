@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Text;
 
 namespace Inventory_And_Warehouse_Management.Models
@@ -14,8 +15,10 @@ namespace Inventory_And_Warehouse_Management.Models
         public string Description { get; set; }
 
 
-        //Belongs to 
+        //product has Category
+        [ForeignKey("category")]
         public int CategoryId { get; set; }
+        public Category category { get; set; }
     }
 
 }
