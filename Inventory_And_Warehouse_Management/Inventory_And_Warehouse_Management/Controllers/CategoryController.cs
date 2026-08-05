@@ -13,11 +13,29 @@ namespace Inventory_And_Warehouse_Management.Controllers
         }
 
 
+
         //Create a new Category
         public void AddCategory(Category c)
         {
             context.categories.Add(c);
             context.SaveChanges();
+        }
+
+        //Update a Category (full update)
+        public void UpdateCategory(int id, string name, string description)
+        {
+            Category category = context.categories.FirstOrDefault(c => c.CategoryId == id);
+
+            if(category == null)
+            {
+
+            }
+            else
+            {
+                category.Name = name;
+                category.Description = description;
+                context.SaveChanges();
+            }
         }
 
 
