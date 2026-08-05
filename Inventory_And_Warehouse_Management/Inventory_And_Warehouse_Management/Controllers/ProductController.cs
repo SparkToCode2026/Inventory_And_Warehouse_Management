@@ -20,6 +20,25 @@ namespace Inventory_And_Warehouse_Management.Controllers
             context.SaveChanges();
         }
 
+        //Update a Product  (full update)
+        public void UpdateProduct(int id, string name, decimal price, string description)
+        {
+            Product product = context.products.FirstOrDefault(p => p.ProductId == id);
+
+            if (product == null)
+            {
+
+            }
+            else
+            {
+                product.Name = name;
+                product.Description = description;
+                product.Price = price;
+                context.SaveChanges();
+            }
+        }
+
+        
 
         //Delete a Product
         public void DeleteProduct(int id)
