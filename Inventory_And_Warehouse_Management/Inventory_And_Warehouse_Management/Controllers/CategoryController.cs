@@ -36,6 +36,10 @@ namespace Inventory_And_Warehouse_Management.Controllers
             }
         }
 
-
+        public Category GetCategory(int id)
+        {
+            Category category = context.categories.FirstOrDefault(c => c.CategoryId == id);
+            return category;
+        }
     }
 }
