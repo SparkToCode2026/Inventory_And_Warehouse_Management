@@ -15,15 +15,15 @@ namespace Inventory_And_Warehouse_Management.Models
         public int ReorderThreshold { get; set; }
 
         // Link back to Warehouse.
-        [ForeignKey("Warehouse")]
+        [ForeignKey("warehouse")]
         public int WarehouseId { get; set; }
-        public Warehouse Warehouse { get; set; }
+        public Warehouse warehouse { get; set; }
 
 
         // Link back to Product.
-        [ForeignKey("Product")]
+        [ForeignKey("product")]
         public int ProductId { get; set; }
-        public Product Product { get; set;}
+        public Product product { get; set;}
 
 
     }
