@@ -1,4 +1,5 @@
 ﻿using Inventory_And_Warehouse_Management.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace Inventory_And_Warehouse_Management.Controllers
 {
@@ -36,6 +37,16 @@ namespace Inventory_And_Warehouse_Management.Controllers
             }
         }
 
+
+        //Get all Categories, including their related Products
+        public List<Category> GetCategories()
+        {
+            List<Category> categories = context.categories.Include(c => c.products).ToList();
+            return categories;
+        }
+
+
+        //Get a single Category by id
         public Category GetCategory(int id)
         {
             Category category = context.categories.FirstOrDefault(c => c.CategoryId == id);
