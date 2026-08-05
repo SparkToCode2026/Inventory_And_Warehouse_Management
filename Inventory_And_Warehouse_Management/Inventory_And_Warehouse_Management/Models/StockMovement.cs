@@ -19,13 +19,17 @@ namespace Inventory_And_Warehouse_Management.Models
         public string MovementType { get; set; }
 
         //Records
-        [ForeignKey("ProductId")]
+        [ForeignKey("product")]
         [Required]
         public int ProductId { get; set; }
+        [JsonIgnore]
+        public Product? product { get; set; }
 
         //occurs at
-        [ForeignKey("WarehouseId")]
+        [ForeignKey("_warehouse")]
         [Required]
         public int WarehouseId { get; set; }
+        [JsonIgnore]
+        public Warehouse? _warehouse { get; set; }
     }
 }

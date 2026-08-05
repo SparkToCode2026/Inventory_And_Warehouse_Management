@@ -25,11 +25,12 @@ namespace Inventory_And_Warehouse_Management.Models
 
         public string Phone { get; set; }
 
-
         //Work
-        [ForeignKey("WarehouseId")]
+        [ForeignKey("_warehouse")]
         [Required]
         public int WarehouseId { get; set; }
+        [JsonIgnore]
+        public Warehouse? _warehouse { get; set; }
 
     }
 }
