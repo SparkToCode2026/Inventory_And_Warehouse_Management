@@ -15,5 +15,8 @@ namespace Inventory_And_Warehouse_Management.Models
         public string Email { get; set; }
         public string Location { get; set; }
 
+
+        public List<SalesOrder> salesOrders { get; set; }
+
     }
 }

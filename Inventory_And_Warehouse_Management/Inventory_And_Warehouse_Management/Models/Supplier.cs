@@ -13,6 +13,9 @@ namespace Inventory_And_Warehouse_Management.Models
         
         public string Phone { get; set; }
         public string Email { get; set; }
-     
+
+
+        public List<PurchaseOrder> purchaseOrders { get; set; }
+
     }
 }
