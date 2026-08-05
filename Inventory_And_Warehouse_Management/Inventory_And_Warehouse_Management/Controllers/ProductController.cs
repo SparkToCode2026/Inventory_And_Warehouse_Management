@@ -38,7 +38,21 @@ namespace Inventory_And_Warehouse_Management.Controllers
             }
         }
 
-        
+        //A second distinct update case (e.g.update just the price)
+        public void UpdateProductPrice(int id, decimal price)
+        {
+            Product product = context.products.FirstOrDefault(p => p.ProductId == id);
+
+            if (product == null)
+            {
+
+            }
+            else
+            {
+                product.Price = price;
+                context.SaveChanges();
+            }
+        }
 
         //Delete a Product
         public void DeleteProduct(int id)
