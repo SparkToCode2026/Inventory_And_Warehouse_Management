@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -6,9 +7,9 @@ using System.Text;
 
 namespace Inventory_And_Warehouse_Management.Models
 {
+    [PrimaryKey(nameof(PurchaseOrderId), nameof(ProductId))]
     public class PurchaseOrderItem
     {
-        [Key]
         public int PurchaseOrderItemId { get; set; }
         public int Quantity { get; set; }
         public decimal UnitPrice { get; set; }
