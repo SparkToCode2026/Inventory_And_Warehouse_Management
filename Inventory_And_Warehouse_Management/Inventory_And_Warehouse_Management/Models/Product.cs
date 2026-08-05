@@ -37,6 +37,10 @@ namespace Inventory_And_Warehouse_Management.Models
         // Link back to SalesOrderItem.
         [InverseProperty("product")]
         public List<SalesOrderItem> SalesOrderItem { get; set; }
+
+        // Link back to ProductSupplier
+        [InverseProperty("product")]
+        public List<ProductSupplier> productSuppliers { get; set; }
     }
 
 }
