@@ -1,5 +1,6 @@
 ﻿using Inventory_And_Warehouse_Management.Models;
 using Microsoft.EntityFrameworkCore;
+using static System.Net.WebRequestMethods;
 
 namespace Inventory_And_Warehouse_Management.Controllers
 {
@@ -85,6 +86,13 @@ namespace Inventory_And_Warehouse_Management.Controllers
         {
             Category category = context.categories.FirstOrDefault(c => c.CategoryId == id);
             return category;
+        }
+
+        //Filter Categories by name
+        public List<Category> FilterCategoriesByName(string name)
+        {
+            List<Category> categories = context.categories.Where(c => c.Name.Contains(name)).Include(c => c.products).ToList();
+            return categories;
         }
     }
 }
