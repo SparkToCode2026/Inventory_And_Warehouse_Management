@@ -15,7 +15,7 @@ namespace Inventory_And_Warehouse_Management.Models
         public string Email { get; set; }
         public string Location { get; set; }
 
-
+        // One Customer can have many SalesOrders.
         public List<SalesOrder> salesOrders { get; set; }
 
     }

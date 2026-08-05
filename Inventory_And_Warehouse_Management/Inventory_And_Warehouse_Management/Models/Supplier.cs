@@ -15,6 +15,7 @@ namespace Inventory_And_Warehouse_Management.Models
         public string Email { get; set; }
 
 
+        // One Supplier can have many PurchaseOrders.
         public List<PurchaseOrder> PurchaseOrders { get; set; }
 
     }
