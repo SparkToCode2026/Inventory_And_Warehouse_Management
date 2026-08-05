@@ -14,5 +14,11 @@ namespace Inventory_And_Warehouse_Management.Models
         public DateTime OrderDate { get; set; }
         public int SupplierId { get; set; }
         public int UserId { get; set; }
+
+        //Relationship for PurchaseOrder
+        public Supplier Supplier { get; set; }
+        public User User { get; set; }
+        public ICollection<PurchaseOrderItem> Items { get; set; }
+
     }
 }
