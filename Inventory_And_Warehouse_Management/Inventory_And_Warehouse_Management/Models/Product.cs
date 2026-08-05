@@ -19,6 +19,24 @@ namespace Inventory_And_Warehouse_Management.Models
         [ForeignKey("category")]
         public int CategoryId { get; set; }
         public Category category { get; set; }
+
+
+        //product records stockMovement 
+        [InverseProperty("product")]
+        public List<StockMovement> stockMovements { get; set; }
+
+
+        // Link back to InventoryLevel.
+        [InverseProperty("Product")]
+        public List<InventoryLevel> inventoryLevels { get; set; }
+
+        // Link back to PurchaseOrderItem.
+        [InverseProperty("Product")]
+        public List<PurchaseOrderItem> purchaseOrderItems { get; set; }
+
+        // Link back to SalesOrderItem.
+        [InverseProperty("Product")]
+        public List<SalesOrderItem> SalesOrderItem { get; set; }
     }
 
 }
