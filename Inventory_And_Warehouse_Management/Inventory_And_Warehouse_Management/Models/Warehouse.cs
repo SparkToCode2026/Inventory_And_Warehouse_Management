@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Mvc;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -10,7 +8,6 @@ namespace Inventory_And_Warehouse_Management.Models
 {
     public class Warehouse
     {
-        
         [Key]
         public int WarehouseId { get; set; }
         public string Name { get; set; }
