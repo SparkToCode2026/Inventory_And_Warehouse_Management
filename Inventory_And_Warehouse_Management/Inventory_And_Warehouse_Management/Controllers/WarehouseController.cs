@@ -85,10 +85,7 @@ namespace Inventory_And_Warehouse_Management.Controllers
         [HttpGet("GetInventoryLevels")]
         public List<InventoryLevel> GetInventoryLevels()
         {
-            List<InventoryLevel> inventoryLevels = context.inventoryLevels
-                .Include(il => il.warehouse)
-                .Include(il => il.product)
-                .ToList();
+            List<InventoryLevel> inventoryLevels = context.inventoryLevels.Include(il => il.warehouse).Include(il => il.product).ToList();
             return inventoryLevels;
         }
 
