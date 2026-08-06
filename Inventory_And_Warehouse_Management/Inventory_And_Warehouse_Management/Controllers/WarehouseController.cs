@@ -65,12 +65,13 @@ namespace Inventory_And_Warehouse_Management.Controllers
 
         //Case3: A second distinct update case 
         [HttpPatch("UpdateWarehouseContact")]
-        public void UpdateWarehouseContact(int id, string location, string phone)
+        public IActionResult UpdateWarehouseContact(int id, string location, string phone)
         {
             Warehouse warehouse = context.warehouses.FirstOrDefault(w => w.WarehouseId == id);
 
             if (warehouse == null)
             {
+                return NotFound("Warehouse " + id + " was not found.");
 
             }
             else
@@ -78,6 +79,8 @@ namespace Inventory_And_Warehouse_Management.Controllers
                 warehouse.Location = location;
                 warehouse.Phone = phone;
                 context.SaveChanges();
+
+                return Ok(warehouse);
             }
         }
 
