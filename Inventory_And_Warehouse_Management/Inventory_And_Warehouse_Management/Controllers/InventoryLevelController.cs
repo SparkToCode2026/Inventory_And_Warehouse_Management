@@ -1,5 +1,6 @@
 ﻿using Inventory_And_Warehouse_Management.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 

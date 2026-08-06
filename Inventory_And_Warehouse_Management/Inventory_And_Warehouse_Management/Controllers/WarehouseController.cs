@@ -2,6 +2,8 @@
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
+using Microsoft.EntityFrameworkCore;
+
 
 namespace Inventory_And_Warehouse_Management.Controllers
 {
