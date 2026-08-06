@@ -1,6 +1,7 @@
 ﻿using Inventory_And_Warehouse_Management.Models;
 using Microsoft.AspNetCore.Mvc;
 using System;
+using System.Collections.Generic;
 
 namespace Inventory_And_Warehouse_Management.Controllers
 {
@@ -79,5 +80,19 @@ namespace Inventory_And_Warehouse_Management.Controllers
                 context.SaveChanges();
             }
         }
+
+        //Case5:Get All Warehouses with Related Inventory Data
+        [HttpGet("GetInventoryLevels")]
+        public List<InventoryLevel> GetInventoryLevels()
+        {
+            List<InventoryLevel> inventoryLevels = context.inventoryLevels
+                .Include(il => il.warehouse)
+                .Include(il => il.product)
+                .ToList();
+            return inventoryLevels;
+        }
+
+
+
     }
 }
