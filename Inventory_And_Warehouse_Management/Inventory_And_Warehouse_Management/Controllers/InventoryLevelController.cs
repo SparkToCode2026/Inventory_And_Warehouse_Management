@@ -24,6 +24,30 @@ namespace Inventory_And_Warehouse_Management.Controllers
         }
 
 
+        //Case2: Update an InventoryLevel (full update)
+        [HttpPut("UpdateInventoryLevel")]
+        public void UpdateInventoryLevel(int warehouseId, int productId, int quantityOnHand, int reorderThreshold)
+        {
+            InventoryLevel inventoryLevel = context.inventoryLevels
+                .FirstOrDefault(il => il.WarehouseId == warehouseId && il.ProductId == productId);
+
+            if (inventoryLevel == null)
+            {
+
+            }
+            else
+            {
+                inventoryLevel.QuantityOnHand = quantityOnHand;
+                inventoryLevel.ReorderThreshold = reorderThreshold;
+                context.SaveChanges();
+            }
+        }
+
+
+
+
+
+
     }
 
 
