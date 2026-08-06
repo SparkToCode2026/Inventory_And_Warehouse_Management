@@ -133,13 +133,13 @@ namespace Inventory_And_Warehouse_Management.Controllers
 
         //Case8: Sort Warehouses by total used capacity
         [HttpGet("SortWarehousesByUsedCapacity")]
-        public List<Warehouse> SortWarehousesByUsedCapacity()
+        public IActionResult SortWarehousesByUsedCapacity()
         {
             List<Warehouse> warehouses = context.warehouses
                 .Include(w => w.inventoryLevels)
                 .OrderByDescending(w => w.inventoryLevels.Sum(il => il.QuantityOnHand))
                 .ToList();
-            return warehouses;
+            return Ok(warehouses);
         }
 
     }
