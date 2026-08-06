@@ -153,7 +153,7 @@ namespace Inventory_And_Warehouse_Management.Controllers
 
         //Case8: Sort total QuantityOnHand per Product across all warehouses
         [HttpGet("GetTotalQuantityByProduct")]
-        public List<object> GetTotalQuantityByProduct()
+        public IActionResult GetTotalQuantityByProduct()
         {
             List<object> totals = Context.InventoryLevels.GroupBy(il => il.ProductId).Select(g => new
                 {
@@ -162,7 +162,7 @@ namespace Inventory_And_Warehouse_Management.Controllers
                 })
                 .OrderByDescending(t => t.TotalQuantityOnHand)
                 .ToList<object>();
-            return totals;
+            return Ok(totals);
         }
 
     }
