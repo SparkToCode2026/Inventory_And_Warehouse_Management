@@ -82,12 +82,20 @@ namespace Inventory_And_Warehouse_Management.Controllers
 
             if (inventoryLevel == null)
             {
-
+                return NotFound("InventoryLevel for Warehouse " + warehouseId + " and Product " + productId + " does not exist.");
             }
             else
             {
-                inventoryLevel.QuantityOnHand = inventoryLevel.QuantityOnHand + delta;
-                Context.SaveChanges();
+                int newQuantity = inventoryLevel.QuantityOnHand + delta;
+                if (newQuantity < 0)
+                {
+                return BadRequest("Adjustment would result in negative stock.");
+                }
+                
+            inventoryLevel.QuantityOnHand = newQuantity;
+            Context.SaveChanges();
+            
+            return Ok(inventoryLevel);
             }
         }
 
