@@ -97,6 +97,16 @@ namespace Inventory_And_Warehouse_Management.Controllers
 
 
 
+        //Case6: Get a single InventoryLevel by composite key (WarehouseId + ProductId)
+        [HttpGet("GetInventoryLevel")]
+        public InventoryLevel GetInventoryLevel(int warehouseId, int productId)
+        {
+            InventoryLevel inventoryLevel = context.inventoryLevels
+                .Include(il => il.warehouse)
+                .Include(il => il.product)
+                .FirstOrDefault(il => il.WarehouseId == warehouseId && il.ProductId == productId);
+            return inventoryLevel;
+        }
 
 
 
