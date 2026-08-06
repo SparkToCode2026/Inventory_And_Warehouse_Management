@@ -20,8 +20,8 @@ namespace Inventory_And_Warehouse_Management.Controllers
         [HttpPost("AddInventoryLevel")]
         public void AddInventoryLevel(InventoryLevel il)
         {
-            context.inventoryLevels.Add(il);
-            context.SaveChanges();
+            Context.InventoryLevels.Add(il);
+            Context.SaveChanges();
         }
 
 
@@ -29,8 +29,7 @@ namespace Inventory_And_Warehouse_Management.Controllers
         [HttpPut("UpdateInventoryLevel")]
         public void UpdateInventoryLevel(int warehouseId, int productId, int quantityOnHand, int reorderThreshold)
         {
-            InventoryLevel inventoryLevel = context.inventoryLevels
-                .FirstOrDefault(il => il.WarehouseId == warehouseId && il.ProductId == productId);
+            InventoryLevel inventoryLevel = Context.InventoryLevels.FirstOrDefault(il => il.WarehouseId == warehouseId && il.ProductId == productId);
 
             if (inventoryLevel == null)
             {
@@ -40,7 +39,7 @@ namespace Inventory_And_Warehouse_Management.Controllers
             {
                 inventoryLevel.QuantityOnHand = quantityOnHand;
                 inventoryLevel.ReorderThreshold = reorderThreshold;
-                context.SaveChanges();
+                Context.SaveChanges();
             }
         }
 
@@ -49,8 +48,7 @@ namespace Inventory_And_Warehouse_Management.Controllers
         [HttpPatch("AdjustQuantity")]
         public void AdjustQuantity(int warehouseId, int productId, int delta)
         {
-            InventoryLevel inventoryLevel = context.inventoryLevels
-                .FirstOrDefault(il => il.WarehouseId == warehouseId && il.ProductId == productId);
+            InventoryLevel inventoryLevel = Context.InventoryLevels.FirstOrDefault(il => il.WarehouseId == warehouseId && il.ProductId == productId);
 
             if (inventoryLevel == null)
             {
@@ -59,7 +57,7 @@ namespace Inventory_And_Warehouse_Management.Controllers
             else
             {
                 inventoryLevel.QuantityOnHand = inventoryLevel.QuantityOnHand + delta;
-                context.SaveChanges();
+                Context.SaveChanges();
             }
         }
 
@@ -69,8 +67,7 @@ namespace Inventory_And_Warehouse_Management.Controllers
         [HttpDelete("DeleteInventoryLevel")]
         public void DeleteInventoryLevel(int warehouseId, int productId)
         {
-            InventoryLevel inventoryLevel = context.inventoryLevels
-                .FirstOrDefault(il => il.WarehouseId == warehouseId && il.ProductId == productId);
+            InventoryLevel inventoryLevel = Context.InventoryLevels.FirstOrDefault(il => il.WarehouseId == warehouseId && il.ProductId == productId);
 
             if (inventoryLevel == null)
             {
@@ -78,8 +75,8 @@ namespace Inventory_And_Warehouse_Management.Controllers
             }
             else
             {
-                context.inventoryLevels.Remove(inventoryLevel);
-                context.SaveChanges();
+                Context.InventoryLevels.Remove(inventoryLevel);
+                Context.SaveChanges();
             }
         }
 
@@ -88,10 +85,7 @@ namespace Inventory_And_Warehouse_Management.Controllers
         [HttpGet("GetInventoryLevels")]
         public List<InventoryLevel> GetInventoryLevels()
         {
-            List<InventoryLevel> inventoryLevels = context.inventoryLevels
-                .Include(il => il.warehouse)
-                .Include(il => il.product)
-                .ToList();
+            List<InventoryLevel> inventoryLevels = Context.InventoryLevels.Include(il => il.warehouse).Include(il => il.product).ToList();
             return inventoryLevels;
         }
 
@@ -101,11 +95,8 @@ namespace Inventory_And_Warehouse_Management.Controllers
         [HttpGet("GetInventoryLevel")]
         public InventoryLevel GetInventoryLevel(int warehouseId, int productId)
         {
-            InventoryLevel inventoryLevel = context.inventoryLevels
-                .Include(il => il.warehouse)
-                .Include(il => il.product)
-                .FirstOrDefault(il => il.WarehouseId == warehouseId && il.ProductId == productId);
-            return inventoryLevel;
+            InventoryLevel InventoryLevels = Context.InventoryLevels.Include(il => il.warehouse).Include(il => il.product).FirstOrDefault(il => il.WarehouseId == warehouseId && il.ProductId == productId);
+            return InventoryLevels;
         }
 
 
