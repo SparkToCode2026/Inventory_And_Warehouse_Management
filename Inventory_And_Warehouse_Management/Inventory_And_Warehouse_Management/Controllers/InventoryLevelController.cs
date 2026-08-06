@@ -109,12 +109,13 @@ namespace Inventory_And_Warehouse_Management.Controllers
 
             if (inventoryLevel == null)
             {
-
+                return NotFound("InventoryLevel for Warehouse " + warehouseId + " and Product " + productId + " does not exist.");
             }
             else
             {
                 Context.InventoryLevels.Remove(inventoryLevel);
                 Context.SaveChanges();
+                return Ok("InventoryLevel deleted successfully.");
             }
         }
 
