@@ -28,7 +28,7 @@ namespace Inventory_And_Warehouse_Management.Models
         [InverseProperty("_warehouse")]
         public List<StockMovement> stockMovements { get; set; }
 
-        //Warehouse and StockMovement
+        //Warehouse and inventoryLevels
         [JsonIgnore]
         [InverseProperty("warehouse")]
         public List<InventoryLevel> inventoryLevels { get; set; }
