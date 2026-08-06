@@ -6,7 +6,7 @@ using System.Text;
 
 namespace Inventory_And_Warehouse_Management
 {
-    internal class ProjectContext : DbContext
+    public class ProjectContext : DbContext
     {
         //1- register models
         public DbSet<User> users { get; set; }
