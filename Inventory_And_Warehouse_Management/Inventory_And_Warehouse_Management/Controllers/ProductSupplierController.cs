@@ -30,6 +30,9 @@ namespace Inventory_And_Warehouse_Management.Controllers
         public IActionResult UpdateProductSupplier(int pId, int sId, ProductSupplier newLink)
         {
             ProductSupplier link = context.productSuppliers.FirstOrDefault(x => x.productId == pId && x.supplierId == sId);
+            if (link == null)
+                return NotFound("ProductSupplier link not found");
+
             link.productId = newLink.productId;
             link.supplierId = newLink.supplierId;
 
@@ -41,6 +44,9 @@ namespace Inventory_And_Warehouse_Management.Controllers
         public IActionResult UpdateSupplierForProduct(int pId, int newSupplierId)
         {
             ProductSupplier link = context.productSuppliers.FirstOrDefault(x => x.productId == pId);
+            if (link == null)
+                return NotFound("ProductSupplier link not found");
+
             link.supplierId = newSupplierId;
             context.SaveChanges();
             return Ok("Supplier updated for this product");
@@ -75,6 +81,9 @@ namespace Inventory_And_Warehouse_Management.Controllers
         {
             ProductSupplier link = context.productSuppliers.Include(x => x.product).Include(x => x.supplier)
                 .FirstOrDefault(x => x.productId == pId && x.supplierId == sId);
+            if (link == null)
+                return NotFound("ProductSupplier link not found");
+
             return Ok(link);
         }
 
