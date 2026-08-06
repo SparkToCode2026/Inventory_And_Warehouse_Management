@@ -40,7 +40,7 @@ namespace Inventory_And_Warehouse_Management.Migrations
 
                     b.HasKey("CategoryId");
 
-                    b.ToTable("categories");
+                    b.ToTable("categories", (string)null);
                 });
 
             modelBuilder.Entity("Inventory_And_Warehouse_Management.Models.Customer", b =>
@@ -69,7 +69,7 @@ namespace Inventory_And_Warehouse_Management.Migrations
 
                     b.HasKey("CustomerId");
 
-                    b.ToTable("customers");
+                    b.ToTable("customers", (string)null);
                 });
 
             modelBuilder.Entity("Inventory_And_Warehouse_Management.Models.InventoryLevel", b =>
@@ -93,7 +93,7 @@ namespace Inventory_And_Warehouse_Management.Migrations
 
                     b.HasIndex("ProductId");
 
-                    b.ToTable("InventoryLevels");
+                    b.ToTable("InventoryLevels", (string)null);
                 });
 
             modelBuilder.Entity("Inventory_And_Warehouse_Management.Models.Product", b =>
@@ -122,7 +122,7 @@ namespace Inventory_And_Warehouse_Management.Migrations
 
                     b.HasIndex("CategoryId");
 
-                    b.ToTable("products");
+                    b.ToTable("products", (string)null);
                 });
 
             modelBuilder.Entity("Inventory_And_Warehouse_Management.Models.ProductSupplier", b =>
@@ -137,7 +137,7 @@ namespace Inventory_And_Warehouse_Management.Migrations
 
                     b.HasIndex("supplierId");
 
-                    b.ToTable("productSuppliers");
+                    b.ToTable("productSuppliers", (string)null);
                 });
 
             modelBuilder.Entity("Inventory_And_Warehouse_Management.Models.PurchaseOrder", b =>
@@ -170,7 +170,7 @@ namespace Inventory_And_Warehouse_Management.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("purchaseOrders");
+                    b.ToTable("purchaseOrders", (string)null);
                 });
 
             modelBuilder.Entity("Inventory_And_Warehouse_Management.Models.PurchaseOrderItem", b =>
@@ -197,7 +197,7 @@ namespace Inventory_And_Warehouse_Management.Migrations
 
                     b.HasIndex("ProductId");
 
-                    b.ToTable("purchaseOrderItems");
+                    b.ToTable("purchaseOrderItems", (string)null);
                 });
 
             modelBuilder.Entity("Inventory_And_Warehouse_Management.Models.SalesOrder", b =>
@@ -230,7 +230,7 @@ namespace Inventory_And_Warehouse_Management.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("salesOrders");
+                    b.ToTable("salesOrders", (string)null);
                 });
 
             modelBuilder.Entity("Inventory_And_Warehouse_Management.Models.SalesOrderItem", b =>
@@ -257,7 +257,7 @@ namespace Inventory_And_Warehouse_Management.Migrations
 
                     b.HasIndex("ProductId");
 
-                    b.ToTable("SalesOrderItems");
+                    b.ToTable("SalesOrderItems", (string)null);
                 });
 
             modelBuilder.Entity("Inventory_And_Warehouse_Management.Models.StockMovement", b =>
@@ -290,7 +290,7 @@ namespace Inventory_And_Warehouse_Management.Migrations
 
                     b.HasIndex("WarehouseId");
 
-                    b.ToTable("stockMovements");
+                    b.ToTable("stockMovements", (string)null);
                 });
 
             modelBuilder.Entity("Inventory_And_Warehouse_Management.Models.Supplier", b =>
@@ -315,7 +315,7 @@ namespace Inventory_And_Warehouse_Management.Migrations
 
                     b.HasKey("SupplierId");
 
-                    b.ToTable("suppliers");
+                    b.ToTable("suppliers", (string)null);
                 });
 
             modelBuilder.Entity("Inventory_And_Warehouse_Management.Models.User", b =>
@@ -353,7 +353,7 @@ namespace Inventory_And_Warehouse_Management.Migrations
 
                     b.HasIndex("WarehouseId");
 
-                    b.ToTable("users");
+                    b.ToTable("users", (string)null);
                 });
 
             modelBuilder.Entity("Inventory_And_Warehouse_Management.Models.Warehouse", b =>
@@ -381,7 +381,7 @@ namespace Inventory_And_Warehouse_Management.Migrations
 
                     b.HasKey("WarehouseId");
 
-                    b.ToTable("warehouses");
+                    b.ToTable("warehouses", (string)null);
                 });
 
             modelBuilder.Entity("Inventory_And_Warehouse_Management.Models.InventoryLevel", b =>
