@@ -87,18 +87,19 @@ namespace Inventory_And_Warehouse_Management.Controllers
 
         //Case4: Delete a Warehouse
         [HttpDelete("DeleteWarehouse")]
-        public void DeleteWarehouse(int id)
+        public IActionResult DeleteWarehouse(int id)
         {
             Warehouse warehouse = context.warehouses.FirstOrDefault(w => w.WarehouseId == id);
 
             if (warehouse == null)
             {
-
+                return NotFound("Warehouse " + id + " was not found.");
             }
             else
             {
                 context.warehouses.Remove(warehouse);
                 context.SaveChanges();
+                return Ok();
             }
         }
 
