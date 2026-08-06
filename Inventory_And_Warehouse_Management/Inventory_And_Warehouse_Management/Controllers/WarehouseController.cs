@@ -42,5 +42,24 @@ namespace Inventory_And_Warehouse_Management.Controllers
                 context.SaveChanges();
             }
         }
+
+
+        //Case3: A second distinct update case 
+        [HttpPatch("UpdateWarehouseContact")]
+        public void UpdateWarehouseContact(int id, string location, string phone)
+        {
+            Warehouse warehouse = context.warehouses.FirstOrDefault(w => w.WarehouseId == id);
+
+            if (warehouse == null)
+            {
+
+            }
+            else
+            {
+                warehouse.Location = location;
+                warehouse.Phone = phone;
+                context.SaveChanges();
+            }
+        }
     }
 }
