@@ -13,12 +13,12 @@ namespace Inventory_And_Warehouse_Management.Models
         [JsonIgnore]
         public int SupplierId { get; set; }
         [Required]
-        public string? Name { get; set; }
+        public string Name { get; set; }
 
         [Required]
-        public string? Phone { get; set; }
+        public string Phone { get; set; }
         [Required]
-        public string? Email { get; set; }
+        public string Email { get; set; }
 
 
         // One Supplier can have many PurchaseOrders.
