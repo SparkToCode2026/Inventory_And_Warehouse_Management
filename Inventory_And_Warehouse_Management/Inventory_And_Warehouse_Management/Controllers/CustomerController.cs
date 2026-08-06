@@ -17,21 +17,25 @@ namespace Inventory_And_Warehouse_Management.Controllers
 
         // Create a new Customer
         [HttpPost("AddCustomer")]
-        public void AddCustomer(Customer c)
+        public IActionResult AddCustomer(Customer customer)
         {
-            context.customers.Add(c);
+            context.customers.Add(customer);
             context.SaveChanges();
+
+            return Ok();
         }
 
         // Update a Customer (full update)
         [HttpPut("UpdateCustomer")]
-        public void UpdateCustomer(int id, string name, string phone, string email, string location)
+        public IActionResult UpdateCustomer(int id, string name, string phone, string email, string location)
+           
         {
-            Customer customer = context.customers.FirstOrDefault(c => c.CustomerId == id);
+            Customer customer = context.customers
+                .FirstOrDefault(c => c.CustomerId == id);
 
             if (customer == null)
             {
-
+                return NotFound("Customer not found");
             }
             else
             {
@@ -41,80 +45,130 @@ namespace Inventory_And_Warehouse_Management.Controllers
                 customer.Location = location;
 
                 context.SaveChanges();
+
+                return Ok("Update successfully");
             }
         }
 
         // Update only the Customer location
         [HttpPatch("UpdateCustomerLocation")]
-        public void UpdateCustomerLocation(int id, string location)
+        public IActionResult UpdateCustomerLocation(int id, string location)
         {
-            Customer customer = context.customers.FirstOrDefault(c => c.CustomerId == id);
+            Customer customer = context.customers
+                .FirstOrDefault(c => c.CustomerId == id);
 
             if (customer == null)
             {
-
+                return NotFound("Customer not found");
             }
             else
             {
                 customer.Location = location;
+
                 context.SaveChanges();
+
+                return Ok("Update successfully");
             }
         }
 
         // Delete a Customer
         [HttpDelete("DeleteCustomer")]
-        public void DeleteCustomer(int id)
+        public IActionResult DeleteCustomer(int id)
         {
-            Customer customer = context.customers.FirstOrDefault(c => c.CustomerId == id);
+            Customer customer = context.customers
+                .FirstOrDefault(c => c.CustomerId == id);
 
             if (customer == null)
             {
-
+                return NotFound("Customer not found");
             }
             else
             {
                 context.customers.Remove(customer);
                 context.SaveChanges();
+
+                return Ok("Delete successfully");
             }
         }
 
         // Get all Customers, including their related SalesOrders
-        [HttpGet("GetCustomers")]
-        public List<Customer> GetCustomers()
+        [HttpGet("GetAllCustomers")]
+        public IActionResult GetAllCustomers()
         {
             List<Customer> customers = context.customers
                 .Include(c => c.salesOrders)
                 .ToList();
 
-            return customers;
+            if (customers.Count == 0)
+            {
+                return NotFound("There are no customers");
+            }
+
+            return Ok(customers);
         }
 
         // Get a single Customer by id
         [HttpGet("GetCustomer")]
-        public Customer GetCustomer(int id)
+        public IActionResult GetCustomer(int id)
         {
-            Customer customer = context.customers.FirstOrDefault(c => c.CustomerId == id);
+            Customer customer = context.customers
+                .FirstOrDefault(c => c.CustomerId == id);
 
-            return customer;
+            if (customer == null)
+            {
+                return NotFound("Customer not found");
+            }
+
+            return Ok(customer);
         }
 
         // Filter Customers by name
-        [HttpGet("FilterCustomersName")]
-        public List<Customer> FilterCustomersName(string name)
+        [HttpGet("FilterCustomersByName")]
+        public IActionResult FilterCustomersByName(string name)
         {
-            List<Customer> customers = context.customers.Where(c => c.Name.Contains(name)).Include(c => c.Name).ToList();
-            return customers;
+            List<Customer> customers = context.customers
+                .Where(c => c.Name.Contains(name))
+                .ToList();
+
+            if (customers.Count == 0)
+            {
+                return NotFound("Customers not found");
+            }
+
+            return Ok(customers);
+        }
+
+        // Filter Customers by location
+        [HttpGet("FilterCustomersByLocation")]
+        public IActionResult FilterCustomersByLocation(string location)
+        {
+            List<Customer> customers = context.customers
+                .Where(c => c.Location.Contains(location))
+                .ToList();
+
+            if (customers.Count == 0)
+            {
+                return NotFound("Customers not found");
+            }
+
+            return Ok(customers);
         }
 
         // Sort Customers by number of SalesOrders
         [HttpGet("SortCustomersByNumOfSalesOrders")]
-        public List<Customer> SortCustomersByNumOfSalesOrders()
+        public IActionResult SortCustomersByNumOfSalesOrders()
         {
             List<Customer> customers = context.customers
+                .Include(c => c.salesOrders)
                 .OrderBy(c => c.salesOrders.Count())
                 .ToList();
 
-            return customers;
+            if (customers.Count == 0)
+            {
+                return NotFound("There are no customers");
+            }
+
+            return Ok(customers);
         }
     }
 }
