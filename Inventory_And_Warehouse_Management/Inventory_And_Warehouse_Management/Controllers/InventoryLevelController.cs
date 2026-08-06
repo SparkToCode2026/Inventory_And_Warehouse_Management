@@ -145,10 +145,10 @@ namespace Inventory_And_Warehouse_Management.Controllers
 
         //Case7: Filter InventoryLevels where QuantityOnHand is below ReorderThreshold (low stock)
         [HttpGet("GetLowStock")]
-        public List<InventoryLevel> GetLowStock()
+        public IActionResult GetLowStock()
         {
             List<InventoryLevel> InventoryLevels = Context.InventoryLevels.Include(il => il.warehouse).Include(il => il.product).Where(il => il.QuantityOnHand < il.ReorderThreshold).ToList();
-            return InventoryLevels;
+            return Ok(InventoryLevels);
         }
 
         //Case8: Sort total QuantityOnHand per Product across all warehouses
