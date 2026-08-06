@@ -18,10 +18,37 @@ namespace Inventory_And_Warehouse_Management.Controllers
 
         //Case1: Create a new InventoryLevel record
         [HttpPost("AddInventoryLevel")]
-        public void AddInventoryLevel(InventoryLevel il)
+        public IActionResult AddInventoryLevel(InventoryLevel il)
         {
+
+            //Validation
+            bool warehouseExists = Context.warehouses.Any(w => w.WarehouseId == il.WarehouseId);
+            if (!warehouseExists)
+            {
+                return BadRequest("Warehouse " + il.WarehouseId + " does not exist.");
+            }
+
+            bool productExists = Context.products.Any(p => p.ProductId == il.ProductId);
+            if (!productExists)
+            {
+                return BadRequest("Product " + il.ProductId + " does not exist.");
+            }
+
+            bool duplicate = Context.InventoryLevels.Any(x => x.WarehouseId == il.WarehouseId && x.ProductId == il.ProductId);
+            if (duplicate)
+            {
+                return BadRequest("An InventoryLevel for this Warehouse/Product combination already exists.");
+            }
+
+            if (il.QuantityOnHand < 0 || il.ReorderThreshold < 0)
+            {
+                return BadRequest("QuantityOnHand and ReorderThreshold cannot be negative.");
+            }
+
             Context.InventoryLevels.Add(il);
             Context.SaveChanges();
+
+            return Ok(il);
         }
 
 

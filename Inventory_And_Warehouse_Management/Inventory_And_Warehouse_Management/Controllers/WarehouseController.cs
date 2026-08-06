@@ -20,6 +20,8 @@ namespace Inventory_And_Warehouse_Management.Controllers
         [HttpPost("AddWarehouse")]
         public IActionResult AddWarehouse(Warehouse w)
         {
+
+            //Validation
             if (string.IsNullOrWhiteSpace(w.Name))
             {
                 return BadRequest("Warehouse Name is required.");
