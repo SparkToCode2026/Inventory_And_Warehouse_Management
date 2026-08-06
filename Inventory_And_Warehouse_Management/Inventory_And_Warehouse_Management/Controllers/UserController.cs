@@ -1,4 +1,4 @@
-﻿using BCrypt.Net;
+﻿
 using Inventory_And_Warehouse_Management.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -24,9 +24,7 @@ namespace Inventory_And_Warehouse_Management.Controllers
             //checks no two users have the same email
             if (context.users.Any(x => x.Email == u.Email))
                 return BadRequest("Email already exists.");
-            //hashing password
-            u.PasswordHash = BCrypt.Net.BCrypt.HashPassword(u.PasswordHash);
-
+           
             context.users.Add(u);
             context.SaveChanges();
 
