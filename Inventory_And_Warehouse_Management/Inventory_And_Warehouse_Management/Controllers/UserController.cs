@@ -35,6 +35,9 @@ namespace Inventory_And_Warehouse_Management.Controllers
         public IActionResult UpdateUser(int id,User newUser) 
         {
             User user = context.users.FirstOrDefault(u => u.UserId == id);
+            if (user == null)
+                return NotFound("User not found");
+
             user.Name = newUser.Name;
             user.Email = newUser.Email;
             user.Role = newUser.Role;
@@ -48,6 +51,9 @@ namespace Inventory_And_Warehouse_Management.Controllers
         public IActionResult UpdateUserRole(int id , string newRole)
         {
             User user = context.users.FirstOrDefault(u => u.UserId == id);
+            if (user == null)
+                return NotFound("User not found");
+
             user.Role = newRole;
             context.SaveChanges();
             return Ok("User Role Updated");
@@ -81,6 +87,8 @@ namespace Inventory_And_Warehouse_Management.Controllers
         public IActionResult GetUser(int id)
         {
             User user = context.users.FirstOrDefault(u => u.UserId == id);
+            if (user == null)
+                return NotFound("User not found");
             return Ok(user);
         }
 
