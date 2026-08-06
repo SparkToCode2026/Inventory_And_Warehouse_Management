@@ -12,8 +12,6 @@ namespace Inventory_And_Warehouse_Management.Models
         [Key]
         [JsonIgnore]
         public int CategoryId { get; set; }
-
-        [Required]
         public string Name { get; set; }
         public string Description { get; set; }
 
@@ -21,6 +19,6 @@ namespace Inventory_And_Warehouse_Management.Models
         //product has Category
         [InverseProperty("category")]
         [JsonIgnore]
-        public List<Product>? products { get; set; }
+        public List<Product> products { get; set; }
     }
 }
