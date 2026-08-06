@@ -1,10 +1,13 @@
 ﻿using Inventory_And_Warehouse_Management.Models;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using static System.Net.WebRequestMethods;
 
 namespace Inventory_And_Warehouse_Management.Controllers
 {
-    public class CategoryController
+    [ApiController]
+    [Route("Category")]
+    public class CategoryController : ControllerBase
     {
         private ProjectContext context;
 
@@ -16,6 +19,7 @@ namespace Inventory_And_Warehouse_Management.Controllers
 
 
         //Create a new Category
+        [HttpPost("AddCategory")]
         public void AddCategory(Category c)
         {
             context.categories.Add(c);
@@ -23,6 +27,7 @@ namespace Inventory_And_Warehouse_Management.Controllers
         }
 
         //Update a Category (full update)
+        [HttpPut("UpdateCategory")]
         public void UpdateCategory(int id, string name, string description)
         {
             Category category = context.categories.FirstOrDefault(c => c.CategoryId == id);
@@ -40,6 +45,7 @@ namespace Inventory_And_Warehouse_Management.Controllers
         }
 
         //A second distinct update case (e.g.update just the description)
+        [HttpPatch("UpdateCategoryDescription")]
         public void UpdateCategoryDescription(int id, string description)
         {
             Category category = context.categories.FirstOrDefault(c => c.CategoryId == id);
@@ -57,7 +63,8 @@ namespace Inventory_And_Warehouse_Management.Controllers
 
 
         //Delete a Category
-        public void DeleteProduct(int id)
+        [HttpDelete("DeleteCategory")]
+        public void DeleteCategory(int id)
         {
             Category category = context.categories.FirstOrDefault(c => c.CategoryId == id);
 
@@ -74,6 +81,7 @@ namespace Inventory_And_Warehouse_Management.Controllers
 
 
         //Get all Categories, including their related Products
+        [HttpGet("GetCategories")]
         public List<Category> GetCategories()
         {
             List<Category> categories = context.categories.Include(c => c.products).ToList();
@@ -82,6 +90,7 @@ namespace Inventory_And_Warehouse_Management.Controllers
 
 
         //Get a single Category by id
+        [HttpGet("GetCategory")]
         public Category GetCategory(int id)
         {
             Category category = context.categories.FirstOrDefault(c => c.CategoryId == id);
@@ -89,6 +98,7 @@ namespace Inventory_And_Warehouse_Management.Controllers
         }
 
         //Filter Categories by name
+        [HttpGet("FilterCategoriesByName")]
         public List<Category> FilterCategoriesByName(string name)
         {
             List<Category> categories = context.categories.Where(c => c.Name.Contains(name)).Include(c => c.products).ToList();
@@ -96,6 +106,7 @@ namespace Inventory_And_Warehouse_Management.Controllers
         }
 
         //SortCategory
+        [HttpGet("SortCategoriesByNumOfProducts")]
         public List<Category> SortCategoriesByNumOfProducts()
         {
             List<Category> categories = context.categories.OrderBy(c => c.products.Count()).ToList();

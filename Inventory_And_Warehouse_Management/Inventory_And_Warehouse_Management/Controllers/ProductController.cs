@@ -1,10 +1,13 @@
 ﻿using Inventory_And_Warehouse_Management.Models;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using static System.Net.WebRequestMethods;
 
 namespace Inventory_And_Warehouse_Management.Controllers
 {
-    public class ProductController
+    [ApiController]
+    [Route("Product")]
+    public class ProductController : ControllerBase
     {
         private ProjectContext context;
 
@@ -15,6 +18,7 @@ namespace Inventory_And_Warehouse_Management.Controllers
 
 
         //Create a new Product
+        [HttpPost("AddProduct")]
         public void AddProduct(Product p)
         {
             context.products.Add(p);
@@ -22,6 +26,7 @@ namespace Inventory_And_Warehouse_Management.Controllers
         }
 
         //Update a Product  (full update)
+        [HttpPut("UpdateProduct")]
         public void UpdateProduct(int id, string name, decimal price, string description)
         {
             Product product = context.products.FirstOrDefault(p => p.ProductId == id);
@@ -40,6 +45,7 @@ namespace Inventory_And_Warehouse_Management.Controllers
         }
 
         //A second distinct update case (e.g.update just the price)
+        [HttpPatch("UpdateProductPrice")]
         public void UpdateProductPrice(int id, decimal price)
         {
             Product product = context.products.FirstOrDefault(p => p.ProductId == id);
@@ -56,6 +62,7 @@ namespace Inventory_And_Warehouse_Management.Controllers
         }
 
         //Delete a Product
+        [HttpDelete("DeleteProduct")]
         public void DeleteProduct(int id)
         {
             Product product = context.products.FirstOrDefault(p => p.ProductId == id);
@@ -72,6 +79,7 @@ namespace Inventory_And_Warehouse_Management.Controllers
         }
 
         //Get all Products, including their related Category
+        [HttpGet("GetProducts")]
         public List<Product> GetProducts()
         {
             List<Product> products = context.products.Include(p => p.category).ToList();
@@ -80,6 +88,7 @@ namespace Inventory_And_Warehouse_Management.Controllers
 
 
         //Get a single Product by id
+        [HttpGet("GetProduct")]
         public Product GetProduct(int id)
         {
             Product product = context.products.FirstOrDefault(p => p.ProductId == id);
@@ -87,6 +96,7 @@ namespace Inventory_And_Warehouse_Management.Controllers
         }
 
         //Filter Products by max price 
+        [HttpGet("ProductsMaxPrice")]
         public List<Product> ProductsMaxPrice(decimal maxPrice)
         {
             List<Product> products = context.products.Where(p => p.Price <= maxPrice).ToList();
@@ -94,6 +104,7 @@ namespace Inventory_And_Warehouse_Management.Controllers
         }
 
         //sort by price
+        [HttpGet("SortProductsByPrice")]
         public List<Product> SortProductsByPrice()
         {
             List<Product> products = context.products.OrderBy(p => p.Price).ToList();
