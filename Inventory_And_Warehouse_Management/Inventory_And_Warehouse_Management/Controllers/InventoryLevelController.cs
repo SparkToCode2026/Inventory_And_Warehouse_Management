@@ -44,6 +44,24 @@ namespace Inventory_And_Warehouse_Management.Controllers
         }
 
 
+        //Case3: A second distinct update case (adjust quantity up or down)
+        [HttpPatch("AdjustQuantity")]
+        public void AdjustQuantity(int warehouseId, int productId, int delta)
+        {
+            InventoryLevel inventoryLevel = context.inventoryLevels
+                .FirstOrDefault(il => il.WarehouseId == warehouseId && il.ProductId == productId);
+
+            if (inventoryLevel == null)
+            {
+
+            }
+            else
+            {
+                inventoryLevel.QuantityOnHand = inventoryLevel.QuantityOnHand + delta;
+                context.SaveChanges();
+            }
+        }
+
 
 
 
