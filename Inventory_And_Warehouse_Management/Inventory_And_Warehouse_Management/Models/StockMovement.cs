@@ -10,13 +10,14 @@ namespace Inventory_And_Warehouse_Management.Models
     public class StockMovement
     {
         [Key]
+        [JsonIgnore]
         public int StockMovementId { get; set; }
         [Required]
         public int Quantity { get; set; }
         [Required]
         public DateTime MovementDate { get; set; }
         [Required]
-        public string MovementType { get; set; }
+        public string? MovementType { get; set; }
 
         //Records
         [ForeignKey("product")]
