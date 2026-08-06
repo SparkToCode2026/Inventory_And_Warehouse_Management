@@ -64,6 +64,25 @@ namespace Inventory_And_Warehouse_Management.Controllers
 
 
 
+        //Case4: Delete an InventoryLevel record
+        [HttpDelete("DeleteInventoryLevel")]
+        public void DeleteInventoryLevel(int warehouseId, int productId)
+        {
+            InventoryLevel inventoryLevel = context.inventoryLevels
+                .FirstOrDefault(il => il.WarehouseId == warehouseId && il.ProductId == productId);
+
+            if (inventoryLevel == null)
+            {
+
+            }
+            else
+            {
+                context.inventoryLevels.Remove(inventoryLevel);
+                context.SaveChanges();
+            }
+        }
+
+
 
 
     }
