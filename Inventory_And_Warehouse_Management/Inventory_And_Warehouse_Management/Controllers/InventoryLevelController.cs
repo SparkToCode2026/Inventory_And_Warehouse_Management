@@ -61,13 +61,15 @@ namespace Inventory_And_Warehouse_Management.Controllers
 
             if (inventoryLevel == null)
             {
-
+                return NotFound("InventoryLevel for Warehouse " + warehouseId + " and Product " + productId + " does not exist.");
             }
             else
             {
                 inventoryLevel.QuantityOnHand = quantityOnHand;
                 inventoryLevel.ReorderThreshold = reorderThreshold;
                 Context.SaveChanges();
+
+                return Ok(inventoryLevel);
             }
         }
 
