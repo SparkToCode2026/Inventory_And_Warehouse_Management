@@ -104,11 +104,11 @@ namespace Inventory_And_Warehouse_Management.Controllers
         }
 
         //Case5:Get All Warehouses with Related Inventory Data
-        [HttpGet("GetInventoryLevels")]
-        public List<InventoryLevel> GetInventoryLevels()
+        [HttpGet("GetWarehouses")]
+        public IActionResult GetWarehouses()
         {
-            List<InventoryLevel> inventoryLevels = context.inventoryLevels.Include(il => il.warehouse).Include(il => il.product).ToList();
-            return inventoryLevels;
+            List<Warehouse> Warehouses = context.warehouses.Include(w => w.inventoryLevels).ToList();
+            return Ok(Warehouses);
         }
 
         //Case6: Get a single Warehouse by id
