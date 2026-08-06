@@ -17,21 +17,26 @@ namespace Inventory_And_Warehouse_Management.Controllers
 
         // Create a new Supplier
         [HttpPost("AddSupplier")]
-        public void AddSupplier(Supplier s)
+        public IActionResult AddSupplier(Supplier supplier)
         {
-           context.suppliers.Add(s);
+            context.suppliers.Add(supplier);
             context.SaveChanges();
 
+            return Ok();
         }
 
         // Update a Supplier (full update)
         [HttpPut("UpdateSupplier")]
-        public void UpdateSupplierEmail(int id, string name, string phone,  string email)
+        public IActionResult UpdateSupplier(int id, string name, string phone, string email)
+            
         {
-            Supplier supplier = context.suppliers.FirstOrDefault(s => s.SupplierId == id);
+            Supplier supplier = context.suppliers
+                .FirstOrDefault(s => s.SupplierId == id);
 
             if (supplier == null)
-            { }
+            {
+                return NotFound("Supplier not found");
+            }
             else
             {
                 supplier.Name = name;
@@ -39,80 +44,130 @@ namespace Inventory_And_Warehouse_Management.Controllers
                 supplier.Email = email;
 
                 context.SaveChanges();
+
+                return Ok("Update successfully");
             }
         }
-
 
         // Update only the Supplier email
         [HttpPatch("UpdateSupplierEmail")]
-        public void UpdateSupplier(int id, string email)
-
+        public IActionResult UpdateSupplierEmail(int id, string email)
         {
-            Supplier supplier = context.suppliers.FirstOrDefault(s => s.SupplierId == id);
+            Supplier supplier = context.suppliers
+                .FirstOrDefault(s => s.SupplierId == id);
 
             if (supplier == null)
-            { }
+            {
+                return NotFound("Supplier not found");
+            }
             else
             {
-             
                 supplier.Email = email;
 
                 context.SaveChanges();
+
+                return Ok("Update successfully");
             }
         }
-
 
         // Delete a Supplier
         [HttpDelete("DeleteSupplier")]
-        public void RemoveSupplier(int id)
+        public IActionResult DeleteSupplier(int id)
         {
-            Supplier s = context.suppliers.FirstOrDefault(s => s.SupplierId == id);
+            Supplier supplier = context.suppliers
+                .FirstOrDefault(s => s.SupplierId == id);
 
-            if (s == null)
+            if (supplier == null)
             {
-
+                return NotFound("Supplier not found");
             }
             else
             {
-                context.suppliers.Remove(s);
+                context.suppliers.Remove(supplier);
                 context.SaveChanges();
+
+                return Ok("Delete successfully");
             }
         }
 
-
-
         // Get all Suppliers, including their related PurchaseOrders
-        [HttpGet("GetSuppliers")]
-        public List<Supplier> GetAllSuppliers()
+        [HttpGet("GetAllSuppliers")]
+        public IActionResult GetAllSuppliers()
         {
-            List<Supplier> suppliers = context.suppliers.ToList();
-            return suppliers;
+            List<Supplier> suppliers = context.suppliers
+                .Include(s => s.PurchaseOrders)
+                .ToList();
+
+            if (suppliers.Count == 0)
+            {
+                return NotFound("There are no suppliers");
+            }
+
+            return Ok(suppliers);
         }
 
         // Get a single Supplier by id
         [HttpGet("GetSupplier")]
-        public Supplier GetSupplier(int id)
+        public IActionResult GetSupplier(int id)
         {
-            Supplier s = context.suppliers.FirstOrDefault(s => s.SupplierId == id);
-            return s;
+            Supplier supplier = context.suppliers
+                .FirstOrDefault(s => s.SupplierId == id);
 
+            if (supplier == null)
+            {
+                return NotFound("Supplier not found");
+            }
+
+            return Ok(supplier);
         }
 
         // Filter Suppliers by name
         [HttpGet("FilterSuppliersByName")]
-        public List<Supplier> FilterSuppliersByName(string name)
+        public IActionResult FilterSuppliersByName(string name)
         {
-            List<Supplier> suppliers = context.suppliers.Where(s => s.Name.Contains(name)).Include(s => s.Name).ToList();
-            return suppliers;
+            List<Supplier> suppliers = context.suppliers
+                .Where(s => s.Name.Contains(name))
+                .ToList();
+
+            if (suppliers.Count == 0)
+            {
+                return NotFound("Suppliers not found");
+            }
+
+            return Ok(suppliers);
         }
 
+        // Filter Suppliers by email
+        [HttpGet("FilterSuppliersByEmail")]
+        public IActionResult FilterSuppliersByEmail(string email)
+        {
+            List<Supplier> suppliers = context.suppliers
+                .Where(s => s.Email.Contains(email))
+                .ToList();
+
+            if (suppliers.Count == 0)
+            {
+                return NotFound("Suppliers not found");
+            }
+
+            return Ok(suppliers);
+        }
 
         // Sort Suppliers by number of PurchaseOrders
         [HttpGet("SortSuppliersByNumOfPurchaseOrders")]
-        public List<Supplier> SortSuppliersByNumOfPurchaseOrders()
+        public IActionResult SortSuppliersByNumOfPurchaseOrders()
         {
-            List<Supplier> suppliers = context.suppliers.OrderBy(s => s.PurchaseOrders.Count()).ToList();
-            return suppliers;
+            List<Supplier> suppliers = context.suppliers
+                .Include(s => s.PurchaseOrders)
+                .OrderBy(s => s.PurchaseOrders.Count())
+                .ToList();
+
+            if (suppliers.Count == 0)
+            {
+                return NotFound("There are no suppliers");
+            }
+
+            return Ok(suppliers);
         }
 
     }
