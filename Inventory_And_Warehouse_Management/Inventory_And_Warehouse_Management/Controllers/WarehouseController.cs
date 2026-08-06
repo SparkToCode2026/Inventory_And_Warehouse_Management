@@ -18,10 +18,22 @@ namespace Inventory_And_Warehouse_Management.Controllers
 
         //Case1: Create a new Warehouse
         [HttpPost("AddWarehouse")]
-        public void AddWarehouse(Warehouse w)
+        public IActionResult AddWarehouse(Warehouse w)
         {
+            if (string.IsNullOrWhiteSpace(w.Name))
+            {
+                return BadRequest("Warehouse Name is required.");
+            }
+
+            if (w.Capacity < 0)
+            {
+                return BadRequest("Capacity cannot be negative.");
+            }
+
             context.warehouses.Add(w);
             context.SaveChanges();
+
+            return Ok(w);
         }
 
         //Case2:Update a Warehouse (full update)
