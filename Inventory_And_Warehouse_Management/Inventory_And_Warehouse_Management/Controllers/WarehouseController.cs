@@ -89,6 +89,13 @@ namespace Inventory_And_Warehouse_Management.Controllers
             return inventoryLevels;
         }
 
+        //Case6: Get a single Warehouse by id
+        [HttpGet("GetWarehouse")]
+        public Warehouse GetWarehouse(int id)
+        {
+            Warehouse warehouse = context.warehouses.FirstOrDefault(w => w.WarehouseId == id);
+            return warehouse;
+        }
 
 
     }
