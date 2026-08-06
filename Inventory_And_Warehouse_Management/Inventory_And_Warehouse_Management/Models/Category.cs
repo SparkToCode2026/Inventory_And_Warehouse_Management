@@ -12,6 +12,8 @@ namespace Inventory_And_Warehouse_Management.Models
         [Key]
         [JsonIgnore]
         public int CategoryId { get; set; }
+
+        [Required]
         public string Name { get; set; }
         public string Description { get; set; }
 

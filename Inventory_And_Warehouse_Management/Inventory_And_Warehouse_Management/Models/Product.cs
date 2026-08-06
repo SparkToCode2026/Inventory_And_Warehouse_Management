@@ -12,12 +12,17 @@ namespace Inventory_And_Warehouse_Management.Models
         [Key]
         [JsonIgnore]
         public int ProductId { get; set; }
+
+        [Required]
         public string Name { get; set; }
+
+        [Required]
         public decimal Price { get; set; }
         public string Description { get; set; }
 
 
         //product has Category
+        [Required]
         [ForeignKey("category")]
         public int CategoryId { get; set; }
         [JsonIgnore]
