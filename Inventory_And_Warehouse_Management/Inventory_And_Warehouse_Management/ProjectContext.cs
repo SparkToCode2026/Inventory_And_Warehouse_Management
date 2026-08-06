@@ -19,7 +19,7 @@ namespace Inventory_And_Warehouse_Management
         public DbSet<Supplier> suppliers { get; set; }
         public DbSet<StockMovement> stockMovements { get; set; }
         public DbSet<PurchaseOrderItem> purchaseOrderItems { get; set; }
-        public DbSet<SalesOrderItem> SalesOrderItems { get; set; }
+        public DbSet<SalesOrderItem> salesOrderItems { get; set; }
         public DbSet<InventoryLevel> InventoryLevels { get; set; }
         public DbSet<ProductSupplier> productSuppliers { get; set; }
 
