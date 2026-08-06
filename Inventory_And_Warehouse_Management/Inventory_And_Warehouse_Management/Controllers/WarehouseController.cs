@@ -15,5 +15,12 @@ namespace Inventory_And_Warehouse_Management.Controllers
             context = _context;
         }
 
+        //Case1: Create a new Warehouse
+        [HttpPost("AddWarehouse")]
+        public void AddWarehouse(Warehouse w)
+        {
+            context.warehouses.Add(w);
+            context.SaveChanges();
+        }
     }
 }
