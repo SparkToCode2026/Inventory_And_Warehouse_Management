@@ -113,10 +113,14 @@ namespace Inventory_And_Warehouse_Management.Controllers
 
         //Case6: Get a single Warehouse by id
         [HttpGet("GetWarehouse")]
-        public Warehouse GetWarehouse(int id)
+        public IActionResult GetWarehouse(int id)
         {
             Warehouse warehouse = context.warehouses.FirstOrDefault(w => w.WarehouseId == id);
-            return warehouse;
+            if (warehouse == null)
+            {
+                return NotFound("Warehouse " + id + " was not found.");
+            }
+            return Ok(warehouse);
         }
 
         //Case7: Filter Warehouses by location
