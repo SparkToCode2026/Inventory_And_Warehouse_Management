@@ -132,10 +132,15 @@ namespace Inventory_And_Warehouse_Management.Controllers
 
         //Case6: Get a single InventoryLevel by composite key (WarehouseId + ProductId)
         [HttpGet("GetInventoryLevel")]
-        public InventoryLevel GetInventoryLevel(int warehouseId, int productId)
+        public IActionResult GetInventoryLevel(int warehouseId, int productId)
         {
-            InventoryLevel InventoryLevels = Context.InventoryLevels.Include(il => il.warehouse).Include(il => il.product).FirstOrDefault(il => il.WarehouseId == warehouseId && il.ProductId == productId);
-            return InventoryLevels;
+            InventoryLevel inventoryLevel = Context.InventoryLevels.Include(...).FirstOrDefault(...);
+
+            if (inventoryLevel == null)
+            {
+            return NotFound("InventoryLevel for Warehouse " + warehouseId + " / Product " + productId + " was not found.");
+            }
+            return Ok(inventoryLevel);
         }
 
         //Case7: Filter InventoryLevels where QuantityOnHand is below ReorderThreshold (low stock)
