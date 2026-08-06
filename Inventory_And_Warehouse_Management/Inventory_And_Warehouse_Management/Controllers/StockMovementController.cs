@@ -39,6 +39,9 @@ namespace Inventory_And_Warehouse_Management.Controllers
         public IActionResult UpdateStockMovement (int id , StockMovement m)
         {
             StockMovement sm = context.stockMovements.FirstOrDefault(s => s.StockMovementId == id);
+            if (sm == null)
+                return NotFound("Stock Movement not found");
+
             sm.Quantity = m.Quantity;
             sm.MovementDate = m.MovementDate;
             sm.MovementType = m.MovementType;
@@ -53,6 +56,9 @@ namespace Inventory_And_Warehouse_Management.Controllers
         public IActionResult UpdateStockMovementQuantity(int id , int newQuantity)
         {
             StockMovement sm = context.stockMovements.FirstOrDefault(s => s.StockMovementId == id);
+            if (sm == null)
+                return NotFound("Stock Movement not found");
+
             sm.Quantity = newQuantity;
             context.SaveChanges();
             return Ok("Stock Movement Quantity Updated");
@@ -82,10 +88,12 @@ namespace Inventory_And_Warehouse_Management.Controllers
             return Ok(movements);
         }
 
-        [HttpGet("")]
+        [HttpGet("GetStockMovement")]
         public IActionResult GetStockMovement(int id)
         {
             StockMovement sm = context.stockMovements.FirstOrDefault(s => s.StockMovementId == id);
+            if (sm == null)
+                return NotFound("Stock Movement not found");
             return Ok (sm);
         }
 
