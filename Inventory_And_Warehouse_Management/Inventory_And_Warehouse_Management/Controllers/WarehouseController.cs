@@ -125,10 +125,10 @@ namespace Inventory_And_Warehouse_Management.Controllers
 
         //Case7: Filter Warehouses by location
         [HttpGet("FilterWarehousesByLocation")]
-        public List<Warehouse> FilterWarehousesByLocation(string location)
+        public IActionResult FilterWarehousesByLocation(string location)
         {
             List<Warehouse> warehouses = context.warehouses.Where(w => w.Location.Contains(location)).Include(w => w.inventoryLevels).ToList();
-            return warehouses;
+            return Ok(warehouses);
         }
 
         //Case8: Sort Warehouses by total used capacity
