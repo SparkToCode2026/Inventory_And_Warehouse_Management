@@ -12,17 +12,12 @@ namespace Inventory_And_Warehouse_Management.Models
         [Key]
         [JsonIgnore]
         public int ProductId { get; set; }
-
-        [Required]
         public string Name { get; set; }
-
-        [Required]
         public decimal Price { get; set; }
         public string Description { get; set; }
 
 
         //product has Category
-        [Required]
         [ForeignKey("category")]
         public int CategoryId { get; set; }
         [JsonIgnore]
@@ -32,28 +27,28 @@ namespace Inventory_And_Warehouse_Management.Models
         //product records stockMovement 
         [InverseProperty("product")]
         [JsonIgnore]
-        public List<StockMovement>? stockMovements { get; set; }
+        public List<StockMovement> stockMovements { get; set; }
 
 
         // Link back to InventoryLevel.
         [InverseProperty("product")]
         [JsonIgnore]
-        public List<InventoryLevel>? inventoryLevels { get; set; }
+        public List<InventoryLevel> inventoryLevels { get; set; }
 
         // Link back to PurchaseOrderItem.
         [InverseProperty("product")]
         [JsonIgnore]
-        public List<PurchaseOrderItem>? purchaseOrderItems { get; set; }
+        public List<PurchaseOrderItem> purchaseOrderItems { get; set; }
 
         // Link back to SalesOrderItem.
         [InverseProperty("product")]
         [JsonIgnore]
-        public List<SalesOrderItem>? SalesOrderItem { get; set; }
+        public List<SalesOrderItem> SalesOrderItem { get; set; }
 
         // Link back to ProductSupplier
         [InverseProperty("product")]
         [JsonIgnore]
-        public List<ProductSupplier>? productSuppliers { get; set; }
+        public List<ProductSupplier> productSuppliers { get; set; }
     }
 
 }
