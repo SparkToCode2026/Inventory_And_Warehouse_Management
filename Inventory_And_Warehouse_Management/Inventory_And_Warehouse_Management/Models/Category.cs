@@ -21,6 +21,6 @@ namespace Inventory_And_Warehouse_Management.Models
         //product has Category
         [InverseProperty("category")]
         [JsonIgnore]
-        public List<Product> products { get; set; }
+        public List<Product>? products { get; set; }
     }
 }
