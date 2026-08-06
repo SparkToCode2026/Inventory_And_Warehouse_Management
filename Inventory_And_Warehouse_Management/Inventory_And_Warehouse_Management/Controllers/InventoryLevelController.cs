@@ -122,10 +122,10 @@ namespace Inventory_And_Warehouse_Management.Controllers
 
         //Case5: Get all InventoryLevels, including related Warehouse and Product
         [HttpGet("GetInventoryLevels")]
-        public List<InventoryLevel> GetInventoryLevels()
+        public IActionResult GetInventoryLevels()
         {
             List<InventoryLevel> inventoryLevels = Context.InventoryLevels.Include(il => il.warehouse).Include(il => il.product).ToList();
-            return inventoryLevels;
+            return Ok(inventoryLevels);
         }
 
 
