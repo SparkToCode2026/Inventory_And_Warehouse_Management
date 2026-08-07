@@ -24,6 +24,7 @@ namespace Inventory_And_Warehouse_Management.Controllers
                 return BadRequest("Invalid data");
             }
 
+            item.TotalPrice = item.Quantity * item.UnitPrice;
 
             context.salesOrderItems.Add(item);
 
@@ -63,7 +64,7 @@ namespace Inventory_And_Warehouse_Management.Controllers
 
             item.Quantity = newItem.Quantity;
             item.UnitPrice = newItem.UnitPrice;
-            item.TotalPrice = newItem.TotalPrice;
+            item.TotalPrice = item.Quantity * item.UnitPrice;
             item.SalesOrderId = newItem.SalesOrderId;
             item.ProductId = newItem.ProductId;
 
@@ -89,7 +90,7 @@ namespace Inventory_And_Warehouse_Management.Controllers
 
 
             item.Quantity = newQuantity;
-
+            item.TotalPrice = item.Quantity * item.UnitPrice;
 
             context.SaveChanges();
 
