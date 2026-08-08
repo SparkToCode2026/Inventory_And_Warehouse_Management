@@ -1,4 +1,5 @@
 ﻿using Inventory_And_Warehouse_Management.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -6,6 +7,7 @@ namespace Inventory_And_Warehouse_Management.Controllers
 {
     [ApiController]
     [Route("ProductSupplier")]
+    [Authorize]
     public class ProductSupplierController : Controller
     {
         private ProjectContext context;
@@ -14,6 +16,7 @@ namespace Inventory_And_Warehouse_Management.Controllers
             context = _context;
         }
 
+        [Authorize(Roles = "Manager,Admin")]
         [HttpPost("AddProductSupplier")]
         public IActionResult AddProductSupplier(ProductSupplier ps)
         {
@@ -26,6 +29,7 @@ namespace Inventory_And_Warehouse_Management.Controllers
             return Ok(new { ps.productId, ps.supplierId });
         }
 
+        [Authorize]
         [HttpPut("UpdateProductSupplier")]
         public IActionResult UpdateProductSupplier(int pId, int sId, ProductSupplier newLink)
         {
@@ -40,6 +44,7 @@ namespace Inventory_And_Warehouse_Management.Controllers
             return Ok("ProductSupplier link updated");
         }
 
+        [Authorize]
         [HttpPatch("UpdateSupplierForProduct")]
         public IActionResult UpdateSupplierForProduct(int pId, int newSupplierId)
         {
@@ -52,6 +57,7 @@ namespace Inventory_And_Warehouse_Management.Controllers
             return Ok("Supplier updated for this product");
         }
 
+        [Authorize(Roles = "Manager,Admin")]
         [HttpDelete("RemoveProductSupplier")]
         public IActionResult RemoveProductSupplier(int pId, int sId)
         {
@@ -67,6 +73,7 @@ namespace Inventory_And_Warehouse_Management.Controllers
                 return Ok("ProductSupplier link removed successfully");
             }
         }
+
 
         [HttpGet("GetAllProductSuppliers")]
         public IActionResult GetAllProductSuppliers()
