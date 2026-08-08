@@ -97,7 +97,7 @@ namespace Inventory_And_Warehouse_Management
 
             app.UseHttpsRedirection();
 
-            app.UseAuthorization();
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.MapControllers();
