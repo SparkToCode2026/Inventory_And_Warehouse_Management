@@ -1,4 +1,5 @@
 ﻿using Inventory_And_Warehouse_Management.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -16,6 +17,7 @@ namespace Inventory_And_Warehouse_Management.Controllers
         }
 
         // Create a new Customer
+        [Authorize]
         [HttpPost("AddCustomer")]
         public IActionResult AddCustomer(Customer customer)
         {
@@ -26,6 +28,7 @@ namespace Inventory_And_Warehouse_Management.Controllers
         }
 
         // Update a Customer (full update)
+        [Authorize]
         [HttpPut("UpdateCustomer")]
         public IActionResult UpdateCustomer(int id, string name, string phone, string email, string location)
            
@@ -51,6 +54,7 @@ namespace Inventory_And_Warehouse_Management.Controllers
         }
 
         // Update only the Customer location
+        [Authorize]
         [HttpPatch("UpdateCustomerLocation")]
         public IActionResult UpdateCustomerLocation(int id, string location)
         {
@@ -72,6 +76,7 @@ namespace Inventory_And_Warehouse_Management.Controllers
         }
 
         // Delete a Customer
+        [Authorize(Roles = "Manager,Admin")]
         [HttpDelete("DeleteCustomer")]
         public IActionResult DeleteCustomer(int id)
         {
@@ -92,6 +97,7 @@ namespace Inventory_And_Warehouse_Management.Controllers
         }
 
         // Get all Customers, including their related SalesOrders
+        [Authorize]
         [HttpGet("GetAllCustomers")]
         public IActionResult GetAllCustomers()
         {
@@ -108,6 +114,7 @@ namespace Inventory_And_Warehouse_Management.Controllers
         }
 
         // Get a single Customer by id
+        [Authorize]
         [HttpGet("GetCustomer")]
         public IActionResult GetCustomer(int id)
         {
@@ -123,6 +130,7 @@ namespace Inventory_And_Warehouse_Management.Controllers
         }
 
         // Filter Customers by name
+        [Authorize]
         [HttpGet("FilterCustomersByName")]
         public IActionResult FilterCustomersByName(string name)
         {
@@ -139,6 +147,7 @@ namespace Inventory_And_Warehouse_Management.Controllers
         }
 
         // Filter Customers by location
+        [Authorize]
         [HttpGet("FilterCustomersByLocation")]
         public IActionResult FilterCustomersByLocation(string location)
         {
@@ -155,6 +164,7 @@ namespace Inventory_And_Warehouse_Management.Controllers
         }
 
         // Sort Customers by number of SalesOrders
+        [Authorize]
         [HttpGet("SortCustomersByNumOfSalesOrders")]
         public IActionResult SortCustomersByNumOfSalesOrders()
         {
