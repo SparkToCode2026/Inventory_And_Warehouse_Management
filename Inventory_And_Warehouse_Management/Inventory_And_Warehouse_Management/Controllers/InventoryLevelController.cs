@@ -4,11 +4,13 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Inventory_And_Warehouse_Management.Controllers
 {
     [ApiController]
     [Route("InventoryLevel")]
+    [Authorize]
     public class InventoryLevelController: ControllerBase
     {
         private ProjectContext Context;
@@ -103,6 +105,7 @@ namespace Inventory_And_Warehouse_Management.Controllers
 
 
         //Case4: Delete an InventoryLevel record
+        [Authorize(Roles = "Manager,Admin")]
         [HttpDelete("DeleteInventoryLevel")]
         public IActionResult DeleteInventoryLevel(int warehouseId, int productId)
         {
