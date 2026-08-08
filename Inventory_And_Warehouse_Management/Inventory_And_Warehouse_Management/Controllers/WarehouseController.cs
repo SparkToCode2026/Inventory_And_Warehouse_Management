@@ -3,12 +3,14 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
 
 
 namespace Inventory_And_Warehouse_Management.Controllers
 {
     [ApiController]
     [Route("Warehouse")]
+    [Authorize]
     public class WarehouseController : ControllerBase
     {
         private ProjectContext context;
@@ -19,6 +21,7 @@ namespace Inventory_And_Warehouse_Management.Controllers
         }
 
         //Case1: Create a new Warehouse
+        [Authorize(Roles = "Manager,Admin")]
         [HttpPost("AddWarehouse")]
         public IActionResult AddWarehouse(Warehouse w)
         {
@@ -41,6 +44,7 @@ namespace Inventory_And_Warehouse_Management.Controllers
         }
 
         //Case2:Update a Warehouse (full update)
+        [Authorize(Roles = "Manager,Admin")]
         [HttpPut("UpdateWarehouse")]
         public IActionResult UpdateWarehouse(int id, string name, int capacity, string location, string phone)
         {
@@ -64,6 +68,7 @@ namespace Inventory_And_Warehouse_Management.Controllers
 
 
         //Case3: A second distinct update case 
+        [Authorize(Roles = "Manager,Admin")]
         [HttpPatch("UpdateWarehouseContact")]
         public IActionResult UpdateWarehouseContact(int id, string location, string phone)
         {
@@ -86,6 +91,7 @@ namespace Inventory_And_Warehouse_Management.Controllers
 
 
         //Case4: Delete a Warehouse
+        [Authorize(Roles = "Manager,Admin")]
         [HttpDelete("DeleteWarehouse")]
         public IActionResult DeleteWarehouse(int id)
         {
