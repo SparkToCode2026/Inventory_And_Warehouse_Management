@@ -1,4 +1,5 @@
 ﻿using Inventory_And_Warehouse_Management.Models;
+using Inventory_And_Warehouse_Management.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -9,13 +10,16 @@ namespace Inventory_And_Warehouse_Management.Controllers
     public class StockMovementController : Controller
     {
         private ProjectContext context;
-        public StockMovementController(ProjectContext _context)
+        private readonly IEmailService _emailService;
+
+        public StockMovementController(ProjectContext _context, IEmailService emailService)
         {
             context = _context;
+            _emailService = emailService;
         }
 
         [HttpPost("AddStockMovement")]
-        public IActionResult AddStockMovement(StockMovement m)
+        public async Task<IActionResult> AddStockMovement(StockMovement m)
         {
             if (m.Quantity <= 0)
                 return BadRequest("Quantity must be greater than zero.");
@@ -32,8 +36,45 @@ namespace Inventory_And_Warehouse_Management.Controllers
             context.stockMovements.Add(m);
             context.SaveChanges();
 
-            return Ok(m.StockMovementId);
+            // Update the running inventory total for this product+warehouse
+            var level = context.InventoryLevels
+                .Include(l => l.product)
+                .FirstOrDefault(l => l.ProductId == m.ProductId && l.WarehouseId == m.WarehouseId);
+            if (level == null)
+            {
+                level = new InventoryLevel
+                {
+                    ProductId = m.ProductId,
+                    WarehouseId = m.WarehouseId,
+                    QuantityOnHand = 0,
+                    ReorderThreshold = 10
+                };
+                context.InventoryLevels.Add(level);
+            }
+
+            if (m.MovementType == "In")
+                level.QuantityOnHand += m.Quantity;
+            else if (m.MovementType == "Out")
+                level.QuantityOnHand -= m.Quantity;
+
+            context.SaveChanges();
+            // Low-stock check
+            if (level.QuantityOnHand < level.ReorderThreshold)
+             {
+                var managers = context.users.Where(u => u.Role == "Manager").ToList();
+                foreach (var mgr in managers)
+                {
+                    await _emailService.SendEmailAsync(
+                        mgr.Email,
+                        $"Low stock: {level.product.Name}",
+                        $"{level.product.Name} is now at {level.QuantityOnHand} units in warehouse {m.WarehouseId}, below the reorder threshold of {level.ReorderThreshold}."
+                        );
+                }
         }
+
+            return Ok(m.StockMovementId);
+     }
+
 
         [HttpPut("UpdateStockMovement")]
         public IActionResult UpdateStockMovement (int id , StockMovement m)
