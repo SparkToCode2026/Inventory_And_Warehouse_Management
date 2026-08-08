@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text;
+using System.Text.Json.Serialization;
 
 namespace Inventory_And_Warehouse_Management.Models
 {
@@ -18,16 +19,19 @@ namespace Inventory_And_Warehouse_Management.Models
         // --- Navigation Properties (relationship setup) ---
 
         //Warehouse and User
+        [JsonIgnore]
         [InverseProperty("_warehouse")]
-        public ICollection<User> users { get; set; }
+        public List<User> users { get; set; }
 
         //Warehouse and StockMovement
+        [JsonIgnore]
         [InverseProperty("_warehouse")]
-        public ICollection<StockMovement> stockMovements { get; set; }
+        public List<StockMovement> stockMovements { get; set; }
 
-        //Warehouse and StockMovement
+        //Warehouse and inventoryLevels
+        [JsonIgnore]
         [InverseProperty("warehouse")]
-        public ICollection<InventoryLevel> inventoryLevels { get; set; }
+        public List<InventoryLevel> inventoryLevels { get; set; }
 
     }
 }

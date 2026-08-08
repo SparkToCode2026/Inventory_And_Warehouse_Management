@@ -1,5 +1,6 @@
 ﻿using Inventory_And_Warehouse_Management.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 
@@ -54,37 +55,47 @@ namespace Inventory_And_Warehouse_Management.Controllers
 
         //Case2: Update an InventoryLevel (full update)
         [HttpPut("UpdateInventoryLevel")]
-        public void UpdateInventoryLevel(int warehouseId, int productId, int quantityOnHand, int reorderThreshold)
+        public IActionResult UpdateInventoryLevel(int warehouseId, int productId, int quantityOnHand, int reorderThreshold)
         {
             InventoryLevel inventoryLevel = Context.InventoryLevels.FirstOrDefault(il => il.WarehouseId == warehouseId && il.ProductId == productId);
 
             if (inventoryLevel == null)
             {
-
+                return NotFound("InventoryLevel for Warehouse " + warehouseId + " and Product " + productId + " does not exist.");
             }
             else
             {
                 inventoryLevel.QuantityOnHand = quantityOnHand;
                 inventoryLevel.ReorderThreshold = reorderThreshold;
                 Context.SaveChanges();
+
+                return Ok(inventoryLevel);
             }
         }
 
 
         //Case3: A second distinct update case (adjust quantity up or down)
         [HttpPatch("AdjustQuantity")]
-        public void AdjustQuantity(int warehouseId, int productId, int delta)
+        public IActionResult AdjustQuantity(int warehouseId, int productId, int delta)
         {
             InventoryLevel inventoryLevel = Context.InventoryLevels.FirstOrDefault(il => il.WarehouseId == warehouseId && il.ProductId == productId);
 
             if (inventoryLevel == null)
             {
-
+                return NotFound("InventoryLevel for Warehouse " + warehouseId + " and Product " + productId + " does not exist.");
             }
             else
             {
-                inventoryLevel.QuantityOnHand = inventoryLevel.QuantityOnHand + delta;
-                Context.SaveChanges();
+                int newQuantity = inventoryLevel.QuantityOnHand + delta;
+                if (newQuantity < 0)
+                {
+                return BadRequest("Adjustment would result in negative stock.");
+                }
+                
+            inventoryLevel.QuantityOnHand = newQuantity;
+            Context.SaveChanges();
+            
+            return Ok(inventoryLevel);
             }
         }
 
@@ -92,51 +103,57 @@ namespace Inventory_And_Warehouse_Management.Controllers
 
         //Case4: Delete an InventoryLevel record
         [HttpDelete("DeleteInventoryLevel")]
-        public void DeleteInventoryLevel(int warehouseId, int productId)
+        public IActionResult DeleteInventoryLevel(int warehouseId, int productId)
         {
             InventoryLevel inventoryLevel = Context.InventoryLevels.FirstOrDefault(il => il.WarehouseId == warehouseId && il.ProductId == productId);
 
             if (inventoryLevel == null)
             {
-
+                return NotFound("InventoryLevel for Warehouse " + warehouseId + " and Product " + productId + " does not exist.");
             }
             else
             {
                 Context.InventoryLevels.Remove(inventoryLevel);
                 Context.SaveChanges();
+                return Ok("InventoryLevel deleted successfully.");
             }
         }
 
 
         //Case5: Get all InventoryLevels, including related Warehouse and Product
         [HttpGet("GetInventoryLevels")]
-        public List<InventoryLevel> GetInventoryLevels()
+        public IActionResult GetInventoryLevels()
         {
             List<InventoryLevel> inventoryLevels = Context.InventoryLevels.Include(il => il.warehouse).Include(il => il.product).ToList();
-            return inventoryLevels;
+            return Ok(inventoryLevels);
         }
 
 
 
         //Case6: Get a single InventoryLevel by composite key (WarehouseId + ProductId)
         [HttpGet("GetInventoryLevel")]
-        public InventoryLevel GetInventoryLevel(int warehouseId, int productId)
+        public IActionResult GetInventoryLevel(int warehouseId, int productId)
         {
-            InventoryLevel InventoryLevels = Context.InventoryLevels.Include(il => il.warehouse).Include(il => il.product).FirstOrDefault(il => il.WarehouseId == warehouseId && il.ProductId == productId);
-            return InventoryLevels;
+            InventoryLevel inventoryLevel = Context.InventoryLevels.Include(...).FirstOrDefault(...);
+
+            if (inventoryLevel == null)
+            {
+            return NotFound("InventoryLevel for Warehouse " + warehouseId + " / Product " + productId + " was not found.");
+            }
+            return Ok(inventoryLevel);
         }
 
         //Case7: Filter InventoryLevels where QuantityOnHand is below ReorderThreshold (low stock)
         [HttpGet("GetLowStock")]
-        public List<InventoryLevel> GetLowStock()
+        public IActionResult GetLowStock()
         {
             List<InventoryLevel> InventoryLevels = Context.InventoryLevels.Include(il => il.warehouse).Include(il => il.product).Where(il => il.QuantityOnHand < il.ReorderThreshold).ToList();
-            return InventoryLevels;
+            return Ok(InventoryLevels);
         }
 
         //Case8: Sort total QuantityOnHand per Product across all warehouses
         [HttpGet("GetTotalQuantityByProduct")]
-        public List<object> GetTotalQuantityByProduct()
+        public IActionResult GetTotalQuantityByProduct()
         {
             List<object> totals = Context.InventoryLevels.GroupBy(il => il.ProductId).Select(g => new
                 {
@@ -145,7 +162,7 @@ namespace Inventory_And_Warehouse_Management.Controllers
                 })
                 .OrderByDescending(t => t.TotalQuantityOnHand)
                 .ToList<object>();
-            return totals;
+            return Ok(totals);
         }
 
     }
