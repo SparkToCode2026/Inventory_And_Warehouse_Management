@@ -63,6 +63,9 @@ namespace Inventory_And_Warehouse_Management
             //JWT Authentication
             builder.Services.AddSingleton<TokenService>();
 
+            //Email Service
+            builder.Services.AddScoped<IEmailService, EmailService>();
+
             builder.Services.AddAuthentication(options =>
             {
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
