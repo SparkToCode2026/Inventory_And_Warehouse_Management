@@ -17,91 +17,103 @@ namespace Inventory_And_Warehouse_Management.Controllers
 
         //Create a new PurchaseOrder (with validation)
         [HttpPost("AddPurchaseOrder")]
-        public void AddPurchaseOrder(PurchaseOrder po)
+        public IActionResult AddPurchaseOrder(PurchaseOrder po)
         {
             var allowedStatuses = new[] { "Pending", "Approved", "Received" };
 
             if (!allowedStatuses.Contains(po.Status))
             {
+                return BadRequest("Status must be one of: Pending, Approved, Received.");
+            }
 
-            }
-            else
-            {
-                context.purchaseOrders.Add(po);
-                context.SaveChanges();
-            }
+            context.purchaseOrders.Add(po);
+            context.SaveChanges();
+
+            return Ok(po);
         }
 
         //Update a PurchaseOrder (full update)
         [HttpPut("UpdatePurchaseOrder")]
-        public void UpdatePurchaseOrder(int id, string status, decimal totalAmount, DateTime orderDate, int supplierId, int userId)
+        public IActionResult UpdatePurchaseOrder(int id, string status, decimal totalAmount, DateTime orderDate, int supplierId, int userId)
         {
             PurchaseOrder purchaseOrder = context.purchaseOrders.FirstOrDefault(p => p.PurchaseOrderId == id);
 
             if (purchaseOrder == null)
             {
+                return NotFound($"PurchaseOrder with id {id} not found.");
+            }
 
-            }
-            else
+            var allowedStatuses = new[] { "Pending", "Approved", "Received" };
+            if (!allowedStatuses.Contains(status))
             {
-                purchaseOrder.Status = status;
-                purchaseOrder.TotalAmount = totalAmount;
-                purchaseOrder.OrderDate = orderDate;
-                purchaseOrder.SupplierId = supplierId;
-                purchaseOrder.UserId = userId;
-                context.SaveChanges();
+                return BadRequest("Status must be one of: Pending, Approved, Received.");
             }
+
+            purchaseOrder.Status = status;
+            purchaseOrder.TotalAmount = totalAmount;
+            purchaseOrder.OrderDate = orderDate;
+            purchaseOrder.SupplierId = supplierId;
+            purchaseOrder.UserId = userId;
+            context.SaveChanges();
+
+            return Ok(purchaseOrder);
         }
 
         //A second distinct update case (change Status only)
         [HttpPatch("UpdatePurchaseOrderStatus")]
-        public void UpdatePurchaseOrderStatus(int id, string status)
+        public IActionResult UpdatePurchaseOrderStatus(int id, string status)
         {
+            var allowedStatuses = new[] { "Pending", "Approved", "Received" };
+            if (!allowedStatuses.Contains(status))
+            {
+                return BadRequest("Status must be one of: Pending, Approved, Received.");
+            }
+
             PurchaseOrder purchaseOrder = context.purchaseOrders.FirstOrDefault(p => p.PurchaseOrderId == id);
 
             if (purchaseOrder == null)
             {
+                return NotFound($"PurchaseOrder with id {id} not found.");
+            }
 
-            }
-            else
-            {
-                purchaseOrder.Status = status;
-                context.SaveChanges();
-            }
+            purchaseOrder.Status = status;
+            context.SaveChanges();
+
+            return Ok(purchaseOrder);
         }
 
         //Delete a PurchaseOrder
         [HttpDelete("DeletePurchaseOrder")]
-        public void DeletePurchaseOrder(int id)
+        public IActionResult DeletePurchaseOrder(int id)
         {
             PurchaseOrder purchaseOrder = context.purchaseOrders.FirstOrDefault(p => p.PurchaseOrderId == id);
 
             if (purchaseOrder == null)
             {
+                return NotFound($"PurchaseOrder with id {id} not found.");
+            }
 
-            }
-            else
-            {
-                context.purchaseOrders.Remove(purchaseOrder);
-                context.SaveChanges();
-            }
+            context.purchaseOrders.Remove(purchaseOrder);
+            context.SaveChanges();
+
+            return Ok($"PurchaseOrder with id {id} deleted successfully.");
         }
 
         //Get all PurchaseOrders, including related Supplier and Items
         [HttpGet("GetPurchaseOrders")]
-        public List<PurchaseOrder> GetPurchaseOrders()
+        public IActionResult GetPurchaseOrders()
         {
             List<PurchaseOrder> purchaseOrders = context.purchaseOrders
                 .Include(p => p.supplier)
                 .Include(p => p.purchaseOrderItems)
                 .ToList();
 
-            return purchaseOrders;
+            return Ok(purchaseOrders);
         }
 
         //Get a single PurchaseOrder by id
         [HttpGet("GetPurchaseOrder")]
-        public PurchaseOrder GetPurchaseOrder(int id)
+        public IActionResult GetPurchaseOrder(int id)
         {
             PurchaseOrder purchaseOrder = context.purchaseOrders
                 .Include(p => p.supplier)
@@ -109,12 +121,17 @@ namespace Inventory_And_Warehouse_Management.Controllers
                 .Include(p => p.purchaseOrderItems)
                 .FirstOrDefault(p => p.PurchaseOrderId == id);
 
-            return purchaseOrder;
+            if (purchaseOrder == null)
+            {
+                return NotFound($"PurchaseOrder with id {id} not found.");
+            }
+
+            return Ok(purchaseOrder);
         }
 
         //Filter PurchaseOrders by status or date range
         [HttpGet("FilterPurchaseOrders")]
-        public List<PurchaseOrder> FilterPurchaseOrders(string status, DateTime? from, DateTime? to)
+        public IActionResult FilterPurchaseOrders(string status, DateTime? from, DateTime? to)
         {
             var query = context.purchaseOrders.AsQueryable();
 
@@ -134,14 +151,14 @@ namespace Inventory_And_Warehouse_Management.Controllers
             }
 
             List<PurchaseOrder> purchaseOrders = query.ToList();
-            return purchaseOrders;
+            return Ok(purchaseOrders);
         }
 
         //Sort/aggregate: total purchase value per Supplier
         [HttpGet("TotalPurchaseValuePerSupplier")]
-        public List<object> TotalPurchaseValuePerSupplier()
+        public IActionResult TotalPurchaseValuePerSupplier()
         {
-            List<object> result = context.purchaseOrders
+            var result = context.purchaseOrders
                 .Include(p => p.supplier)
                 .GroupBy(p => new { p.SupplierId, p.supplier.Name })
                 .Select(g => new
@@ -151,9 +168,9 @@ namespace Inventory_And_Warehouse_Management.Controllers
                     TotalPurchaseValue = g.Sum(p => p.TotalAmount)
                 })
                 .OrderByDescending(x => x.TotalPurchaseValue)
-                .ToList<object>();
+                .ToList();
 
-            return result;
+            return Ok(result);
         }
     }
 }
