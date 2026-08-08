@@ -1,5 +1,6 @@
 ﻿
 using Inventory_And_Warehouse_Management.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -7,6 +8,7 @@ namespace Inventory_And_Warehouse_Management.Controllers
 {
     [ApiController]
     [Route("User")]
+    [Authorize(Roles = "Manager,Admin")]
     public class UserController : Controller
     {
         private ProjectContext context;

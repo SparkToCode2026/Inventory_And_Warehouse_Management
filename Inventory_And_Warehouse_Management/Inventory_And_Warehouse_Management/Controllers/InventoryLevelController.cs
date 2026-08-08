@@ -4,17 +4,23 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
+using Microsoft.AspNetCore.Authorization;
+using Inventory_And_Warehouse_Management.Services;
 
 namespace Inventory_And_Warehouse_Management.Controllers
 {
     [ApiController]
     [Route("InventoryLevel")]
+    [Authorize]
     public class InventoryLevelController: ControllerBase
     {
         private ProjectContext Context;
-        public InventoryLevelController(ProjectContext _context)
+        private readonly IEmailService emailService;
+
+        public InventoryLevelController(ProjectContext _context, IEmailService _emailService)
         {
             Context = _context;
+            emailService = _emailService;
         }
 
 
@@ -56,9 +62,9 @@ namespace Inventory_And_Warehouse_Management.Controllers
 
         //Case2: Update an InventoryLevel (full update)
         [HttpPut("UpdateInventoryLevel")]
-        public IActionResult UpdateInventoryLevel(int warehouseId, int productId, int quantityOnHand, int reorderThreshold)
+        public async Task<IActionResult> UpdateInventoryLevel(int warehouseId, int productId, int quantityOnHand, int reorderThreshold)
         {
-            InventoryLevel inventoryLevel = Context.InventoryLevels.FirstOrDefault(il => il.WarehouseId == warehouseId && il.ProductId == productId);
+            InventoryLevel inventoryLevel = Context.InventoryLevels.Include(il => il.product).Include(il => il.warehouse).FirstOrDefault(il => il.WarehouseId == warehouseId && il.ProductId == productId);
 
             if (inventoryLevel == null)
             {
@@ -69,18 +75,29 @@ namespace Inventory_And_Warehouse_Management.Controllers
                 inventoryLevel.QuantityOnHand = quantityOnHand;
                 inventoryLevel.ReorderThreshold = reorderThreshold;
                 Context.SaveChanges();
+                
+                List<User> managers = Context.users.Where(u => u.Role == "Manager").ToList();
+                foreach (User manager in managers)
+                {
+                    await emailService.SendEmailAsync(
+                    manager.Email,
+                    "Low Stock Alert",
+                    $"Product {inventoryLevel.product.Name} at Warehouse {inventoryLevel.warehouse.Name} is low on stock: " +
+                    $"{inventoryLevel.QuantityOnHand} units remaining (threshold: {inventoryLevel.ReorderThreshold})"
+                    );
+                }
 
                 return Ok(inventoryLevel);
             }
+            
         }
 
 
         //Case3: A second distinct update case (adjust quantity up or down)
         [HttpPatch("AdjustQuantity")]
-        public IActionResult AdjustQuantity(int warehouseId, int productId, int delta)
+        public async Task<IActionResult> AdjustQuantity(int warehouseId, int productId, int delta)
         {
-            InventoryLevel inventoryLevel = Context.InventoryLevels.FirstOrDefault(il => il.WarehouseId == warehouseId && il.ProductId == productId);
-
+            InventoryLevel inventoryLevel = Context.InventoryLevels.Include(il => il.product).Include(il => il.warehouse).FirstOrDefault(il => il.WarehouseId == warehouseId && il.ProductId == productId);
             if (inventoryLevel == null)
             {
                 return NotFound("InventoryLevel for Warehouse " + warehouseId + " and Product " + productId + " does not exist.");
@@ -95,6 +112,17 @@ namespace Inventory_And_Warehouse_Management.Controllers
                 
             inventoryLevel.QuantityOnHand = newQuantity;
             Context.SaveChanges();
+            List<User> managers = Context.users.Where(u => u.Role == "Manager").ToList();
+                foreach (User manager in managers)
+                {
+                    await emailService.SendEmailAsync(
+                    manager.Email,
+                    "Low Stock Alert",
+                    $"Product {inventoryLevel.product.Name} at Warehouse {inventoryLevel.warehouse.Name} is low on stock: " +
+                    $"{inventoryLevel.QuantityOnHand} units remaining (threshold: {inventoryLevel.ReorderThreshold})"
+                    );
+                }
+
             
             return Ok(inventoryLevel);
             }
@@ -103,6 +131,7 @@ namespace Inventory_And_Warehouse_Management.Controllers
 
 
         //Case4: Delete an InventoryLevel record
+        [Authorize(Roles = "Manager,Admin")]
         [HttpDelete("DeleteInventoryLevel")]
         public IActionResult DeleteInventoryLevel(int warehouseId, int productId)
         {
@@ -135,7 +164,9 @@ namespace Inventory_And_Warehouse_Management.Controllers
         [HttpGet("GetInventoryLevel")]
         public IActionResult GetInventoryLevel(int warehouseId, int productId)
         {
-            InventoryLevel inventoryLevel = Context.InventoryLevels.Include(...).FirstOrDefault(...);
+            InventoryLevel inventoryLevel = Context.InventoryLevels.Include(il => il.warehouse)
+                .Include(il => il.product)
+                .FirstOrDefault(il => il.WarehouseId == warehouseId && il.ProductId == productId);
 
             if (inventoryLevel == null)
             {
@@ -146,10 +177,10 @@ namespace Inventory_And_Warehouse_Management.Controllers
 
         //Case7: Filter InventoryLevels where QuantityOnHand is below ReorderThreshold (low stock)
         [HttpGet("GetLowStock")]
-        public IActionResult GetLowStock()
+        public async Task<IActionResult> GetLowStock()
         {
-            List<InventoryLevel> InventoryLevels = Context.InventoryLevels.Include(il => il.warehouse).Include(il => il.product).Where(il => il.QuantityOnHand < il.ReorderThreshold).ToList();
-            return Ok(InventoryLevels);
+            List<InventoryLevel> inventoryLevels = Context.InventoryLevels.Include(il => il.warehouse).Include(il => il.product).Where(il => il.QuantityOnHand < il.ReorderThreshold).ToList();
+            return Ok(inventoryLevels);
         }
 
         //Case8: Sort total QuantityOnHand per Product across all warehouses

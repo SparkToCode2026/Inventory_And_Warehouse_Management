@@ -1,4 +1,5 @@
 ﻿using Inventory_And_Warehouse_Management.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using static System.Net.WebRequestMethods;
@@ -18,6 +19,7 @@ namespace Inventory_And_Warehouse_Management.Controllers
 
 
         //Create a new Product
+        [Authorize(Roles = "Manager,Admin")]
         [HttpPost("AddProduct")]
         public IActionResult AddProduct(Product p)
         {
@@ -27,6 +29,7 @@ namespace Inventory_And_Warehouse_Management.Controllers
         }
 
         //Update a Product  (full update)
+        [Authorize]
         [HttpPut("UpdateProduct")]
         public IActionResult UpdateProduct(int id, string name, decimal price, string description)
         {
@@ -47,6 +50,7 @@ namespace Inventory_And_Warehouse_Management.Controllers
         }
 
         //A second distinct update case (e.g.update just the price)
+        [Authorize]
         [HttpPatch("UpdateProductPrice")]
         public IActionResult UpdateProductPrice(int id, decimal price)
         {
@@ -65,6 +69,7 @@ namespace Inventory_And_Warehouse_Management.Controllers
         }
 
         //Delete a Product
+        [Authorize(Roles = "Manager,Admin")]
         [HttpDelete("DeleteProduct")]
         public IActionResult DeleteProduct(int id)
         {

@@ -1,10 +1,12 @@
 ﻿using Inventory_And_Warehouse_Management.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 namespace Inventory_And_Warehouse_Management.Controllers
 {
     [ApiController]
     [Route("SalesOrderItem")]
+    [Authorize]
     public class SalesOrderItemController : ControllerBase
     {
         private ProjectContext context;

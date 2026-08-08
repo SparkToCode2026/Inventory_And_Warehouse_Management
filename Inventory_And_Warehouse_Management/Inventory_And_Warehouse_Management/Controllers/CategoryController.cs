@@ -1,4 +1,5 @@
 ﻿using Inventory_And_Warehouse_Management.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using static System.Net.WebRequestMethods;
@@ -19,6 +20,7 @@ namespace Inventory_And_Warehouse_Management.Controllers
 
 
         //Create a new Category
+        [Authorize(Roles = "Manager,Admin")]
         [HttpPost("AddCategory")]
         public IActionResult AddCategory(Category c)
         {
@@ -28,6 +30,7 @@ namespace Inventory_And_Warehouse_Management.Controllers
         }
 
         //Update a Category (full update)
+        [Authorize]
         [HttpPut("UpdateCategory")]
         public IActionResult UpdateCategory(int id, string name, string description)
         {
@@ -47,6 +50,7 @@ namespace Inventory_And_Warehouse_Management.Controllers
         }
 
         //A second distinct update case (e.g.update just the description)
+        [Authorize]
         [HttpPatch("UpdateCategoryDescription")]
         public IActionResult UpdateCategoryDescription(int id, string description)
         {
@@ -66,6 +70,7 @@ namespace Inventory_And_Warehouse_Management.Controllers
 
 
         //Delete a Category
+        [Authorize(Roles = "Manager,Admin")]
         [HttpDelete("DeleteCategory")]
         public IActionResult DeleteCategory(int id)
         {

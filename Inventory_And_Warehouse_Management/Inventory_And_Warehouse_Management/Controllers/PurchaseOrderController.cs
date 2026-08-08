@@ -1,5 +1,6 @@
 ﻿using Inventory_And_Warehouse_Management.Models;
 using Inventory_And_Warehouse_Management.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -7,6 +8,7 @@ namespace Inventory_And_Warehouse_Management.Controllers
 {
     [ApiController]
     [Route("PurchaseOrder")]
+    [Authorize]
     public class PurchaseOrderController : ControllerBase
     {
         private ProjectContext context;
