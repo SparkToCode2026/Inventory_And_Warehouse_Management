@@ -18,7 +18,7 @@ namespace Inventory_And_Warehouse_Management.Models
 
         [Required]
         public decimal Price { get; set; }
-        public string Description { get; set; }
+        public string? Description { get; set; }
 
 
         //product has Category
