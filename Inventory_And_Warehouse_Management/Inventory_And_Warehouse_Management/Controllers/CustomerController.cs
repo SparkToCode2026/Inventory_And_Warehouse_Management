@@ -21,6 +21,21 @@ namespace Inventory_And_Warehouse_Management.Controllers
         [HttpPost("AddCustomer")]
         public IActionResult AddCustomer(Customer customer)
         {
+
+            bool emailExists = context.customers.Any(c => c.Email == customer.Email);
+            
+
+            if (emailExists)
+            {
+                return BadRequest("Email already exists");
+            }
+
+            bool phoneExists = context.customers.Any(c => c.Phone == customer.Phone);
+
+            if (phoneExists)
+            {
+                return BadRequest("Phone number already exists");
+            }
             context.customers.Add(customer);
             context.SaveChanges();
 

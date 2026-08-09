@@ -21,6 +21,19 @@ namespace Inventory_And_Warehouse_Management.Controllers
         [HttpPost("AddSupplier")]
         public IActionResult AddSupplier(Supplier supplier)
         {
+            bool emailExists = context.suppliers.Any(s => s.Email == supplier.Email);
+
+            if (emailExists)
+            {
+                return BadRequest("Email already exists");
+            }
+
+            bool phoneExists = context.suppliers.Any(s => s.Phone == supplier.Phone);
+
+            if (phoneExists)
+            {
+                return BadRequest("Phone number already exists");
+            }
             context.suppliers.Add(supplier);
             context.SaveChanges();
 
