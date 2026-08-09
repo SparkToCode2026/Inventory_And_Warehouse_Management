@@ -10,20 +10,22 @@ namespace Inventory_And_Warehouse_Management.Models
     public class User
     {
         [Key]
+        [JsonIgnore]
         public int UserId { get; set; }
         [Required]
-        public string Name { get; set; }
+        public string? Name { get; set; }
         [Required]
 
-        public string Email { get; set; }
+        public string? Email { get; set; }
         [Required]
-        public string PasswordHash { get; set; }
-        [Required]
-
-        public string Role { get; set; }
+        [JsonIgnore]
+        public string? PasswordHash { get; set; }
         [Required]
 
-        public string Phone { get; set; }
+        public string? Role { get; set; }
+        [Required]
+
+        public string? Phone { get; set; }
 
         //Work
         [ForeignKey("_warehouse")]

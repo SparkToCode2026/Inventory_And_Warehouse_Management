@@ -1,4 +1,5 @@
 ﻿using Inventory_And_Warehouse_Management.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using static System.Net.WebRequestMethods;
@@ -18,22 +19,25 @@ namespace Inventory_And_Warehouse_Management.Controllers
 
 
         //Create a new Product
+        [Authorize(Roles = "Manager,Admin")]
         [HttpPost("AddProduct")]
-        public void AddProduct(Product p)
+        public IActionResult AddProduct(Product p)
         {
             context.products.Add(p);
             context.SaveChanges();
+            return Ok();
         }
 
         //Update a Product  (full update)
+        [Authorize]
         [HttpPut("UpdateProduct")]
-        public void UpdateProduct(int id, string name, decimal price, string description)
+        public IActionResult UpdateProduct(int id, string name, decimal price, string description)
         {
             Product product = context.products.FirstOrDefault(p => p.ProductId == id);
 
             if (product == null)
             {
-
+                return NotFound("Product not found");
             }
             else
             {
@@ -41,74 +45,95 @@ namespace Inventory_And_Warehouse_Management.Controllers
                 product.Description = description;
                 product.Price = price;
                 context.SaveChanges();
+                return Ok("Update successfully");
             }
         }
 
         //A second distinct update case (e.g.update just the price)
+        [Authorize]
         [HttpPatch("UpdateProductPrice")]
-        public void UpdateProductPrice(int id, decimal price)
+        public IActionResult UpdateProductPrice(int id, decimal price)
         {
             Product product = context.products.FirstOrDefault(p => p.ProductId == id);
 
             if (product == null)
             {
-
+                return NotFound("Product not found");
             }
             else
             {
                 product.Price = price;
                 context.SaveChanges();
+                return Ok("Update successfully");
             }
         }
 
         //Delete a Product
+        [Authorize(Roles = "Manager,Admin")]
         [HttpDelete("DeleteProduct")]
-        public void DeleteProduct(int id)
+        public IActionResult DeleteProduct(int id)
         {
             Product product = context.products.FirstOrDefault(p => p.ProductId == id);
 
             if (product == null)
             {
-
+                return NotFound("Product not found");
             }
             else
             {
                 context.products.Remove(product);
                 context.SaveChanges();
+                return Ok("Delete successfully");
             }
         }
 
         //Get all Products, including their related Category
         [HttpGet("GetProducts")]
-        public List<Product> GetProducts()
+        public IActionResult GetProducts()
         {
             List<Product> products = context.products.Include(p => p.category).ToList();
-            return products;
+            if (products.Count == 0)
+            {
+                return NotFound("There are no products");
+            }
+            return Ok(products);
         }
 
 
         //Get a single Product by id
         [HttpGet("GetProduct")]
-        public Product GetProduct(int id)
+        public IActionResult GetProduct(int id)
         {
             Product product = context.products.FirstOrDefault(p => p.ProductId == id);
-            return product;
+            if (product == null)
+            {
+                return NotFound("Product not found");
+            }
+            return Ok(product);
         }
 
         //Filter Products by max price 
         [HttpGet("ProductsMaxPrice")]
-        public List<Product> ProductsMaxPrice(decimal maxPrice)
+        public IActionResult ProductsMaxPrice(decimal maxPrice)
         {
             List<Product> products = context.products.Where(p => p.Price <= maxPrice).ToList();
-            return products;
+            if (products.Count == 0)
+            {
+                return NotFound("There are no products");
+            }
+            return Ok(products);
         }
 
         //sort by price
         [HttpGet("SortProductsByPrice")]
-        public List<Product> SortProductsByPrice()
+        public IActionResult SortProductsByPrice()
         {
             List<Product> products = context.products.OrderBy(p => p.Price).ToList();
-            return products;
+            if (products.Count == 0)
+            {
+                return NotFound("There are no products");
+            }
+            return Ok(products);
         }
 
     }

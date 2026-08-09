@@ -1,4 +1,5 @@
 ﻿using Inventory_And_Warehouse_Management.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using static System.Net.WebRequestMethods;
@@ -19,98 +20,122 @@ namespace Inventory_And_Warehouse_Management.Controllers
 
 
         //Create a new Category
+        [Authorize(Roles = "Manager,Admin")]
         [HttpPost("AddCategory")]
-        public void AddCategory(Category c)
+        public IActionResult AddCategory(Category c)
         {
             context.categories.Add(c);
             context.SaveChanges();
+            return Ok(); 
         }
 
         //Update a Category (full update)
+        [Authorize]
         [HttpPut("UpdateCategory")]
-        public void UpdateCategory(int id, string name, string description)
+        public IActionResult UpdateCategory(int id, string name, string description)
         {
             Category category = context.categories.FirstOrDefault(c => c.CategoryId == id);
 
             if(category == null)
             {
-
+                return NotFound("Category not found");
             }
             else
             {
                 category.Name = name;
                 category.Description = description;
                 context.SaveChanges();
+                return Ok("Update successfully");
             }
         }
 
         //A second distinct update case (e.g.update just the description)
+        [Authorize]
         [HttpPatch("UpdateCategoryDescription")]
-        public void UpdateCategoryDescription(int id, string description)
+        public IActionResult UpdateCategoryDescription(int id, string description)
         {
             Category category = context.categories.FirstOrDefault(c => c.CategoryId == id);
 
             if (category == null)
             {
-
+                return NotFound("Category not found");
             }
             else
             {
                 category.Description = description;
                 context.SaveChanges();
+                return Ok("Update successfully");
             }
         }
 
 
         //Delete a Category
+        [Authorize(Roles = "Manager,Admin")]
         [HttpDelete("DeleteCategory")]
-        public void DeleteCategory(int id)
+        public IActionResult DeleteCategory(int id)
         {
             Category category = context.categories.FirstOrDefault(c => c.CategoryId == id);
 
             if (category == null)
             {
-
+                return NotFound("Category not found");
             }
             else
             {
                 context.categories.Remove(category);
                 context.SaveChanges();
+                return Ok("Delete successfully");
             }
         }
 
 
         //Get all Categories, including their related Products
         [HttpGet("GetCategories")]
-        public List<Category> GetCategories()
+        public IActionResult GetCategories()
         {
             List<Category> categories = context.categories.Include(c => c.products).ToList();
-            return categories;
+            if (categories.Count == 0)
+            {
+                return NotFound("There are no categorys");
+            }
+            return Ok(categories);
         }
 
 
         //Get a single Category by id
         [HttpGet("GetCategory")]
-        public Category GetCategory(int id)
+        public IActionResult GetCategory(int id)
         {
             Category category = context.categories.FirstOrDefault(c => c.CategoryId == id);
-            return category;
+            if (category == null)
+            {
+                return NotFound("Category not found");
+            }
+            return Ok(category);
         }
 
         //Filter Categories by name
         [HttpGet("FilterCategoriesByName")]
-        public List<Category> FilterCategoriesByName(string name)
+        public IActionResult FilterCategoriesByName(string name)
         {
             List<Category> categories = context.categories.Where(c => c.Name.Contains(name)).Include(c => c.products).ToList();
-            return categories;
+            if (categories.Count == 0)
+            {
+                return NotFound("Categorys not found");
+            }
+            return Ok(categories);
         }
 
         //SortCategory
         [HttpGet("SortCategoriesByNumOfProducts")]
-        public List<Category> SortCategoriesByNumOfProducts()
+        public IActionResult SortCategoriesByNumOfProducts()
         {
             List<Category> categories = context.categories.OrderBy(c => c.products.Count()).ToList();
-            return categories;
+            if (categories.Count == 0)
+            {
+                return NotFound("There are no categorys");
+            }
+            return Ok(categories);
         }
     }
 }
