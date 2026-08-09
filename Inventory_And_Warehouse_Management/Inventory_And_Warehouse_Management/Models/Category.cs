@@ -15,7 +15,7 @@ namespace Inventory_And_Warehouse_Management.Models
 
         [Required]
         public string Name { get; set; }
-        public string Description { get; set; }
+        public string? Description { get; set; }
 
 
         //product has Category

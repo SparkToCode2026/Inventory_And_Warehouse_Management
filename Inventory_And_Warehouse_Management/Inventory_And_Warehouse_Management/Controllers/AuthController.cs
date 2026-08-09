@@ -31,7 +31,8 @@ namespace Inventory_And_Warehouse_Management.Controllers
             {
                 Name = dto.Name,
                 Email = dto.Email,
-                Role = dto.Role
+                Role = dto.Role,
+                Phone = dto.Phone
             };
             user.PasswordHash = _hasher.HashPassword(user, dto.Password);
 
