@@ -116,12 +116,9 @@ namespace Inventory_And_Warehouse_Management.Controllers
         [HttpGet("CountUsersPerWarehouse")]
         public IActionResult CountUsersPerWarehouse()
         {
-            var result = context.users
-                .Include(u => u._warehouse)
-                .GroupBy(u => u._warehouse.WarehouseId)
-                .Select(g => new{WarehouseName = g.Key,UserCount = g.Count()})
+            var result = context.users.GroupBy(u => u.WarehouseId)
+                .Select(g => new { WarehouseId = g.Key, UserCount = g.Count() })
                 .ToList();
-
             return Ok(result);
         }
     }

@@ -17,7 +17,6 @@ namespace Inventory_And_Warehouse_Management.Models
         [Required]
 
         public string? Email { get; set; }
-        [Required]
         [JsonIgnore]
         public string? PasswordHash { get; set; }
         [Required]
