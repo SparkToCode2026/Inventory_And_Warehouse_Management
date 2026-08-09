@@ -30,7 +30,7 @@ namespace Inventory_And_Warehouse_Management.Models
         //Work
         [ForeignKey("_warehouse")]
         [Required]
-        public int WarehouseId { get; set; }
+        public int? WarehouseId { get; set; }
         [JsonIgnore]
         public Warehouse? _warehouse { get; set; }
 
