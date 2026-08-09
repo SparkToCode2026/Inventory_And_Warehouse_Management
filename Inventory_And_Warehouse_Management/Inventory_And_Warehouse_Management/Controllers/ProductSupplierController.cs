@@ -31,19 +31,22 @@ namespace Inventory_And_Warehouse_Management.Controllers
 
         [Authorize]
         [HttpPut("UpdateProductSupplier")]
-        public IActionResult UpdateProductSupplier(int pId, int sId, ProductSupplier newLink)
+        public IActionResult UpdateProductSupplier(int pId, int sId, int newProductId, int newSupplierId)
         {
             ProductSupplier link = context.productSuppliers.FirstOrDefault(x => x.productId == pId && x.supplierId == sId);
             if (link == null)
                 return NotFound("ProductSupplier link not found");
 
-            link.productId = newLink.productId;
-            link.supplierId = newLink.supplierId;
+            bool alreadyExists = context.productSuppliers.Any(x => x.productId == newProductId && x.supplierId == newSupplierId);
+            if (alreadyExists)
+                return BadRequest("That ProductSupplier link already exists.");
 
+            context.productSuppliers.Remove(link);
+            context.productSuppliers.Add(new ProductSupplier { productId = newProductId, supplierId = newSupplierId });
             context.SaveChanges();
+
             return Ok("ProductSupplier link updated");
         }
-
         [Authorize]
         [HttpPatch("UpdateSupplierForProduct")]
         public IActionResult UpdateSupplierForProduct(int pId, int newSupplierId)
@@ -52,8 +55,14 @@ namespace Inventory_And_Warehouse_Management.Controllers
             if (link == null)
                 return NotFound("ProductSupplier link not found");
 
-            link.supplierId = newSupplierId;
+            bool alreadyExists = context.productSuppliers.Any(x => x.productId == pId && x.supplierId == newSupplierId);
+            if (alreadyExists)
+                return BadRequest("This product is already linked to that supplier.");
+
+            context.productSuppliers.Remove(link);
+            context.productSuppliers.Add(new ProductSupplier { productId = pId, supplierId = newSupplierId });
             context.SaveChanges();
+
             return Ok("Supplier updated for this product");
         }
 
