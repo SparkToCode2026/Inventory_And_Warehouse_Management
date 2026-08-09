@@ -38,42 +38,6 @@ namespace Inventory_And_Warehouse_Management.Controllers
             context.stockMovements.Add(m);
             context.SaveChanges();
 
-            // Update the running inventory total for this product+warehouse
-            var level = context.InventoryLevels
-                .Include(l => l.product)
-                .FirstOrDefault(l => l.ProductId == m.ProductId && l.WarehouseId == m.WarehouseId);
-            if (level == null)
-            {
-                level = new InventoryLevel
-                {
-                    ProductId = m.ProductId,
-                    WarehouseId = m.WarehouseId,
-                    QuantityOnHand = 0,
-                    ReorderThreshold = 10
-                };
-                context.InventoryLevels.Add(level);
-            }
-
-            if (m.MovementType == "In")
-                level.QuantityOnHand += m.Quantity;
-            else if (m.MovementType == "Out")
-                level.QuantityOnHand -= m.Quantity;
-
-            context.SaveChanges();
-            // Low-stock check
-            if (level.QuantityOnHand < level.ReorderThreshold)
-             {
-                var managers = context.users.Where(u => u.Role == "Manager").ToList();
-                foreach (var mgr in managers)
-                {
-                    await _emailService.SendEmailAsync(
-                        mgr.Email,
-                        $"Low stock: {level.product.Name}",
-                        $"{level.product.Name} is now at {level.QuantityOnHand} units in warehouse {m.WarehouseId}, below the reorder threshold of {level.ReorderThreshold}."
-                        );
-                }
-        }
-
             return Ok(m.StockMovementId);
      }
 
