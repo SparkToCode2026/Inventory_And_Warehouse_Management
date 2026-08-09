@@ -44,10 +44,41 @@ namespace Inventory_And_Warehouse_Management.Controllers
 
             return Ok(po.PurchaseOrderId);
         }
+        
+        //Update a PurchaseOrder (full update)
+        [HttpPut("UpdatePurchaseOrder")]
+        public IActionResult UpdatePurchaseOrder(int id, string status, decimal totalAmount, DateTime orderDate, int supplierId, int userId)
+        {
+            PurchaseOrder purchaseOrder = context.purchaseOrders.FirstOrDefault(p => p.PurchaseOrderId == id);
+
+            if (purchaseOrder == null)
+                return NotFound($"PurchaseOrder with id {id} not found.");
+
+            var allowedStatuses = new[] { "Pending", "Approved", "Received" };
+            if (!allowedStatuses.Contains(status))
+                return BadRequest("Status must be one of: Pending, Approved, Received.");
+
+            purchaseOrder.Status = status;
+            purchaseOrder.TotalAmount = totalAmount;
+            purchaseOrder.OrderDate = orderDate;
+            purchaseOrder.SupplierId = supplierId;
+            purchaseOrder.UserId = userId;
+            context.SaveChanges();
+
+            return Ok(purchaseOrder);
+        }
+        
+        
         //A second distinct update case (change Status only)
         [HttpPatch("UpdatePurchaseOrderStatus")]
         public IActionResult UpdatePurchaseOrderStatus(int id, string status)
         {
+            var allowedStatuses = new[] { "Pending", "Approved", "Received" };
+            if (!allowedStatuses.Contains(status))
+            {
+                return BadRequest("Status must be one of: Pending, Approved, Received.");
+            }
+
             PurchaseOrder purchaseOrder = context.purchaseOrders.FirstOrDefault(p => p.PurchaseOrderId == id);
 
             if (purchaseOrder == null)
@@ -60,6 +91,11 @@ namespace Inventory_And_Warehouse_Management.Controllers
                 context.SaveChanges();
                 return Ok("Purchase order Status Updated");
             }
+
+            purchaseOrder.Status = status;
+            context.SaveChanges();
+
+            return Ok(purchaseOrder);
         }
 
         //Delete a PurchaseOrder
@@ -146,7 +182,7 @@ namespace Inventory_And_Warehouse_Management.Controllers
                     TotalPurchaseValue = g.Sum(p => p.TotalAmount)
                 })
                 .OrderByDescending(x => x.TotalPurchaseValue)
-                .ToList<object>();
+                .ToList();
 
             return Ok(result);
         }

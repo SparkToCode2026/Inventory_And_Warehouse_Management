@@ -19,156 +19,161 @@ namespace Inventory_And_Warehouse_Management.Controllers
 
         //Create a new PurchaseOrderItem (and update the parent PurchaseOrder's TotalAmount)
         [HttpPost("AddPurchaseOrderItem")]
-        public void AddPurchaseOrderItem(PurchaseOrderItem item)
+        public IActionResult AddPurchaseOrderItem(PurchaseOrderItem item)
         {
             PurchaseOrder parentOrder = context.purchaseOrders.FirstOrDefault(p => p.PurchaseOrderId == item.PurchaseOrderId);
 
             if (parentOrder == null)
             {
-
+                return BadRequest($"PurchaseOrder with id {item.PurchaseOrderId} does not exist.");
             }
-            else
-            {
-                item.TotalPrice = item.Quantity * item.UnitPrice;
 
-                context.purchaseOrderItems.Add(item);
+            item.TotalPrice = item.Quantity * item.UnitPrice;
 
-                parentOrder.TotalAmount += item.TotalPrice;
+            context.purchaseOrderItems.Add(item);
 
-                context.SaveChanges();
-            }
+            parentOrder.TotalAmount += item.TotalPrice;
+
+            context.SaveChanges();
+
+            return Ok(item);
         }
 
         //Update a PurchaseOrderItem (full update)
         [HttpPut("UpdatePurchaseOrderItem")]
-        public void UpdatePurchaseOrderItem(int id, int purchaseOrderId, int productId, int quantity, decimal unitPrice)
+        public IActionResult UpdatePurchaseOrderItem(int id, int purchaseOrderId, int productId, int quantity, decimal unitPrice)
         {
             PurchaseOrderItem item = context.purchaseOrderItems.FirstOrDefault(i => i.PurchaseOrderItemId == id);
 
             if (item == null)
             {
-
+                return NotFound($"PurchaseOrderItem with id {id} not found.");
             }
-            else
+
+            PurchaseOrder parentOrder = context.purchaseOrders.FirstOrDefault(p => p.PurchaseOrderId == item.PurchaseOrderId);
+
+            if (parentOrder != null)
             {
-                PurchaseOrder parentOrder = context.purchaseOrders.FirstOrDefault(p => p.PurchaseOrderId == item.PurchaseOrderId);
-
-                if (parentOrder != null)
-                {
-                    parentOrder.TotalAmount -= item.TotalPrice;
-                }
-
-                item.PurchaseOrderId = purchaseOrderId;
-                item.ProductId = productId;
-                item.Quantity = quantity;
-                item.UnitPrice = unitPrice;
-                item.TotalPrice = quantity * unitPrice;
-
-                if (parentOrder != null)
-                {
-                    parentOrder.TotalAmount += item.TotalPrice;
-                }
-
-                context.SaveChanges();
+                parentOrder.TotalAmount -= item.TotalPrice;
             }
+
+            item.PurchaseOrderId = purchaseOrderId;
+            item.ProductId = productId;
+            item.Quantity = quantity;
+            item.UnitPrice = unitPrice;
+            item.TotalPrice = quantity * unitPrice;
+
+            if (parentOrder != null)
+            {
+                parentOrder.TotalAmount += item.TotalPrice;
+            }
+
+            context.SaveChanges();
+
+            return Ok(item);
         }
 
         //A second distinct update case (update Quantity only)
         [HttpPatch("UpdatePurchaseOrderItemQuantity")]
-        public void UpdatePurchaseOrderItemQuantity(int id, int quantity)
+        public IActionResult UpdatePurchaseOrderItemQuantity(int id, int quantity)
         {
             PurchaseOrderItem item = context.purchaseOrderItems.FirstOrDefault(i => i.PurchaseOrderItemId == id);
 
             if (item == null)
             {
-
+                return NotFound($"PurchaseOrderItem with id {id} not found.");
             }
-            else
+
+            PurchaseOrder parentOrder = context.purchaseOrders.FirstOrDefault(p => p.PurchaseOrderId == item.PurchaseOrderId);
+
+            if (parentOrder != null)
             {
-                PurchaseOrder parentOrder = context.purchaseOrders.FirstOrDefault(p => p.PurchaseOrderId == item.PurchaseOrderId);
-
-                if (parentOrder != null)
-                {
-                    parentOrder.TotalAmount -= item.TotalPrice;
-                }
-
-                item.Quantity = quantity;
-                item.TotalPrice = item.Quantity * item.UnitPrice;
-
-                if (parentOrder != null)
-                {
-                    parentOrder.TotalAmount += item.TotalPrice;
-                }
-
-                context.SaveChanges();
+                parentOrder.TotalAmount -= item.TotalPrice;
             }
+
+            item.Quantity = quantity;
+            item.TotalPrice = item.Quantity * item.UnitPrice;
+
+            if (parentOrder != null)
+            {
+                parentOrder.TotalAmount += item.TotalPrice;
+            }
+
+            context.SaveChanges();
+
+            return Ok(item);
         }
 
         //Delete a PurchaseOrderItem
         [HttpDelete("DeletePurchaseOrderItem")]
-        public void DeletePurchaseOrderItem(int id)
+        public IActionResult DeletePurchaseOrderItem(int id)
         {
             PurchaseOrderItem item = context.purchaseOrderItems.FirstOrDefault(i => i.PurchaseOrderItemId == id);
 
             if (item == null)
             {
-
+                return NotFound($"PurchaseOrderItem with id {id} not found.");
             }
-            else
+
+            PurchaseOrder parentOrder = context.purchaseOrders.FirstOrDefault(p => p.PurchaseOrderId == item.PurchaseOrderId);
+
+            if (parentOrder != null)
             {
-                PurchaseOrder parentOrder = context.purchaseOrders.FirstOrDefault(p => p.PurchaseOrderId == item.PurchaseOrderId);
-
-                if (parentOrder != null)
-                {
-                    parentOrder.TotalAmount -= item.TotalPrice;
-                }
-
-                context.purchaseOrderItems.Remove(item);
-                context.SaveChanges();
+                parentOrder.TotalAmount -= item.TotalPrice;
             }
+
+            context.purchaseOrderItems.Remove(item);
+            context.SaveChanges();
+
+            return Ok($"PurchaseOrderItem with id {id} deleted successfully.");
         }
 
         //Get all PurchaseOrderItems, including related PurchaseOrder and Product
         [HttpGet("GetPurchaseOrderItems")]
-        public List<PurchaseOrderItem> GetPurchaseOrderItems()
+        public IActionResult GetPurchaseOrderItems()
         {
             List<PurchaseOrderItem> items = context.purchaseOrderItems
                 .Include(i => i.purchaseOrder)
                 .Include(i => i.product)
                 .ToList();
 
-            return items;
+            return Ok(items);
         }
 
         //Get by id (composite key - matching both PurchaseOrderId and ProductId)
         [HttpGet("GetPurchaseOrderItem")]
-        public PurchaseOrderItem GetPurchaseOrderItem(int purchaseOrderId, int productId)
+        public IActionResult GetPurchaseOrderItem(int purchaseOrderId, int productId)
         {
             PurchaseOrderItem item = context.purchaseOrderItems
                 .Include(i => i.purchaseOrder)
                 .Include(i => i.product)
                 .FirstOrDefault(i => i.PurchaseOrderId == purchaseOrderId && i.ProductId == productId);
 
-            return item;
+            if (item == null)
+            {
+                return NotFound($"No item found for PurchaseOrderId {purchaseOrderId} and ProductId {productId}.");
+            }
+
+            return Ok(item);
         }
 
         //Filter PurchaseOrderItems by product id
         [HttpGet("PurchaseOrderItemsByProduct")]
-        public List<PurchaseOrderItem> PurchaseOrderItemsByProduct(int productId)
+        public IActionResult PurchaseOrderItemsByProduct(int productId)
         {
             List<PurchaseOrderItem> items = context.purchaseOrderItems
                 .Include(i => i.purchaseOrder)
                 .Where(i => i.ProductId == productId)
                 .ToList();
 
-            return items;
+            return Ok(items);
         }
 
         //Sort/aggregate: most-ordered products (sum of quantity grouped by product)
         [HttpGet("MostOrderedProducts")]
-        public List<object> MostOrderedProducts()
+        public IActionResult MostOrderedProducts()
         {
-            List<object> result = context.purchaseOrderItems
+            var result = context.purchaseOrderItems
                 .Include(i => i.product)
                 .GroupBy(i => new { i.ProductId, i.product.Name })
                 .Select(g => new
@@ -178,9 +183,9 @@ namespace Inventory_And_Warehouse_Management.Controllers
                     TotalQuantityOrdered = g.Sum(i => i.Quantity)
                 })
                 .OrderByDescending(x => x.TotalQuantityOrdered)
-                .ToList<object>();
+                .ToList();
 
-            return result;
+            return Ok(result);
         }
     }
 }
