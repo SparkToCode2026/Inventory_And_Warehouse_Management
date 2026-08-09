@@ -25,7 +25,7 @@ namespace Inventory_And_Warehouse_Management.Models
         public string? Role { get; set; }
         [Required]
 
-        public string? Phone { get; set; }
+        public string Phone { get; set; }
 
         //Work
         [ForeignKey("_warehouse")]
