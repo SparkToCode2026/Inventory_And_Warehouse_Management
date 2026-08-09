@@ -1,6 +1,8 @@
 ﻿
 using Inventory_And_Warehouse_Management.Models;
+using Inventory_And_Warehouse_Management.Models.Dtos;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -12,25 +14,33 @@ namespace Inventory_And_Warehouse_Management.Controllers
     public class UserController : Controller
     {
         private ProjectContext context;
+        private readonly PasswordHasher<User> _hasher = new();
         public UserController(ProjectContext _context)
         {
             context = _context;
         }
 
         [HttpPost("AddUser")]
-        public IActionResult AddUser(User u)
+        public IActionResult AddUser(RegisterDto dto)
         {
             //checks that Name, Email, and Password aren't blank before doing anything else.
-            if (string.IsNullOrEmpty(u.Name) || string.IsNullOrEmpty(u.Email) || string.IsNullOrEmpty(u.PasswordHash)) 
+            if (string.IsNullOrEmpty(dto.Name) || string.IsNullOrEmpty(dto.Email) || string.IsNullOrEmpty(dto.Password)) 
                 return BadRequest("Name, Email and Password are required.");
             //checks no two users have the same email
-            if (context.users.Any(x => x.Email == u.Email))
+            if (context.users.Any(x => x.Email == dto.Email))
                 return BadRequest("Email already exists.");
-           
-            context.users.Add(u);
+            var user = new User
+            {
+                Name = dto.Name,
+                Email = dto.Email,
+                Role = dto.Role,
+                Phone = dto.Phone
+            };
+            user.PasswordHash = _hasher.HashPassword(user, dto.Password);
+            context.users.Add(user);
             context.SaveChanges();
 
-            return Ok(u.UserId);
+            return Ok(user.UserId);
         }
 
         [HttpPut("UpdateUser")]
