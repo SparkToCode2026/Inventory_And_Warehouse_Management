@@ -12,6 +12,7 @@ namespace Inventory_And_Warehouse_Management.Models
     public class InventoryLevel
     {
         [JsonIgnore]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int InventoryLevelId { get; set; }
         [Required]
         public int QuantityOnHand { get; set; }

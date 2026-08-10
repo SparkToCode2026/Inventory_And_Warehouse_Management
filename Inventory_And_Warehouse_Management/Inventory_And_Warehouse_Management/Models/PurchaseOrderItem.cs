@@ -4,12 +4,15 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text;
+using System.Text.Json.Serialization;
 
 namespace Inventory_And_Warehouse_Management.Models
 {
     [PrimaryKey(nameof(PurchaseOrderId), nameof(ProductId))]
     public class PurchaseOrderItem
     {
+        [JsonIgnore]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int PurchaseOrderItemId { get; set; }
         public int Quantity { get; set; }
         public decimal UnitPrice { get; set; }
