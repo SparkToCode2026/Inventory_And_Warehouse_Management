@@ -10,10 +10,15 @@ namespace Inventory_And_Warehouse_Management.Models
     public class Warehouse
     {
         [Key]
+        [JsonIgnore]
         public int WarehouseId { get; set; }
+        [Required]
         public string Name { get; set; }
+        [Required]
         public int Capacity { get; set; }
+        [Required]
         public string Location { get; set; }
+        [Required]
         public string Phone { get; set; }
 
         // --- Navigation Properties (relationship setup) ---
