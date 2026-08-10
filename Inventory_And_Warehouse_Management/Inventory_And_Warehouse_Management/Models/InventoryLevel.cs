@@ -4,14 +4,18 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text;
+using System.Text.Json.Serialization;
 
 namespace Inventory_And_Warehouse_Management.Models
 {
     [PrimaryKey(nameof(WarehouseId), nameof(ProductId))]
     public class InventoryLevel
     {
+        [JsonIgnore]
         public int InventoryLevelId { get; set; }
+        [Required]
         public int QuantityOnHand { get; set; }
+        [Required]
         public int ReorderThreshold { get; set; }
 
         // Link back to Warehouse.
