@@ -28,6 +28,9 @@ namespace Inventory_And_Warehouse_Management.Controllers
 
             item.TotalPrice = item.Quantity * item.UnitPrice;
 
+            item.salesOrder = null;
+            item.product = null;
+
             context.salesOrderItems.Add(item);
 
             context.SaveChanges();

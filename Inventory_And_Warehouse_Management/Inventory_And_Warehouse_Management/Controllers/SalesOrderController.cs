@@ -27,6 +27,10 @@ namespace Inventory_And_Warehouse_Management.Controllers
                 return BadRequest("Invalid data");
             }
 
+            // Don't create new Customer/User objects
+            order.customer = null;
+            order.user = null;
+
             context.salesOrders.Add(order);
             context.SaveChanges();
 
