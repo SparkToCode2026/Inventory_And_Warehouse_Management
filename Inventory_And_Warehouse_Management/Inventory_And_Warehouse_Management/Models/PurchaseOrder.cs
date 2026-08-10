@@ -3,12 +3,14 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text;
+using System.Text.Json.Serialization;
 
 namespace Inventory_And_Warehouse_Management.Models
 {
     public class PurchaseOrder
     {
         [Key]
+        [JsonIgnore]
         public int PurchaseOrderId { get; set; }
         public string Status { get; set; }
         public decimal TotalAmount { get; set; }
@@ -26,7 +28,8 @@ namespace Inventory_And_Warehouse_Management.Models
 
         //Relationship between PurchaseOrder and PurchaseOrderItem
         [InverseProperty("purchaseOrder")]
-        public List<PurchaseOrderItem> purchaseOrderItems { get; set; }
+        [JsonIgnore]
+        public List<PurchaseOrderItem>? purchaseOrderItems { get; set; }
 
     }
 }

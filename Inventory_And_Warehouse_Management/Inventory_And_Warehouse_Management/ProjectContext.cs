@@ -6,7 +6,7 @@ using System.Text;
 
 namespace Inventory_And_Warehouse_Management
 {
-    internal class ProjectContext : DbContext
+    public class ProjectContext : DbContext
     {
         //1- register models
         public DbSet<User> users { get; set; }
@@ -19,16 +19,14 @@ namespace Inventory_And_Warehouse_Management
         public DbSet<Supplier> suppliers { get; set; }
         public DbSet<StockMovement> stockMovements { get; set; }
         public DbSet<PurchaseOrderItem> purchaseOrderItems { get; set; }
-        public DbSet<SalesOrderItem> SalesOrderItems { get; set; }
+        public DbSet<SalesOrderItem> salesOrderItems { get; set; }
         public DbSet<InventoryLevel> InventoryLevels { get; set; }
         public DbSet<ProductSupplier> productSuppliers { get; set; }
 
         //2- connect to database
-        protected override void OnConfiguring(DbContextOptionsBuilder options)
+        public ProjectContext(DbContextOptions<ProjectContext> options) : base(options)
         {
-            options.UseSqlServer(
-            "Server=Abdullah\\SQLEXPRESS;Database=Inventory_And_Warehouse_Management_DB;Trusted_Connection=True;TrustServerCertificate=True;"
-            );
         }
+
     }
 }

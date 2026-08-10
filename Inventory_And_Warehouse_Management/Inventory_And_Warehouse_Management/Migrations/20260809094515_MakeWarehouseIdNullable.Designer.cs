@@ -4,6 +4,7 @@ using Inventory_And_Warehouse_Management;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Inventory_And_Warehouse_Management.Migrations
 {
     [DbContext(typeof(ProjectContext))]
-    partial class ProjectContextModelSnapshot : ModelSnapshot
+    [Migration("20260809094515_MakeWarehouseIdNullable")]
+    partial class MakeWarehouseIdNullable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -31,6 +34,7 @@ namespace Inventory_And_Warehouse_Management.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CategoryId"));
 
                     b.Property<string>("Description")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
@@ -345,7 +349,7 @@ namespace Inventory_And_Warehouse_Management.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("WarehouseId")
+                    b.Property<int>("WarehouseId")
                         .HasColumnType("int");
 
                     b.HasKey("UserId");
@@ -531,7 +535,9 @@ namespace Inventory_And_Warehouse_Management.Migrations
                 {
                     b.HasOne("Inventory_And_Warehouse_Management.Models.Warehouse", "_warehouse")
                         .WithMany("users")
-                        .HasForeignKey("WarehouseId");
+                        .HasForeignKey("WarehouseId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("_warehouse");
                 });
