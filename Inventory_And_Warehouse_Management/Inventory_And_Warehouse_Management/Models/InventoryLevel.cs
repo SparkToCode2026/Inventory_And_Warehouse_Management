@@ -21,12 +21,14 @@ namespace Inventory_And_Warehouse_Management.Models
         // Link back to Warehouse.
         [ForeignKey("warehouse")]
         public int WarehouseId { get; set; }
+        [JsonIgnore]
         public Warehouse warehouse { get; set; }
 
 
         // Link back to Product.
         [ForeignKey("product")]
         public int ProductId { get; set; }
+        [JsonIgnore]
         public Product product { get; set;}
 
 
