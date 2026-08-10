@@ -19,11 +19,13 @@ namespace Inventory_And_Warehouse_Management.Models
         //Relationship between PurchaseOrder and Supplier
         [ForeignKey("supplier")]
         public int SupplierId { get; set; }
+        [JsonIgnore]
         public Supplier supplier { get; set; }
 
         //Relationship between PurchaseOrder and User
         [ForeignKey("user")]
         public int UserId { get; set; }
+        [JsonIgnore]
         public User user { get; set; }
 
         //Relationship between PurchaseOrder and PurchaseOrderItem

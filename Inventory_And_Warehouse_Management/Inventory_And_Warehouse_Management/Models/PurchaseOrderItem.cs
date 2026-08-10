@@ -21,12 +21,14 @@ namespace Inventory_And_Warehouse_Management.Models
         //Relationship for PurchaseOrderItem and purchaseOrder
         [ForeignKey("purchaseOrder")]
         public int PurchaseOrderId { get; set; }
+        [JsonIgnore]
         public PurchaseOrder purchaseOrder { get; set; }
 
 
         //Relationship for PurchaseOrderItem and Product
         [ForeignKey("product")]
         public int ProductId { get; set; }
+        [JsonIgnore]
         public Product product { get; set; }
     }
 }

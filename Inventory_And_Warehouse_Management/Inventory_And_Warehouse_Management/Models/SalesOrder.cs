@@ -27,12 +27,14 @@ namespace Inventory_And_Warehouse_Management.Models
         // Relationship between SalesOrder and Customer
         [ForeignKey("customer")]
         public int CustomerId { get; set; }
+        [JsonIgnore]
         public Customer? customer { get; set; }
       
 
         // Relationship between SalesOrder and User
         [ForeignKey("User")]
         public int UserId { get; set; }
+        [JsonIgnore]
         public User? user { get; set; }
 
         // Relationship between SalesOrder and SalesOrderItem
