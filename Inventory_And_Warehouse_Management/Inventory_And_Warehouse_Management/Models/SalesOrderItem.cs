@@ -12,6 +12,7 @@ namespace Inventory_And_Warehouse_Management.Models
     public class SalesOrderItem
     {
         [JsonIgnore]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int SalesOrderItemId { get; set; }
 
         [Required]
