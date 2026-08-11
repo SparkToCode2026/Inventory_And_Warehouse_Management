@@ -110,6 +110,9 @@ namespace Inventory_And_Warehouse_Management
 
             app.UseCors("AllowFrontendDev");
 
+            app.UseDefaultFiles();
+            app.UseStaticFiles();
+
             app.UseHttpsRedirection();
 
             app.UseAuthentication();
