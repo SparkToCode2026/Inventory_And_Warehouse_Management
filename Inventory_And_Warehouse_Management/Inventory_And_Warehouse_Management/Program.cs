@@ -29,6 +29,16 @@ namespace Inventory_And_Warehouse_Management
 
             // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 
+            // Alongside your other builder.Services.Add... calls:
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("AllowFrontendDev", policy =>
+                {
+                    policy.WithOrigins("http://127.0.0.1:5500", "http://localhost:5500")
+                          .AllowAnyHeader()
+                          .AllowAnyMethod();
+                });
+            });
 
             //Swagger
             builder.Services.AddEndpointsApiExplorer();
@@ -97,6 +107,8 @@ namespace Inventory_And_Warehouse_Management
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
+
+            app.UseCors("AllowFrontendDev");
 
             app.UseHttpsRedirection();
 
