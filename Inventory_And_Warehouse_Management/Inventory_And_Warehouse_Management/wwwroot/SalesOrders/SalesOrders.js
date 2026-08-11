@@ -1,4 +1,3 @@
-javascript
 const API_BASE = 'https://localhost:7111';
 const TOKEN_KEY = 'token';
 
