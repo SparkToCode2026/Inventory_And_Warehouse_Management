@@ -274,3 +274,14 @@ h1, h2, h3{
   .site-nav.open{ display: flex; }
   .site-nav .btn{ width: 100%; }
 }
+
+.hidden {
+    display: none !important;
+}
+
+.user-info {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text);
+    margin-right: 0.5rem;
+}
