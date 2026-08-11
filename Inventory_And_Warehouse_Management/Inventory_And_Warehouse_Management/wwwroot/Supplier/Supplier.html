@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Supplier Management</title>
+
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+
+    <!-- Header -->
+    <header class="site-header">
+
+        <div class="container header-inner">
+
+            <a href="../index.html" class="brand">
+                Inventory & Warehouse
+            </a>
+
+            <nav class="site-nav">
+                <a href="../index.html" class="nav-link">Home</a>
+            </nav>
+
+        </div>
+
+    </header>
+
+
+    <main>
+
+        <!-- Page Heading -->
+        <section class="hero">
+
+            <div class="container">
+
+                <h1 class="hero-title">
+                    Supplier Management
+                </h1>
+
+                <p class="hero-sub">
+                    Add, edit and manage supplier information.
+                </p>
+
+            </div>
+
+        </section>
+
+
+        <!-- Supplier Content -->
+        <section class="modules">
+
+            <div class="container">
+
+                <div
+                    id="statusBanner"
+                    class="status-banner"
+                    hidden>
+                </div>
+
+
+                <!-- Supplier Form -->
+                <div class="zone">
+
+                    <h2 class="zone-title">
+                        Supplier Details
+                    </h2>
+
+                    <div class="card-module">
+
+                        <form id="supplierForm">
+
+                            <input
+                                type="hidden"
+                                id="supplierId">
+
+
+                            <div class="form-field">
+
+                                <label for="supplierName">
+                                    Name
+                                </label>
+
+                                <input
+                                    type="text"
+                                    id="supplierName"
+                                   required>
+
+                            </div>
+
+
+                            <div class="form-field">
+
+                                <label for="supplierEmail">
+                                    Email
+                                </label>
+
+                                <input
+                                    type="email"
+                                    id="supplierEmail"                                   
+                                    required>
+
+                            </div>
+
+
+                            <div class="form-field">
+
+                                <label for="supplierPhone">
+                                    Phone
+                                </label>
+
+                                <input
+                                    type="text"
+                                    id="supplierPhone"                                    
+                                    required>
+
+                            </div>
+
+
+                            <div class="hero-actions">
+
+                                <button
+                                    type="submit"
+                                    class="btn btn-accent"
+                                    id="saveSupplierBtn">
+
+                                    Save Supplier
+
+                                </button>
+
+
+                                <button
+                                    type="reset"
+                                    class="btn btn-outline"
+                                    id="clearSupplierBtn">
+
+                                    Clear
+
+                                </button>
+
+                            </div>
+
+                        </form>
+
+                    </div>
+
+                </div>
+
+
+                <!-- Supplier List -->
+                <div class="zone">
+
+                    <h2 class="zone-title">
+                        Suppliers
+                    </h2>
+
+                    <div class="card-module">
+
+                        <table>
+
+                            <caption>
+                                Supplier List
+                            </caption>
+
+                            <thead>
+
+                                <tr>
+                                    <th scope="col">ID</th>
+                                    <th scope="col">Name</th>
+                                    <th scope="col">Email</th>
+                                    <th scope="col">Phone</th>
+                                    <th scope="col">Actions</th>
+                                </tr>
+
+                            </thead>
+
+                            <tbody id="supplierTableBody">
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <footer class="site-footer">
+
+        <div class="container footer-inner">
+
+            <p>
+                Inventory and Warehouse Management System
+            </p>
+
+        </div>
+
+    </footer>
+
+
+    <script src="Supplier.js"></script>
+
+</body>
+
+</html>
