@@ -1,0 +1,120 @@
+.auth-page{
+  min-height: calc(100vh - 64px - 90px); /* viewport minus header + footer, roughly */
+  display: flex;
+  align-items: center;
+  padding: 3rem 0;
+}
+
+.auth-card{
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  max-width: 420px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.auth-head{
+  margin-bottom: 1.5rem;
+}
+.auth-head h1{
+  font-size: 1.4rem;
+  color: var(--text);
+  margin: 0 0 .35rem;
+}
+
+.auth-eyebrow{
+  font-size: .82rem;
+  font-weight: 600;
+  color: var(--accent);
+  margin: 0 0 .35rem;
+}
+
+.auth-sub{
+  color: var(--text-dim);
+  font-size: .95rem;
+  margin: 0;
+}
+
+.auth-foot{
+  margin: 1.5rem 0 0;
+  text-align: center;
+  font-size: .88rem;
+  color: var(--text-dim);
+}
+.auth-foot a{
+  color: var(--accent);
+  font-weight: 600;
+}
+.auth-foot a:hover{ text-decoration: underline; }
+
+.optional-tag{
+  font-weight: 400;
+  color: var(--text-dim);
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+.btn-block{
+  width: 100%;
+  margin-top: .5rem;
+}
+
+.btn:disabled{
+  opacity: .65;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* ---- Status banner ---- */
+.status-banner{
+  padding: .75rem 1rem;
+  border-radius: var(--radius);
+  font-size: .88rem;
+  margin-bottom: 1.25rem;
+  border: 1px solid transparent;
+}
+.status-banner.error{
+  background: #FDEDED;
+  border-color: #F3C2C2;
+  color: #A32020;
+}
+.status-banner.success{
+  background: #EAF6EE;
+  border-color: #BFE3C8;
+  color: #1E7A38;
+}
+.status-banner.info{
+  background: var(--accent-soft);
+  border-color: #C9DCF3;
+  color: var(--accent-hover);
+}
+
+/* ---- Form fields ---- */
+.form-field{
+  margin-bottom: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: .35rem;
+}
+.form-field label{
+  font-size: .82rem;
+  font-weight: 600;
+  color: var(--text);
+}
+.form-field input,
+.form-field select{
+  padding: .6rem .7rem;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: .92rem;
+}
+.form-field input:focus,
+.form-field select:focus{
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
