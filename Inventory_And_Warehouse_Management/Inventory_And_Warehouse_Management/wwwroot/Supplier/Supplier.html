@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Supplier Management</title>
+
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+
+    <header>
+        <h1>Supplier Management</h1>
+        <p>Add, edit and manage suppliers.</p>
+    </header>
+
+    <main>
+
+        <div id="statusBanner" hidden></div>
+
+        <section>
+
+            <h2>Supplier Details</h2>
+
+            <form id="supplierForm">
+
+                <input type="hidden" id="supplierId">
+
+                <div class="form-field">
+                    <label for="supplierName">Name</label>
+                    <input type="text" id="supplierName" required>
+                </div>
+
+                <div class="form-field">
+                    <label for="supplierEmail">Email</label>
+                    <input type="email" id="supplierEmail" required>
+                </div>
+
+                <div class="form-field">
+                    <label for="supplierPhone">Phone</label>
+                    <input type="text" id="supplierPhone" required>
+                </div>
+
+                <button type="submit" class="btn btn-accent">
+                    Save Supplier
+                </button>
+
+                <button type="reset" class="btn">
+                    Clear
+                </button>
+
+            </form>
+
+        </section>
+
+        <section>
+
+            <h2>Suppliers</h2>
+
+            <table>
+
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Phone</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+
+                <tbody id="supplierTableBody">
+                </tbody>
+
+            </table>
+
+        </section>
+
+    </main>
+<script src="Supplier.js"></script>
+</body>
+
+</html>
