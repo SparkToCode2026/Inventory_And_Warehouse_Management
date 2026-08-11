@@ -3,7 +3,8 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
 
     <title>Supplier Management</title>
 
@@ -12,75 +13,202 @@
 
 <body>
 
-    <header>
-        <h1>Supplier Management</h1>
-        <p>Add, edit and manage suppliers.</p>
+    <!-- Header -->
+    <header class="site-header">
+
+        <div class="container header-inner">
+
+            <a href="../index.html" class="brand">
+                Inventory & Warehouse
+            </a>
+
+            <nav class="site-nav">
+                <a href="../index.html" class="nav-link">Home</a>
+            </nav>
+
+        </div>
+
     </header>
+
 
     <main>
 
-        <div id="statusBanner" hidden></div>
+        <!-- Page Heading -->
+        <section class="hero">
 
-        <section>
+            <div class="container">
 
-            <h2>Supplier Details</h2>
+                <h1 class="hero-title">
+                    Supplier Management
+                </h1>
 
-            <form id="supplierForm">
+                <p class="hero-sub">
+                    Add, edit and manage supplier information.
+                </p>
 
-                <input type="hidden" id="supplierId">
-
-                <div class="form-field">
-                    <label for="supplierName">Name</label>
-                    <input type="text" id="supplierName" required>
-                </div>
-
-                <div class="form-field">
-                    <label for="supplierEmail">Email</label>
-                    <input type="email" id="supplierEmail" required>
-                </div>
-
-                <div class="form-field">
-                    <label for="supplierPhone">Phone</label>
-                    <input type="text" id="supplierPhone" required>
-                </div>
-
-                <button type="submit" class="btn btn-accent">
-                    Save Supplier
-                </button>
-
-                <button type="reset" class="btn">
-                    Clear
-                </button>
-
-            </form>
+            </div>
 
         </section>
 
-        <section>
 
-            <h2>Suppliers</h2>
+        <!-- Supplier Content -->
+        <section class="modules">
 
-            <table>
+            <div class="container">
 
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Name</th>
-                        <th>Email</th>
-                        <th>Phone</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
+                <div
+                    id="statusBanner"
+                    class="status-banner"
+                    hidden>
+                </div>
 
-                <tbody id="supplierTableBody">
-                </tbody>
 
-            </table>
+                <!-- Supplier Form -->
+                <div class="zone">
+
+                    <h2 class="zone-title">
+                        Supplier Details
+                    </h2>
+
+                    <div class="card-module">
+
+                        <form id="supplierForm">
+
+                            <input
+                                type="hidden"
+                                id="supplierId">
+
+
+                            <div class="form-field">
+
+                                <label for="supplierName">
+                                    Name
+                                </label>
+
+                                <input
+                                    type="text"
+                                    id="supplierName"
+                                   required>
+
+                            </div>
+
+
+                            <div class="form-field">
+
+                                <label for="supplierEmail">
+                                    Email
+                                </label>
+
+                                <input
+                                    type="email"
+                                    id="supplierEmail"                                   
+                                    required>
+
+                            </div>
+
+
+                            <div class="form-field">
+
+                                <label for="supplierPhone">
+                                    Phone
+                                </label>
+
+                                <input
+                                    type="text"
+                                    id="supplierPhone"                                    
+                                    required>
+
+                            </div>
+
+
+                            <div class="hero-actions">
+
+                                <button
+                                    type="submit"
+                                    class="btn btn-accent"
+                                    id="saveSupplierBtn">
+
+                                    Save Supplier
+
+                                </button>
+
+
+                                <button
+                                    type="reset"
+                                    class="btn btn-outline"
+                                    id="clearSupplierBtn">
+
+                                    Clear
+
+                                </button>
+
+                            </div>
+
+                        </form>
+
+                    </div>
+
+                </div>
+
+
+                <!-- Supplier List -->
+                <div class="zone">
+
+                    <h2 class="zone-title">
+                        Suppliers
+                    </h2>
+
+                    <div class="card-module">
+
+                        <table>
+
+                            <caption>
+                                Supplier List
+                            </caption>
+
+                            <thead>
+
+                                <tr>
+                                    <th scope="col">ID</th>
+                                    <th scope="col">Name</th>
+                                    <th scope="col">Email</th>
+                                    <th scope="col">Phone</th>
+                                    <th scope="col">Actions</th>
+                                </tr>
+
+                            </thead>
+
+                            <tbody id="supplierTableBody">
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+                </div>
+
+            </div>
 
         </section>
 
     </main>
-<script src="Supplier.js"></script>
+
+
+    <footer class="site-footer">
+
+        <div class="container footer-inner">
+
+            <p>
+                Inventory and Warehouse Management System
+            </p>
+
+        </div>
+
+    </footer>
+
+
+    <script src="Supplier.js"></script>
+
 </body>
 
 </html>

@@ -12,11 +12,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const tableBody = document.getElementById('supplierTableBody');
     const statusBanner = document.getElementById('statusBanner');
+
     const saveButton = document.getElementById('saveSupplierBtn');
+    const clearButton = document.getElementById('clearSupplierBtn');
 
 
-    function showStatus(message) {
+    function showStatus(message, type = 'info') {
         statusBanner.textContent = message;
+        statusBanner.className = `status-banner ${type}`;
         statusBanner.hidden = false;
     }
 
@@ -31,10 +34,92 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
 
+    function checkToken() {
+
+        const token = getToken();
+
+        if (!token) {
+            showStatus(
+                'Please register or sign in first.',
+                'error'
+            );
+
+            return null;
+        }
+
+        return token;
+    }
+
+
+    // Find the real SupplierId because SupplierId
+    // is hidden from JSON by [JsonIgnore]
+    async function findSupplierId(supplier, token) {
+
+        // This project has a small training database.
+        // Check possible IDs until the matching supplier is found.
+        for (let id = 1; id <= 200; id++) {
+
+            const response = await fetch(
+                `${API_BASE}/Supplier/GetSupplier?id=${id}`,
+                {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                }
+            );
+
+
+            if (response.status === 404) {
+                continue;
+            }
+
+
+            if (response.status === 401) {
+                throw new Error(
+                    'Your login session is invalid or expired.'
+                );
+            }
+
+
+            if (response.status === 403) {
+                throw new Error(
+                    'Only Manager or Admin users can manage suppliers.'
+                );
+            }
+
+
+            if (!response.ok) {
+                continue;
+            }
+
+
+            const result = await response.json();
+
+
+            // Compare the supplier information
+            if (
+                result.name === supplier.name &&
+                result.email === supplier.email &&
+                result.phone === supplier.phone
+            ) {
+                return id;
+            }
+        }
+
+
+        return null;
+    }
+
+
     // Load all suppliers
     async function loadSuppliers() {
 
-        const token = getToken();
+        const token = checkToken();
+
+        if (!token) {
+            return;
+        }
+
 
         try {
 
@@ -48,36 +133,72 @@ document.addEventListener('DOMContentLoaded', () => {
             );
 
 
-            // Your controller returns 404 if there are no suppliers
+            if (response.status === 401) {
+                throw new Error(
+                    'Your login session is invalid or expired.'
+                );
+            }
+
+
+            if (response.status === 403) {
+                throw new Error(
+                    'Only Manager or Admin users can manage suppliers.'
+                );
+            }
+
+
             if (response.status === 404) {
+
                 tableBody.innerHTML = '';
-                showStatus('There are no suppliers yet.');
+
+                showStatus(
+                    'There are no suppliers yet.',
+                    'info'
+                );
+
                 return;
             }
 
 
             if (!response.ok) {
-                throw new Error('Could not load suppliers.');
+
+                const message = await response.text();
+
+                throw new Error(
+                    message || 'Could not load suppliers.'
+                );
             }
 
 
             const suppliers = await response.json();
 
+
+            // Find the hidden ID for every supplier
+            for (const supplier of suppliers) {
+
+                supplier.realId =
+                    await findSupplierId(supplier, token);
+            }
+
+
             displaySuppliers(suppliers);
+
+            clearStatus();
 
         }
         catch (error) {
 
-            showStatus(error.message);
+            showStatus(error.message, 'error');
 
         }
     }
 
 
-    // Display suppliers inside the table
+    // Display suppliers
     function displaySuppliers(suppliers) {
 
         tableBody.innerHTML = '';
+
 
         suppliers.forEach(supplier => {
 
@@ -85,38 +206,72 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
             const idCell = document.createElement('td');
-            idCell.textContent = supplier.supplierId;
+
+            idCell.textContent =
+                supplier.realId ?? '-';
 
 
             const nameCell = document.createElement('td');
-            nameCell.textContent = supplier.name;
+
+            nameCell.textContent =
+                supplier.name;
 
 
             const emailCell = document.createElement('td');
-            emailCell.textContent = supplier.email;
+
+            emailCell.textContent =
+                supplier.email;
 
 
             const phoneCell = document.createElement('td');
-            phoneCell.textContent = supplier.phone;
+
+            phoneCell.textContent =
+                supplier.phone;
 
 
-            const actionsCell = document.createElement('td');
+            const actionsCell =
+                document.createElement('td');
 
 
-            const editButton = document.createElement('button');
+            // Edit button
+            const editButton =
+                document.createElement('button');
+
+            editButton.type = 'button';
             editButton.textContent = 'Edit';
+            editButton.className = 'btn';
+
 
             editButton.addEventListener('click', () => {
+
                 editSupplier(supplier);
+
             });
 
 
-            const deleteButton = document.createElement('button');
+            // Delete button
+            const deleteButton =
+                document.createElement('button');
+
+            deleteButton.type = 'button';
             deleteButton.textContent = 'Delete';
+            deleteButton.className = 'btn';
+
 
             deleteButton.addEventListener('click', () => {
-                deleteSupplier(supplier.supplierId);
+
+                deleteSupplier(supplier.realId);
+
             });
+
+
+            // Disable actions if the ID could not be found
+            if (supplier.realId === null) {
+
+                editButton.disabled = true;
+                deleteButton.disabled = true;
+
+            }
 
 
             actionsCell.appendChild(editButton);
@@ -136,25 +291,37 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
 
-    // Add or update supplier
+    // Form submit
     form.addEventListener('submit', async (event) => {
 
         event.preventDefault();
+
         clearStatus();
 
-        const id = supplierId.value;
 
-
-        if (id === '') {
+        if (supplierId.value === '') {
 
             await addSupplier();
 
         }
         else {
 
-            await updateSupplier(id);
+            await updateSupplier(supplierId.value);
 
         }
+
+    });
+
+
+    // Clear button
+    clearButton.addEventListener('click', () => {
+
+        supplierId.value = '';
+
+        saveButton.textContent =
+            'Save Supplier';
+
+        clearStatus();
 
     });
 
@@ -162,13 +329,18 @@ document.addEventListener('DOMContentLoaded', () => {
     // Add supplier
     async function addSupplier() {
 
-        const token = getToken();
+        const token = checkToken();
+
+        if (!token) {
+            return;
+        }
+
 
         const supplier = {
 
             Name: supplierName.value,
-            Email: supplierEmail.value,
-            Phone: supplierPhone.value
+            Phone: supplierPhone.value,
+            Email: supplierEmail.value
 
         };
 
@@ -192,36 +364,76 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (!response.ok) {
 
-                const message = await response.text();
+                const message =
+                    await response.text();
 
-                throw new Error(message || 'Could not add supplier.');
+                throw new Error(
+                    message ||
+                    'Could not add supplier.'
+                );
             }
 
 
-            showStatus('Supplier added successfully.');
-
             form.reset();
 
+            supplierId.value = '';
+
+            saveButton.textContent =
+                'Save Supplier';
+
+
             await loadSuppliers();
+
+
+            showStatus(
+                'Supplier added successfully.',
+                'success'
+            );
 
         }
         catch (error) {
 
-            showStatus(error.message);
+            showStatus(
+                error.message,
+                'error'
+            );
 
         }
     }
 
 
-    // Put supplier information into the form
+    // Fill form for editing
     function editSupplier(supplier) {
 
-        supplierId.value = supplier.supplierId;
-        supplierName.value = supplier.name;
-        supplierEmail.value = supplier.email;
-        supplierPhone.value = supplier.phone;
+        if (supplier.realId === null) {
 
-        saveButton.textContent = 'Update Supplier';
+            showStatus(
+                'Could not find supplier ID.',
+                'error'
+            );
+
+            return;
+        }
+
+
+        supplierId.value =
+            supplier.realId;
+
+        supplierName.value =
+            supplier.name;
+
+        supplierEmail.value =
+            supplier.email;
+
+        supplierPhone.value =
+            supplier.phone;
+
+
+        saveButton.textContent =
+            'Update Supplier';
+
+
+        clearStatus();
 
     }
 
@@ -229,16 +441,28 @@ document.addEventListener('DOMContentLoaded', () => {
     // Update supplier
     async function updateSupplier(id) {
 
-        const token = getToken();
+        const token = checkToken();
 
-        const parameters = new URLSearchParams({
+        if (!token) {
+            return;
+        }
 
-            id: id,
-            name: supplierName.value,
-            phone: supplierPhone.value,
-            email: supplierEmail.value
 
-        });
+        const parameters =
+            new URLSearchParams({
+
+                id: id,
+
+                name:
+                    supplierName.value,
+
+                phone:
+                    supplierPhone.value,
+
+                email:
+                    supplierEmail.value
+
+            });
 
 
         try {
@@ -257,26 +481,39 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (!response.ok) {
 
-                const message = await response.text();
+                const message =
+                    await response.text();
 
-                throw new Error(message || 'Could not update supplier.');
+                throw new Error(
+                    message ||
+                    'Could not update supplier.'
+                );
             }
 
-
-            showStatus('Supplier updated successfully.');
 
             form.reset();
 
             supplierId.value = '';
 
-            saveButton.textContent = 'Save Supplier';
+            saveButton.textContent =
+                'Save Supplier';
+
 
             await loadSuppliers();
+
+
+            showStatus(
+                'Supplier updated successfully.',
+                'success'
+            );
 
         }
         catch (error) {
 
-            showStatus(error.message);
+            showStatus(
+                error.message,
+                'error'
+            );
 
         }
     }
@@ -285,10 +522,27 @@ document.addEventListener('DOMContentLoaded', () => {
     // Delete supplier
     async function deleteSupplier(id) {
 
-        const token = getToken();
+        if (id === null) {
 
-        const confirmDelete =
-            confirm('Are you sure you want to delete this supplier?');
+            showStatus(
+                'Could not find supplier ID.',
+                'error'
+            );
+
+            return;
+        }
+
+
+        const token = checkToken();
+
+        if (!token) {
+            return;
+        }
+
+
+        const confirmDelete = confirm(
+            'Are you sure you want to delete this supplier?'
+        );
 
 
         if (!confirmDelete) {
@@ -312,26 +566,48 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (!response.ok) {
 
-                const message = await response.text();
+                const message =
+                    await response.text();
 
-                throw new Error(message || 'Could not delete supplier.');
+                throw new Error(
+                    message ||
+                    'Could not delete supplier.'
+                );
             }
 
 
-            showStatus('Supplier deleted successfully.');
+            if (supplierId.value == id) {
+
+                form.reset();
+
+                supplierId.value = '';
+
+                saveButton.textContent =
+                    'Save Supplier';
+            }
+
 
             await loadSuppliers();
+
+
+            showStatus(
+                'Supplier deleted successfully.',
+                'success'
+            );
 
         }
         catch (error) {
 
-            showStatus(error.message);
+            showStatus(
+                error.message,
+                'error'
+            );
 
         }
     }
 
 
-    // Load suppliers when the page opens
+    // Run when page opens
     loadSuppliers();
 
 });
