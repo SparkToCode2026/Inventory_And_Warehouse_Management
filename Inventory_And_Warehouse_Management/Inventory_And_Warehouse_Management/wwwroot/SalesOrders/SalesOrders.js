@@ -2,7 +2,6 @@ const API_BASE = 'https://localhost:7111';
 const TOKEN_KEY = 'token';
 
 document.addEventListener('DOMContentLoaded', () => {
-
   const form = document.getElementById('salesOrderForm');
   const formCard = document.getElementById('orderFormCard');
   const formTitle = document.getElementById('formTitle');
@@ -18,520 +17,199 @@ document.addEventListener('DOMContentLoaded', () => {
 
   let editingId = null;
 
-
-  // ---------- Status Message ----------
-
   function showStatus(message, type = 'info') {
     statusBanner.textContent = message;
     statusBanner.className = `status-banner ${type}`;
+    statusBanner.style.display = 'block';
     statusBanner.hidden = false;
   }
 
   function clearStatus() {
+    statusBanner.textContent = '';
+    statusBanner.style.display = 'none';
     statusBanner.hidden = true;
   }
 
-
-  // ---------- API Helper ----------
-
   async function apiRequest(url, options = {}) {
-
     const token = localStorage.getItem(TOKEN_KEY);
+    const headers = { 'Content-Type': 'application/json', ...(options.headers || {}) };
+    if (token) headers.Authorization = `Bearer ${token}`;
 
-    const headers = {
-      'Content-Type': 'application/json',
-      ...(options.headers || {})
-    };
-
-    if (token) {
-      headers.Authorization = `Bearer ${token}`;
-    }
-
-    const response = await fetch(url, {
-      ...options,
-      headers
-    });
-
-    if (response.status === 401) {
-      throw new Error('You are not authorized. Please sign in again.');
-    }
+    const response = await fetch(url, { ...options, headers });
+    if (response.status === 401) throw new Error('Not authorized.');
 
     const contentType = response.headers.get('content-type') || '';
-
-    const body = contentType.includes('application/json')
-      ? await response.json()
-      : await response.text();
-
-    if (!response.ok) {
-      throw new Error(
-        typeof body === 'string'
-          ? body
-          : 'Request failed.'
-      );
-    }
-
+    const body = contentType.includes('application/json') ? await response.json() : await response.text();
+    if (!response.ok) throw new Error(typeof body === 'string' ? body : JSON.stringify(body));
     return body;
   }
 
-
-  // ---------- Load All Sales Orders ----------
-
   async function loadOrders() {
+    clearStatus();
 
     try {
+        const orders = await apiRequest(
+            `${API_BASE}/SalesOrder/GetALLSalesOrders`
+        );
 
-      clearStatus();
-
-      const orders = await apiRequest(
-        `${API_BASE}/SalesOrder/GetALLSalesOrders`
-      );
-
-      displayOrders(orders);
+        displayOrders(orders);
 
     } catch (err) {
-
-      showStatus(err.message, 'error');
-
+        showStatus(err.message, 'error');
+        console.error(err);
     }
-  }
-
-
-  // ---------- Display Orders ----------
+}
 
   function displayOrders(orders) {
-
     ordersContainer.innerHTML = '';
-
     if (!orders || orders.length === 0) {
-
-      ordersContainer.innerHTML = `
-        <div class="empty-orders">
-          No sales orders found.
-        </div>
-      `;
-
+      ordersContainer.innerHTML = `<div class="empty-orders">No sales orders found.</div>`;
       return;
     }
 
-
     orders.forEach(order => {
-
+      const orderId = order.SalesOrderId || order.salesOrderId || order.id || 0;
       const card = document.createElement('div');
-
       card.className = 'order-card';
-
       card.innerHTML = `
-        <h3>Sales Order #${order.salesOrderId}</h3>
-
+        <h3>Sales Order #${orderId}</h3>
         <div class="order-info">
-
-          <div>
-            <strong>Customer ID:</strong>
-            ${order.customerId}
-          </div>
-
-          <div>
-            <strong>User ID:</strong>
-            ${order.userId}
-          </div>
-
-          <div>
-            <strong>Order Date:</strong>
-            ${formatDate(order.orderDate)}
-          </div>
-
-          <div>
-            <strong>Total Amount:</strong>
-            ${order.totalAmount}
-          </div>
-
-          <div>
-            <strong>Status:</strong>
-            <span class="order-status">
-              ${order.status}
-            </span>
-          </div>
-
+          <div><strong>Customer ID:</strong> ${order.CustomerId || order.customerId || 0}</div>
+          <div><strong>User ID:</strong> ${order.UserId || order.userId || 0}</div>
+          <div><strong>Order Date:</strong> ${order.OrderDate || order.orderDate ? new Date(order.OrderDate || order.orderDate).toLocaleString() : ''}</div>
+          <div><strong>Total Amount:</strong> $${(order.TotalAmount || order.totalAmount || 0).toFixed(2)}</div>
+          <div><strong>Status:</strong> <span class="order-status">${order.Status || order.status || ''}</span></div>
         </div>
-
         <div class="order-actions">
-
-          <button
-            class="btn btn-outline"
-            onclick="editOrder(${order.salesOrderId})">
-            Edit
-          </button>
-
-          <button
-            class="btn btn-outline"
-            onclick="updateOrderStatus(${order.salesOrderId})">
-            Update Status
-          </button>
-
-          <button
-            class="btn btn-outline"
-            onclick="deleteOrder(${order.salesOrderId})">
-            Delete
-          </button>
-
+          <button class="btn btn-outline" onclick="editOrder(${orderId})">Edit</button>
+          <button class="btn btn-outline" onclick="updateOrderStatus(${orderId})">Update Status</button>
+          <button class="btn btn-outline" onclick="deleteOrder(${orderId})">Delete</button>
         </div>
       `;
-
       ordersContainer.appendChild(card);
-
     });
   }
 
-
-  // ---------- Format Date ----------
-
-  function formatDate(date) {
-
-    if (!date) {
-      return '';
-    }
-
-    return new Date(date).toLocaleString();
-
-  }
-
-
-  // ---------- Open Add Form ----------
-
   document.getElementById('addOrderBtn').addEventListener('click', () => {
-
     editingId = null;
-
     form.reset();
-
     formTitle.textContent = 'Add Sales Order';
     saveBtn.textContent = 'Create Order';
-
     formCard.hidden = false;
-
     clearStatus();
-
   });
-
-
-  // ---------- Cancel Form ----------
 
   document.getElementById('cancelOrderBtn').addEventListener('click', () => {
-
     form.reset();
-
-    editingId = null;
-
     formCard.hidden = true;
-
     clearStatus();
-
   });
-
-
-  // ---------- Create / Update ----------
 
   form.addEventListener('submit', async (e) => {
-
     e.preventDefault();
-
     clearStatus();
-
+    const currentId = editingId || 0;
     const payload = {
-
+      SalesOrderId: currentId,
+      id: currentId,
       CustomerId: Number(customerIdInput.value),
-
       UserId: Number(userIdInput.value),
-
       OrderDate: new Date(orderDateInput.value).toISOString(),
-
       TotalAmount: Number(totalAmountInput.value),
-
       Status: statusInput.value
-
     };
 
-
     try {
-
       saveBtn.disabled = true;
-
-      saveBtn.textContent = editingId
-        ? 'Updating...'
-        : 'Creating...';
-
-
       if (editingId === null) {
-
-        // CREATE
-        await apiRequest(
-          `${API_BASE}/SalesOrder/AddSalesOrder`,
-          {
-            method: 'POST',
-            body: JSON.stringify(payload)
-          }
-        );
-
-        showStatus(
-          'Sales Order created successfully.',
-          'success'
-        );
-
+        await apiRequest(`${API_BASE}/SalesOrder/AddSalesOrder`, { method: 'POST', body: JSON.stringify(payload) });
       } else {
-
-        // UPDATE
-        await apiRequest(
-          `${API_BASE}/SalesOrder/UpdateSalesOrder?id=${editingId}`,
-          {
-            method: 'PUT',
-            body: JSON.stringify(payload)
-          }
-        );
-
-        showStatus(
-          'Sales Order updated successfully.',
-          'success'
-        );
-
+        await apiRequest(`${API_BASE}/SalesOrder/UpdateSalesOrder?id=${editingId}`, { method: 'PUT', body: JSON.stringify(payload) });
       }
-
-
       form.reset();
-
-      editingId = null;
-
       formCard.hidden = true;
-
-      await loadOrders();
-
-
+      loadOrders();
     } catch (err) {
-
-      showStatus(err.message, 'error');
-
+      showStatus("Check database primary keys or credentials.", 'error');
     } finally {
-
       saveBtn.disabled = false;
-
-      saveBtn.textContent = 'Create Order';
-
     }
-
   });
-
-
-  // ---------- Edit Order ----------
 
   window.editOrder = async function (id) {
-
     try {
-
-      const order = await apiRequest(
-        `${API_BASE}/SalesOrder/GetSalesOrder?id=${id}`
-      );
-
-
+      clearStatus();
+      const order = await apiRequest(`${API_BASE}/SalesOrder/GetSalesOrder?id=${id}`);
       editingId = id;
-
-      customerIdInput.value = order.customerId;
-
-      userIdInput.value = order.userId;
-
-      totalAmountInput.value = order.totalAmount;
-
-      statusInput.value = order.status;
-
-
-      if (order.orderDate) {
-
-        const date = new Date(order.orderDate);
-
-        const localDate =
-          date.getFullYear() +
-          '-' +
-          String(date.getMonth() + 1).padStart(2, '0') +
-          '-' +
-          String(date.getDate()).padStart(2, '0') +
-          'T' +
-          String(date.getHours()).padStart(2, '0') +
-          ':' +
-          String(date.getMinutes()).padStart(2, '0');
-
-        orderDateInput.value = localDate;
-
-      }
-
-
+      customerIdInput.value = order.CustomerId || order.customerId;
+      userIdInput.value = order.UserId || order.userId;
+      totalAmountInput.value = order.TotalAmount || order.totalAmount;
+      statusInput.value = order.Status || order.status;
       formTitle.textContent = 'Edit Sales Order';
-
       saveBtn.textContent = 'Update Order';
-
       formCard.hidden = false;
-
-      window.scrollTo({
-        top: formCard.offsetTop - 20,
-        behavior: 'smooth'
-      });
-
-
     } catch (err) {
-
-      showStatus(err.message, 'error');
-
+      showStatus("Error loading item details.", 'error');
     }
-
   };
-
-
-  // ---------- Update Status ----------
 
   window.updateOrderStatus = async function (id) {
-
     const newStatus = prompt(
-      'Enter new status: Pending, Shipped, or Delivered'
+        'Enter status (Pending, Shipped, Delivered):'
     );
 
-    if (!newStatus) {
-      return;
-    }
-
+    if (!newStatus) return;
 
     try {
+        clearStatus();
 
-      await apiRequest(
-        `${API_BASE}/SalesOrder/UpdateStatus?id=${id}&status=${encodeURIComponent(newStatus)}`,
-        {
-          method: 'PATCH'
-        }
-      );
+        await apiRequest(
+            `${API_BASE}/SalesOrder/UpdateStatus?id=${id}&status=${encodeURIComponent(newStatus)}`,
+            {
+                method: 'PATCH'
+            }
+        );
 
-
-      showStatus(
-        'Status updated successfully.',
-        'success'
-      );
-
-      await loadOrders();
-
+        await loadOrders();
 
     } catch (err) {
-
-      showStatus(err.message, 'error');
-
+        showStatus(err.message, 'error');
+        console.error(err);
     }
-
-  };
-
-
-  // ---------- Delete Order ----------
+};
 
   window.deleteOrder = async function (id) {
-
-    const confirmed = confirm(
-      `Are you sure you want to delete Sales Order #${id}?`
-    );
-
-    if (!confirmed) {
-      return;
-    }
-
-
+    if (!confirm(`Delete Order #${id}?`)) return;
     try {
-
-      await apiRequest(
-        `${API_BASE}/SalesOrder/RemoveSalesOrder?id=${id}`,
-        {
-          method: 'DELETE'
-        }
-      );
-
-
-      showStatus(
-        'Sales Order deleted successfully.',
-        'success'
-      );
-
-      await loadOrders();
-
-
+      clearStatus();
+      await apiRequest(`${API_BASE}/SalesOrder/RemoveSalesOrder?id=${id}`, { method: 'DELETE' });
+      loadOrders();
     } catch (err) {
-
-      showStatus(err.message, 'error');
-
+      showStatus("Error removing order.", 'error');
     }
-
   };
 
-
-  // ---------- Filter by Status ----------
-
-  document.getElementById('filterBtn').addEventListener('click', async () => {
-
-    const status =
-      document.getElementById('statusFilter').value.trim();
-
-    if (!status) {
-
-      showStatus(
-        'Please enter a status.',
-        'error'
-      );
-
-      return;
-    }
-
-
+  document.getElementById('sortBtn').addEventListener('click', async () => {
     try {
+        clearStatus();
 
-      const orders = await apiRequest(
-        `${API_BASE}/SalesOrder/FilterByStatus?status=${encodeURIComponent(status)}`
-      );
+        const orders = await apiRequest(
+            `${API_BASE}/SalesOrder/SortByTotalAmount`
+        );
 
-      displayOrders(orders);
+        displayOrders(orders);
 
     } catch (err) {
-
-      showStatus(err.message, 'error');
-
+        showStatus(err.message, 'error');
+        console.error(err);
     }
-
-  });
-
-
-  // ---------- Show All ----------
+});
 
   document.getElementById('showAllBtn').addEventListener('click', () => {
-
     document.getElementById('statusFilter').value = '';
-
     loadOrders();
-
   });
 
-
-  // ---------- Sort by Total Amount ----------
-
-  document.getElementById('sortBtn').addEventListener('click', async () => {
-
-    try {
-
-      const orders = await apiRequest(
-        `${API_BASE}/SalesOrder/SortByTotalAmount`
-      );
-
-      displayOrders(orders);
-
-    } catch (err) {
-
-      showStatus(err.message, 'error');
-
-    }
-
-  });
-
-
-  // ---------- Load Page ----------
-
+  // Run on start
   loadOrders();
-
 });
