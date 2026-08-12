@@ -10,7 +10,6 @@ namespace Inventory_And_Warehouse_Management.Models
     public class Warehouse
     {
         [Key]
-        [JsonIgnore]
         public int WarehouseId { get; set; }
         [Required]
         public string Name { get; set; }

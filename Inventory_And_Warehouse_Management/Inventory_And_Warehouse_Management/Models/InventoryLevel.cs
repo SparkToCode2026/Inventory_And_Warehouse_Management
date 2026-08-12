@@ -11,7 +11,7 @@ namespace Inventory_And_Warehouse_Management.Models
     [PrimaryKey(nameof(WarehouseId), nameof(ProductId))]
     public class InventoryLevel
     {
-        [JsonIgnore]
+
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int InventoryLevelId { get; set; }
         [Required]

@@ -10,7 +10,6 @@ namespace Inventory_And_Warehouse_Management.Models
     public class User
     {
         [Key]
-        [JsonIgnore]
         public int UserId { get; set; }
         [Required]
         public string? Name { get; set; }
