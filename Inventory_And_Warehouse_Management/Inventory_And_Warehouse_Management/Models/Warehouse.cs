@@ -10,7 +10,7 @@ namespace Inventory_And_Warehouse_Management.Models
     public class Warehouse
     {
         [Key]
-        [JsonIgnore]
+        
         public int WarehouseId { get; set; }
         [Required]
         public string Name { get; set; }
@@ -34,7 +34,6 @@ namespace Inventory_And_Warehouse_Management.Models
         public List<StockMovement> stockMovements { get; set; }
 
         //Warehouse and inventoryLevels
-        [JsonIgnore]
         [InverseProperty("warehouse")]
         public List<InventoryLevel> inventoryLevels { get; set; }
 
