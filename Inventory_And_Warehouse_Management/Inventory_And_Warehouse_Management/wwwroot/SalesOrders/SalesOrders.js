@@ -10,24 +10,24 @@ document.addEventListener('DOMContentLoaded', () => {
   const ordersContainer = document.getElementById('ordersContainer');
   const siteNav = document.getElementById('siteNav');
 
-if (localStorage.getItem(TOKEN_KEY)) {
-  siteNav.innerHTML = `
-    <button type="button" class="btn btn-ghost" id="signOutBtn">
-      Sign Out
-    </button>
-  `;
+  if (localStorage.getItem(TOKEN_KEY)) {
+    siteNav.innerHTML = `
+      <button type="button" class="btn btn-ghost" id="signOutBtn">
+        Sign Out
+      </button>
+    `;
 
-  document.getElementById('signOutBtn').addEventListener('click', () => {
-    localStorage.removeItem(TOKEN_KEY);
-    window.location.href = '../Auth/login.html';
-  });
-} else {
-  siteNav.innerHTML = `
-    <a href="../Auth/login.html" class="btn btn-ghost">
-      Sign In
-    </a>
-  `;
-}
+    document.getElementById('signOutBtn').addEventListener('click', () => {
+      localStorage.removeItem(TOKEN_KEY);
+      window.location.href = '../Auth/login.html';
+    });
+  } else {
+    siteNav.innerHTML = `
+      <a href="../Auth/login.html" class="btn btn-ghost">
+        Sign In
+      </a>
+    `;
+  }
 
   const customerIdInput = document.getElementById('customerId');
   const userIdInput = document.getElementById('userId');
@@ -65,50 +65,11 @@ if (localStorage.getItem(TOKEN_KEY)) {
     return body;
   }
 
-  // ---- ID lookup (SalesOrderId is hidden via [JsonIgnore], so we find it manually) ----
-
-  // Rounds the date down to the minute so small formatting differences don't break the match
-  function minuteKey(dateVal) {
-    if (!dateVal) return '';
-    const d = new Date(dateVal);
-    if (isNaN(d.getTime())) return '';
-    return d.toISOString().slice(0, 16);
-  }
-
-  // Checks if two orders are "the same" by comparing their fields
-  function ordersMatch(a, b) {
-    const aCust = a.CustomerId ?? a.customerId;
-    const bCust = b.CustomerId ?? b.customerId;
-    const aUser = a.UserId ?? a.userId;
-    const bUser = b.UserId ?? b.userId;
-    const aTotal = a.TotalAmount ?? a.totalAmount;
-    const bTotal = b.TotalAmount ?? b.totalAmount;
-    const aStatus = (a.Status ?? a.status ?? '').toString().toLowerCase();
-    const bStatus = (b.Status ?? b.status ?? '').toString().toLowerCase();
-    const aDate = minuteKey(a.OrderDate ?? a.orderDate);
-    const bDate = minuteKey(b.OrderDate ?? b.orderDate);
-
-    return (
-      Number(aCust) === Number(bCust) &&
-      Number(aUser) === Number(bUser) &&
-      Number(aTotal) === Number(bTotal) &&
-      aStatus === bStatus &&
-      aDate === bDate
-    );
-  }
-
-  // Tries IDs 1 to maxId until it finds the order that matches
-  async function findSalesOrderId(order, maxId = 200) {
-    const token = localStorage.getItem(TOKEN_KEY);
-    const headers = token ? { Authorization: `Bearer ${token}` } : {};
-
-    for (let id = 1; id <= maxId; id++) {
-      const res = await fetch(`${API_BASE}/SalesOrder/GetSalesOrder?id=${id}`, { headers });
-      if (res.status === 404 || !res.ok) continue;
-      const candidate = await res.json();
-      if (ordersMatch(candidate, order)) return id;
-    }
-    return null;
+  // ---- ID access ----
+  // Backend no longer hides SalesOrderId via [JsonIgnore], so it comes back
+  // directly on every order. No more probing IDs 1-200 to find a match.
+  function realIdOf(order) {
+    return order.SalesOrderId ?? order.salesOrderId ?? null;
   }
 
   async function loadOrders() {
@@ -117,10 +78,7 @@ if (localStorage.getItem(TOKEN_KEY)) {
     try {
       const orders = await apiRequest(`${API_BASE}/SalesOrder/GetALLSalesOrders`);
 
-      // Find the real ID for each order before displaying
-      for (const order of orders) {
-        order.realId = await findSalesOrderId(order);
-      }
+      orders.forEach(order => { order.realId = realIdOf(order); });
 
       currentOrders = orders;
       displayOrders(orders);
@@ -139,7 +97,7 @@ if (localStorage.getItem(TOKEN_KEY)) {
 
     orders.forEach(order => {
       const orderId = order.realId;
-      const disabled = orderId === null ? 'disabled' : ''; // no ID found = can't edit/delete safely
+      const disabled = orderId === null ? 'disabled' : ''; // no ID = can't edit/delete safely
 
       const card = document.createElement('div');
       card.className = 'order-card';
@@ -202,13 +160,12 @@ if (localStorage.getItem(TOKEN_KEY)) {
       formCard.hidden = true;
       loadOrders();
     } catch (err) {
-  showStatus(err.message, 'error');
-  console.error(err);
-
-} finally {
-  saveBtn.disabled = false;
-}
-});
+      showStatus(err.message, 'error');
+      console.error(err);
+    } finally {
+      saveBtn.disabled = false;
+    }
+  });
 
   window.editOrder = async function (id) {
     if (!id) { showStatus("Could not find this order's ID.", 'error'); return; }
@@ -274,9 +231,7 @@ if (localStorage.getItem(TOKEN_KEY)) {
     try {
       clearStatus();
       const orders = await apiRequest(`${API_BASE}/SalesOrder/SortByTotalAmount`);
-      for (const order of orders) {
-        order.realId = await findSalesOrderId(order);
-      }
+      orders.forEach(order => { order.realId = realIdOf(order); });
       currentOrders = orders;
       displayOrders(orders);
     } catch (err) {
