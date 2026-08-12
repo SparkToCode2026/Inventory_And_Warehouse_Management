@@ -11,7 +11,6 @@ namespace Inventory_And_Warehouse_Management.Models
     [PrimaryKey(nameof(SalesOrderId), nameof(ProductId))]
     public class SalesOrderItem
     {
-        [JsonIgnore]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int SalesOrderItemId { get; set; }
 

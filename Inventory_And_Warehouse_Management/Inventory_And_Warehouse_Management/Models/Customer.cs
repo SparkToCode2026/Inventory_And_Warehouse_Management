@@ -10,7 +10,7 @@ namespace Inventory_And_Warehouse_Management.Models
     public class Customer
     {
         [Key]
-        [JsonIgnore]
+
         public int CustomerId { get; set; }
         [Required]
         public string Name { get; set; }

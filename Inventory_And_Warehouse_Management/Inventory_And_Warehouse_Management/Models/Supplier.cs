@@ -10,7 +10,6 @@ namespace Inventory_And_Warehouse_Management.Models
     public class Supplier
     {
         [Key]
-        [JsonIgnore]
         public int SupplierId { get; set; }
         [Required]
         public string Name { get; set; }

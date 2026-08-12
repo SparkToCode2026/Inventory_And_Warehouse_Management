@@ -10,7 +10,7 @@ namespace Inventory_And_Warehouse_Management.Models
     public class PurchaseOrder
     {
         [Key]
-        [JsonIgnore]
+
         public int PurchaseOrderId { get; set; }
         public string Status { get; set; }
         public decimal TotalAmount { get; set; }
