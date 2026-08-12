@@ -10,7 +10,6 @@ namespace Inventory_And_Warehouse_Management.Models
     public class Category
     {
         [Key]
-        [JsonIgnore]
         public int CategoryId { get; set; }
 
         [Required]

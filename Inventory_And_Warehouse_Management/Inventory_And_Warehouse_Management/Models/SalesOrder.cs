@@ -10,7 +10,6 @@ namespace Inventory_And_Warehouse_Management.Models
     public class SalesOrder
     {
         [Key]
-        [JsonIgnore]
         public int SalesOrderId { get; set; }
 
         [Required]

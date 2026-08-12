@@ -43,32 +43,6 @@ function checkAccess() {
   }
 }
 
-// ---- ID lookups (ProductId / CategoryId are hidden via [JsonIgnore]) ----
-
-async function findCategoryId(category) {
-  for (let id = 1; id <= 200; id++) {
-    const res = await fetch(`${CATEGORY_API_BASE}/GetCategory?id=${id}`);
-    if (res.status === 404 || !res.ok) continue;
-    const result = await res.json();
-    if (result.name === category.name) return id;
-  }
-  return null;
-}
-
-async function findProductId(product) {
-  for (let id = 1; id <= 200; id++) {
-    const res = await fetch(`${API_BASE}/GetProduct?id=${id}`);
-    if (res.status === 404 || !res.ok) continue;
-    const result = await res.json();
-    if (
-      result.name === product.name &&
-      result.price === product.price &&
-      result.description === product.description
-    ) return id;
-  }
-  return null;
-}
-
 function categoryNameFor(categoryId) {
   const match = currentCategories.find(c => c.realId === categoryId);
   return match ? match.name : `Category #${categoryId}`;
@@ -95,7 +69,7 @@ async function loadCategories() {
 
     const result = await res.json();
     for (const category of result) {
-      category.realId = await findCategoryId(category);
+      category.realId = category.categoryId;
     }
     currentCategories = result;
 
@@ -128,7 +102,7 @@ async function getAllProducts() {
 
     const result = await res.json();
     for (const product of result) {
-      product.realId = await findProductId(product);
+      product.realId = product.productId;
     }
     currentProducts = result;
     renderProducts(currentProducts);
@@ -184,7 +158,7 @@ document.getElementById("applyFilterBtn")?.addEventListener("click", async () =>
     if (!res.ok) throw new Error("Could not filter products.");
     const result = await res.json();
     for (const product of result) {
-      product.realId = await findProductId(product);
+      product.realId = product.productId;
     }
     currentProducts = result;
     renderProducts(currentProducts);
@@ -204,7 +178,7 @@ document.getElementById("sortByPriceBtn")?.addEventListener("click", async () =>
     if (!res.ok) throw new Error("Could not sort products.");
     const result = await res.json();
     for (const product of result) {
-      product.realId = await findProductId(product);
+      product.realId = product.productId;
     }
     currentProducts = result;
     renderProducts(currentProducts);

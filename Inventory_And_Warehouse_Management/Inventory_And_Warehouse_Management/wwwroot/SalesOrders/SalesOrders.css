@@ -1,0 +1,233 @@
+.sales-orders-page {
+  padding: 3rem 0 5rem;
+}
+
+
+/* ---- Page Header ---- */
+
+.page-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.page-head h1 {
+  font-size: 1.5rem;
+  color: var(--text);
+  margin: 0;
+}
+
+.page-sub {
+  color: var(--text-dim);
+  font-size: .95rem;
+  margin: .35rem 0 0;
+}
+
+
+/* ---- Create / Edit Form ---- */
+
+.order-form-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  max-width: 600px;
+  margin: 0 auto 2rem;
+  padding: 2rem;
+}
+
+.order-form-card .form-field {
+  margin-bottom: 1.25rem;
+}
+
+.order-form-card .form-field label {
+  display: block;
+  margin-bottom: .4rem;
+  font-weight: 600;
+  font-size: .9rem;
+  color: var(--text);
+}
+
+.order-form-card .form-field input,
+.order-form-card .form-field select {
+  width: 100%;
+  padding: .65rem .8rem;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: .95rem;
+  box-sizing: border-box;
+}
+
+.order-form-card .form-field input:focus,
+.order-form-card .form-field select:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
+
+/* ---- Buttons ---- */
+
+.btn-block {
+  width: 100%;
+  margin-top: .5rem;
+}
+
+
+/* ---- Filter / Sort ---- */
+
+.orders-tools {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.filter-box {
+  display: flex;
+  gap: .5rem;
+}
+
+.filter-box input {
+  padding: .6rem .7rem;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: .92rem;
+}
+
+.filter-box input:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
+
+/* ---- Orders Section ---- */
+
+.orders-section {
+  margin-top: 2rem;
+}
+
+.section-head {
+  margin-bottom: 1rem;
+}
+
+.section-head h2 {
+  font-size: 1.1rem;
+  color: var(--text);
+}
+
+
+/* ---- Sales Order Card ---- */
+
+.order-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.25rem;
+  margin-bottom: 1rem;
+  transition: border-color .15s ease, box-shadow .15s ease;
+}
+
+.order-card:hover {
+  border-color: var(--accent);
+  box-shadow: 0 2px 10px rgba(31, 36, 48, 0.06);
+}
+
+.order-card h3 {
+  font-size: 1.05rem;
+  color: var(--text);
+  margin-bottom: .75rem;
+}
+
+.order-info {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: .5rem 1.5rem;
+  color: var(--text-dim);
+  font-size: .9rem;
+}
+
+.order-info strong {
+  color: var(--text);
+}
+
+.order-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .5rem;
+  margin-top: 1rem;
+}
+
+
+/* ---- Status ---- */
+
+.order-status {
+  display: inline-block;
+  padding: .2rem .55rem;
+  border-radius: 4px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-size: .8rem;
+  font-weight: 600;
+}
+
+
+/* ---- Empty Message ---- */
+
+.empty-orders {
+  text-align: center;
+  padding: 2rem;
+  color: var(--text-dim);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+
+/* ---- Responsive ---- */
+
+@media (max-width: 768px) {
+
+  .page-head {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .page-head .btn {
+    width: 100%;
+  }
+
+  .orders-tools {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .filter-box {
+    flex-direction: column;
+  }
+
+  .filter-box .btn {
+    width: 100%;
+  }
+
+  .order-info {
+    grid-template-columns: 1fr;
+  }
+
+  .order-actions {
+    flex-direction: column;
+  }
+
+  .order-actions .btn {
+    width: 100%;
+  }
+}
