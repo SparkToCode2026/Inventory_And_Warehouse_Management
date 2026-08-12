@@ -37,9 +37,36 @@
   padding: 2rem;
 }
 
-.order-form-card h2 {
-  font-size: 1.2rem;
+.order-form-card .form-field {
+  margin-bottom: 1.25rem;
+}
+
+.order-form-card .form-field label {
+  display: block;
+  margin-bottom: .4rem;
+  font-weight: 600;
+  font-size: .9rem;
   color: var(--text);
+}
+
+.order-form-card .form-field input,
+.order-form-card .form-field select {
+  width: 100%;
+  padding: .65rem .8rem;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: .95rem;
+  box-sizing: border-box;
+}
+
+.order-form-card .form-field input:focus,
+.order-form-card .form-field select:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
 }
 
 

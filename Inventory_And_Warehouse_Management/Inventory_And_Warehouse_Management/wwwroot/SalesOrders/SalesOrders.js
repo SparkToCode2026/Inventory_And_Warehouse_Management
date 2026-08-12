@@ -224,16 +224,28 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   };
 
-  window.deleteOrder = async function (id) {
+  window.deleteOrder = function (id) {
     if (!id) { showStatus("Could not find this order's ID.", 'error'); return; }
-    if (!confirm(`Delete Order #${id}?`)) return;
-    try {
-      clearStatus();
-      await apiRequest(`${API_BASE}/SalesOrder/RemoveSalesOrder?id=${id}`, { method: 'DELETE' });
-      loadOrders();
-    } catch (err) {
-      showStatus("Error removing order.", 'error');
-    }
+
+    const modalEl = document.getElementById('deleteConfirmModal');
+    const modal = new bootstrap.Modal(modalEl);
+    const confirmBtn = document.getElementById('confirmDeleteBtn');
+
+    const newConfirmBtn = confirmBtn.cloneNode(true);
+    confirmBtn.parentNode.replaceChild(newConfirmBtn, confirmBtn);
+
+    newConfirmBtn.addEventListener('click', async () => {
+      modal.hide();
+      try {
+        clearStatus();
+        await apiRequest(`${API_BASE}/SalesOrder/RemoveSalesOrder?id=${id}`, { method: 'DELETE' });
+        loadOrders();
+      } catch (err) {
+        showStatus("Error removing order.", 'error');
+      }
+    });
+
+    modal.show();
   };
 
   document.getElementById('sortBtn').addEventListener('click', async () => {
