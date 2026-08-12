@@ -8,6 +8,26 @@ document.addEventListener('DOMContentLoaded', () => {
   const saveBtn = document.getElementById('saveOrderBtn');
   const statusBanner = document.getElementById('statusBanner');
   const ordersContainer = document.getElementById('ordersContainer');
+  const siteNav = document.getElementById('siteNav');
+
+if (localStorage.getItem(TOKEN_KEY)) {
+  siteNav.innerHTML = `
+    <button type="button" class="btn btn-ghost" id="signOutBtn">
+      Sign Out
+    </button>
+  `;
+
+  document.getElementById('signOutBtn').addEventListener('click', () => {
+    localStorage.removeItem(TOKEN_KEY);
+    window.location.href = '../Auth/login.html';
+  });
+} else {
+  siteNav.innerHTML = `
+    <a href="../Auth/login.html" class="btn btn-ghost">
+      Sign In
+    </a>
+  `;
+}
 
   const customerIdInput = document.getElementById('customerId');
   const userIdInput = document.getElementById('userId');
@@ -182,11 +202,13 @@ document.addEventListener('DOMContentLoaded', () => {
       formCard.hidden = true;
       loadOrders();
     } catch (err) {
-      showStatus("Check database primary keys or credentials.", 'error');
-    } finally {
-      saveBtn.disabled = false;
-    }
-  });
+  showStatus(err.message, 'error');
+  console.error(err);
+
+} finally {
+  saveBtn.disabled = false;
+}
+});
 
   window.editOrder = async function (id) {
     if (!id) { showStatus("Could not find this order's ID.", 'error'); return; }
