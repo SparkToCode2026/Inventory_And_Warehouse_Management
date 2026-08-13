@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Warehouse Management</title>
+
+    <link rel="stylesheet" href="Warehouse.css">
+    <link rel="stylesheet" href="../style.css">
+
+</head>
+
+<body>
+
+<!------------------Header------------------>
+<!------------------------------------------>
+
+<header class="site-header">
+    <div class="container header-inner">
+        <!-- Website Name -->
+        <div class="brand name">
+            Inventory & Warehouse Management
+            <span class="brand-sub"> Warehouse Management  </span>
+        </div>
+
+        <!-- Navigation Menu -->
+        <nav class="site-nav" id="siteNav">
+            <!-- Link To Home  -->
+            <a class="nav-link" href="../index.html">Home</a>
+        </nav>
+    </div>
+</header>
+
+<!--------------Hero Section---------------->
+<!------------------------------------------>
+
+<!--Hero Section -->
+<section class="hero">
+    <div class="container">
+        <!--Small label above the main title-->
+        <div class="hero-eyebrow">Warehouse Management</div>
+        <!--Main title-->
+        <h1 class="hero-title"> Every warehouse, one console.</h1>
+        <!--Description of the system -->
+        <p class="hero-sub">See capacity, contact details, and stock on hand across every site your team runs then add, edit, or retire a warehouse without leaving the page.</p>
+        <!-- Main Action Buttons -->
+        <div class="hero-actions">
+            <!-- Scroll to add warehouse section -->
+            <a href="#addWarehouse" class="btn btn-accent btn-lg">Add new Warehouse</a>
+            <!--View All warehouses-->
+            <a href="#warehouses" class="btn btn-ghost btn-lg">View All Warehouses</a>
+        </div>
+        <!--Warehouse Statics Section-->
+        <div class="hero-meta" id="heroStats">
+            <!-- Number of Warehouses-->
+            <span>
+                <span class="stat-num" id="statCount">-</span>
+                Warehouses
+            </span>
+            <!-- Total Capacity -->
+            <span>
+                <span class="stat-num" id="statCapacity">-</span>
+                total capacity      
+            </span>
+            <!--Total Stock On Hand -->
+            <span>
+                <span class="stat-num" id="statUsed">-</span>
+                Units on hand
+            </span>
+        </div>   
+    </div> 
+</section>
+
+<!--------------Main Content---------------->
+<!------------------------------------------>
+
+<main class="modules">
+    <div class="container">
+
+        <!-- Warehouse fillter Section  -->
+        <!-- JavaScript will create the container for warehouse cards -->
+        <!-------------------------------------------------------------->
+
+        <!-- Warehouse Section -->
+        <div class="zone" id="warehouses">
+            <!--Section Title-->
+            <div class="zone-title"><span>Warehouses</span></div>
+
+            <!-- Search, Filter, Sort and clear buttons-->
+            <div class="toolbar">
+                <!-- Location Filter -->
+                <input id="locationFilter" type="text" placeholder="Filter by location">
+                <!-- Apply Location filter -->
+                <button id="filterBtn" class="btn btn-outline btn-sm">Filter</button>
+                <!-- Sort Warehouses based on capacity -->
+                <button id="sortBtn" class="btn btn-outline btn-sm">Sort by used Capacity</button>
+                <!-- Clear Filter -->
+                <button id="clearBtn" class="btn btn-outline btn-sm">Clear</button>
+            </div>
+
+            <!-- Warehouse cards will be dynamically inserted here -->
+            <div class="grid" id="warehouseGrid"></div>
+                
+        </div>
+
+        <!-- Add New Warehouse Section  -->
+        <!-------------------------------------------------------------->
+
+        <!--Add Warehouse Section-->
+        <div class="zone" id="addWarehouse"> 
+            <!-- Section Title -->
+            <div class="zone-title">
+                Add New Warehouse
+            </div>
+
+            <!--Form used to add a new warehouse-->
+            <div class="card-module form-card">
+                <form id="addForm">
+                    <!--Form input fields-->
+                    <div class="form-grid">
+                        <!--Warehouse Name -->
+                        <label>
+                            Name
+                            <input name="Name" required>
+                        </label>
+                        <!--Warehouse Location -->
+                        <label>
+                            Location
+                            <input name="Location" required>
+                        </label>
+                        <!--Warehouse Capacity -->
+                        <label>
+                            Capacity
+                            <input name="Capacity" type="number" min="0" required>
+                        </label>
+                        <!--Warehouse Contact -->
+                        <label>
+                        Phone
+                        <input name="Phone" required>
+                        </label>
+                    </div>
+                    <!-- Submit Button -->
+                    <button type="submit" class="btn btn-accent">Add Warehouse</button>
+                    <!--JavaScript displays success or error messages here after submitting the form -->
+                    <span class="form-status" id="addStatus"></span>
+                </form>
+            </div>    
+        </div>
+    </div>
+</main>
+        
+        
+        
+    
+<script src="Warehouse.js"></script>
+</body>
