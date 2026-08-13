@@ -91,11 +91,6 @@ namespace Inventory_And_Warehouse_Management.Controllers
                 context.SaveChanges();
                 return Ok("Purchase order Status Updated");
             }
-
-            purchaseOrder.Status = status;
-            context.SaveChanges();
-
-            return Ok(purchaseOrder);
         }
 
         //Delete a PurchaseOrder
@@ -139,7 +134,7 @@ namespace Inventory_And_Warehouse_Management.Controllers
             .FirstOrDefault(p => p.PurchaseOrderId == id);
 
             if (purchaseOrder == null)
-                return NotFound("purchase ordernot found");
+                return NotFound("purchase order not found");
             return Ok(purchaseOrder);
         }
 
