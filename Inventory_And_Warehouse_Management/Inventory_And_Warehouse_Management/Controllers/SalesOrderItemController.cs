@@ -55,7 +55,7 @@ namespace Inventory_And_Warehouse_Management.Controllers
 
         // 2. Full Update SalesOrderItem
         [HttpPut("UpdateSalesOrderItem")]
-        public IActionResult UpdateSalesOrderItem(int id, SalesOrderItem newItem)
+        public IActionResult UpdateSalesOrderItem(int id, decimal newUnitPrice, int newQuantity)
         {
             SalesOrderItem item = context.salesOrderItems
                 .FirstOrDefault(i => i.SalesOrderItemId == id);
@@ -66,14 +66,17 @@ namespace Inventory_And_Warehouse_Management.Controllers
                 return NotFound("Item not found");
             }
 
+            decimal oldTotalPrice = item.TotalPrice;
 
-            item.Quantity = newItem.Quantity;
-            item.UnitPrice = newItem.UnitPrice;
+            item.Quantity = newQuantity;
+            item.UnitPrice = newUnitPrice;
             item.TotalPrice = item.Quantity * item.UnitPrice;
-            item.SalesOrderId = newItem.SalesOrderId;
-            item.ProductId = newItem.ProductId;
 
-
+            SalesOrder order = context.salesOrders
+                .FirstOrDefault(o => o.SalesOrderId == item.SalesOrderId); 
+            if (order != null) {
+                order.TotalAmount = order.TotalAmount - oldTotalPrice + item.TotalPrice;
+            }
             context.SaveChanges();
 
             return Ok();
@@ -92,10 +95,17 @@ namespace Inventory_And_Warehouse_Management.Controllers
             {
                 return NotFound("Item not found");
             }
-
+            decimal oldTotalPrice = item.TotalPrice;
 
             item.Quantity = newQuantity;
             item.TotalPrice = item.Quantity * item.UnitPrice;
+
+            SalesOrder order = context.salesOrders
+                .FirstOrDefault(o => o.SalesOrderId == item.SalesOrderId);
+            if (order != null)
+            {
+                order.TotalAmount = order.TotalAmount - oldTotalPrice + item.TotalPrice;
+            }
 
             context.SaveChanges();
 
@@ -117,6 +127,12 @@ namespace Inventory_And_Warehouse_Management.Controllers
                 return NotFound("Item not found");
             }
 
+            SalesOrder order = context.salesOrders
+                .FirstOrDefault(o => o.SalesOrderId == item.SalesOrderId);
+
+            if (order != null) {
+                order.TotalAmount -= item.TotalPrice;
+            }
 
             context.salesOrderItems.Remove(item);
 

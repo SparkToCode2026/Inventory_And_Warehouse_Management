@@ -75,16 +75,19 @@ namespace Inventory_And_Warehouse_Management.Controllers
                 inventoryLevel.QuantityOnHand = quantityOnHand;
                 inventoryLevel.ReorderThreshold = reorderThreshold;
                 Context.SaveChanges();
-                
-                List<User> managers = Context.users.Where(u => u.Role == "Manager").ToList();
-                foreach (User manager in managers)
+
+                if (inventoryLevel.QuantityOnHand < inventoryLevel.ReorderThreshold)
                 {
-                    await emailService.SendEmailAsync(
-                    manager.Email,
-                    "Low Stock Alert",
-                    $"Product {inventoryLevel.product.Name} at Warehouse {inventoryLevel.warehouse.Name} is low on stock: " +
-                    $"{inventoryLevel.QuantityOnHand} units remaining (threshold: {inventoryLevel.ReorderThreshold})"
-                    );
+                    List<User> managers = Context.users.Where(u => u.Role == "Manager").ToList();
+                    foreach (User manager in managers)
+                    {
+                        await emailService.SendEmailAsync(
+                        manager.Email,
+                        "Low Stock Alert",
+                        $"Product {inventoryLevel.product.Name} at Warehouse {inventoryLevel.warehouse.Name} is low on stock: " +
+                        $"{inventoryLevel.QuantityOnHand} units remaining (threshold: {inventoryLevel.ReorderThreshold})"
+                        );
+                    }
                 }
 
                 return Ok(inventoryLevel);
@@ -112,15 +115,19 @@ namespace Inventory_And_Warehouse_Management.Controllers
                 
             inventoryLevel.QuantityOnHand = newQuantity;
             Context.SaveChanges();
-            List<User> managers = Context.users.Where(u => u.Role == "Manager").ToList();
-                foreach (User manager in managers)
+
+                if (inventoryLevel.QuantityOnHand < inventoryLevel.ReorderThreshold)
                 {
-                    await emailService.SendEmailAsync(
-                    manager.Email,
-                    "Low Stock Alert",
-                    $"Product {inventoryLevel.product.Name} at Warehouse {inventoryLevel.warehouse.Name} is low on stock: " +
-                    $"{inventoryLevel.QuantityOnHand} units remaining (threshold: {inventoryLevel.ReorderThreshold})"
-                    );
+                    List<User> managers = Context.users.Where(u => u.Role == "Manager").ToList();
+                    foreach (User manager in managers)
+                    {
+                        await emailService.SendEmailAsync(
+                        manager.Email,
+                        "Low Stock Alert",
+                        $"Product {inventoryLevel.product.Name} at Warehouse {inventoryLevel.warehouse.Name} is low on stock: " +
+                        $"{inventoryLevel.QuantityOnHand} units remaining (threshold: {inventoryLevel.ReorderThreshold})"
+                        );
+                    }
                 }
 
             

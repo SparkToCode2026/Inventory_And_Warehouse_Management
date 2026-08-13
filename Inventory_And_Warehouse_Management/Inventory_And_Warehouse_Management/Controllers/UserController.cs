@@ -11,7 +11,7 @@ namespace Inventory_And_Warehouse_Management.Controllers
     [ApiController]
     [Route("User")]
     [Authorize(Roles = "Manager,Admin")]
-    public class UserController : Controller
+    public class UserController : ControllerBase
     {
         private ProjectContext context;
         private readonly PasswordHasher<User> _hasher = new();

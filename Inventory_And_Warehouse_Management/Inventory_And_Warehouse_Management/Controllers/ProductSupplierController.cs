@@ -8,7 +8,7 @@ namespace Inventory_And_Warehouse_Management.Controllers
     [ApiController]
     [Route("ProductSupplier")]
     [Authorize]
-    public class ProductSupplierController : Controller
+    public class ProductSupplierController : ControllerBase
     {
         private ProjectContext context;
         public ProductSupplierController(ProjectContext _context)

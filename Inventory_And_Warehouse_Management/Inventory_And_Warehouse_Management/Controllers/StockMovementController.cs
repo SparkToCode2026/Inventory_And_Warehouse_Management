@@ -9,7 +9,7 @@ namespace Inventory_And_Warehouse_Management.Controllers
     [ApiController]
     [Route("StockMovement")]
     [Authorize]
-    public class StockMovementController : Controller
+    public class StockMovementController : ControllerBase
     {
         private ProjectContext context;
         private readonly IEmailService _emailService;
