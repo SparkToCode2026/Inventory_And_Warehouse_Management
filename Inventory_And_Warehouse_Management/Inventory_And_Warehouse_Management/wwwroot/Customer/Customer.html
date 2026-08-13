@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Customer Management</title>
+
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+
+    <!-- Header -->
+    <header class="site-header">
+
+        <div class="container header-inner">
+
+            <a href="../index.html" class="brand">
+                Inventory & Warehouse
+            </a>
+
+            <nav class="site-nav">
+                <a href="../index.html" class="nav-link">Home</a>
+            </nav>
+
+        </div>
+
+    </header>
+
+
+    <main>
+
+        <!-- Page Heading -->
+        <section class="hero">
+
+            <div class="container">
+
+                <h1 class="hero-title">
+                    Customer Management
+                </h1>
+
+                <p class="hero-sub">
+                    Add, edit and manage customer information.
+                </p>
+
+            </div>
+
+        </section>
+
+
+        <!-- Customer Content -->
+        <section class="modules">
+
+            <div class="container">
+
+                <div
+                    id="statusBanner"
+                    class="status-banner"
+                    hidden>
+                </div>
+
+
+                <!-- Customer Form -->
+                <div class="zone">
+
+                    <h2 class="zone-title">
+                        Customer Details
+                    </h2>
+
+                    <div class="card-module">
+
+                        <form id="customerForm">
+
+                            <input
+                                type="hidden"
+                                id="customerId">
+
+
+                            <div class="form-field">
+
+                                <label for="customerName">
+                                    Name
+                                </label>
+
+                                <input
+                                    type="text"
+                                    id="customerName"
+                                    required>
+
+                            </div>
+
+
+                            <div class="form-field">
+
+                                <label for="customerEmail">
+                                    Email
+                                </label>
+
+                                <input
+                                    type="email"
+                                    id="customerEmail"
+                                    required>
+
+                            </div>
+
+
+                            <div class="form-field">
+
+                                <label for="customerPhone">
+                                    Phone
+                                </label>
+
+                                <input
+                                    type="text"
+                                    id="customerPhone"
+                                    required>
+
+                            </div>
+
+
+                            <div class="form-field">
+
+                                <label for="customerLocation">
+                                    Location
+                                </label>
+
+                                <input
+                                    type="text"
+                                    id="customerLocation"
+                                    required>
+
+                            </div>
+
+
+                            <div class="hero-actions">
+
+                                <button
+                                    type="submit"
+                                    class="btn btn-accent"
+                                    id="saveCustomerBtn">
+
+                                    Save Customer
+
+                                </button>
+
+
+                                <button
+                                    type="reset"
+                                    class="btn btn-outline"
+                                    id="clearCustomerBtn">
+
+                                    Clear
+
+                                </button>
+
+                            </div>
+
+                        </form>
+
+                    </div>
+
+                </div>
+
+
+                <!-- Customer List -->
+                <div class="zone">
+
+                    <h2 class="zone-title">
+                        Customers
+                    </h2>
+
+                    <div class="card-module">
+
+                        <table>
+
+                            <caption>
+                                Customer List
+                            </caption>
+
+                            <thead>
+
+                                <tr>
+                                    <th scope="col">ID</th>
+                                    <th scope="col">Name</th>
+                                    <th scope="col">Email</th>
+                                    <th scope="col">Phone</th>
+                                    <th scope="col">Location</th>
+                                    <th scope="col">Actions</th>
+                                </tr>
+
+                            </thead>
+
+                            <tbody id="customerTableBody">
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <footer class="site-footer">
+
+        <div class="container footer-inner">
+
+            <p>
+                Inventory and Warehouse Management System
+            </p>
+
+        </div>
+
+    </footer>
+
+
+    <script src="Customer.js"></script>
+
+</body>
+
+</html>

@@ -3,18 +3,19 @@ const TOKEN_KEY = 'token';
 
 document.addEventListener('DOMContentLoaded', () => {
 
-    const form = document.getElementById('supplierForm');
+    const form = document.getElementById('customerForm');
 
-    const supplierId = document.getElementById('supplierId');
-    const supplierName = document.getElementById('supplierName');
-    const supplierEmail = document.getElementById('supplierEmail');
-    const supplierPhone = document.getElementById('supplierPhone');
+    const customerId = document.getElementById('customerId');
+    const customerName = document.getElementById('customerName');
+    const customerEmail = document.getElementById('customerEmail');
+    const customerPhone = document.getElementById('customerPhone');
+    const customerLocation = document.getElementById('customerLocation');
 
-    const tableBody = document.getElementById('supplierTableBody');
+    const tableBody = document.getElementById('customerTableBody');
     const statusBanner = document.getElementById('statusBanner');
 
-    const saveButton = document.getElementById('saveSupplierBtn');
-    const clearButton = document.getElementById('clearSupplierBtn');
+    const saveButton = document.getElementById('saveCustomerBtn');
+    const clearButton = document.getElementById('clearCustomerBtn');
 
 
     function showStatus(message, type = 'info') {
@@ -45,7 +46,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
 
-    async function loadSuppliers() {
+    async function loadCustomers() {
 
         const token = checkToken();
 
@@ -57,7 +58,7 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
 
             const response = await fetch(
-                `${API_BASE}/Supplier/GetAllSuppliers`,
+                `${API_BASE}/Customer/GetAllCustomers`,
                 {
                     headers: {
                         'Authorization': `Bearer ${token}`
@@ -72,7 +73,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
             if (response.status === 403) {
-                throw new Error('Only Manager or Admin users can manage suppliers.');
+                throw new Error('You are not allowed to access customers.');
             }
 
 
@@ -84,13 +85,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (!response.ok) {
                 const message = await response.text();
-                throw new Error(message || 'Could not load suppliers.');
+                throw new Error(message || 'Could not load customers.');
             }
 
 
-            const suppliers = await response.json();
+            const customers = await response.json();
 
-            displaySuppliers(suppliers);
+            displayCustomers(customers);
 
             clearStatus();
 
@@ -103,30 +104,34 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
 
-    function displaySuppliers(suppliers) {
+    function displayCustomers(customers) {
 
         tableBody.innerHTML = '';
 
 
-        suppliers.forEach(supplier => {
+        customers.forEach(customer => {
 
             const row = document.createElement('tr');
 
 
             const idCell = document.createElement('td');
-            idCell.textContent = supplier.supplierId;
+            idCell.textContent = customer.customerId;
 
 
             const nameCell = document.createElement('td');
-            nameCell.textContent = supplier.name;
+            nameCell.textContent = customer.name;
 
 
             const emailCell = document.createElement('td');
-            emailCell.textContent = supplier.email;
+            emailCell.textContent = customer.email;
 
 
             const phoneCell = document.createElement('td');
-            phoneCell.textContent = supplier.phone;
+            phoneCell.textContent = customer.phone;
+
+
+            const locationCell = document.createElement('td');
+            locationCell.textContent = customer.location;
 
 
             const actionsCell = document.createElement('td');
@@ -138,7 +143,7 @@ document.addEventListener('DOMContentLoaded', () => {
             editButton.className = 'btn btn-outline';
 
             editButton.addEventListener('click', () => {
-                editSupplier(supplier);
+                editCustomer(customer);
             });
 
 
@@ -148,7 +153,7 @@ document.addEventListener('DOMContentLoaded', () => {
             deleteButton.className = 'btn btn-outline';
 
             deleteButton.addEventListener('click', () => {
-                deleteSupplier(supplier.supplierId);
+                deleteCustomer(customer.customerId);
             });
 
 
@@ -160,6 +165,7 @@ document.addEventListener('DOMContentLoaded', () => {
             row.appendChild(nameCell);
             row.appendChild(emailCell);
             row.appendChild(phoneCell);
+            row.appendChild(locationCell);
             row.appendChild(actionsCell);
 
 
@@ -176,14 +182,14 @@ document.addEventListener('DOMContentLoaded', () => {
         clearStatus();
 
 
-        if (supplierId.value === '') {
+        if (customerId.value === '') {
 
-            await addSupplier();
+            await addCustomer();
 
         }
         else {
 
-            await updateSupplier(supplierId.value);
+            await updateCustomer(customerId.value);
 
         }
 
@@ -192,16 +198,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
     clearButton.addEventListener('click', () => {
 
-        supplierId.value = '';
+        customerId.value = '';
 
-        saveButton.textContent = 'Save Supplier';
+        saveButton.textContent = 'Save Customer';
 
         clearStatus();
 
     });
 
 
-    async function addSupplier() {
+    async function addCustomer() {
 
         const token = checkToken();
 
@@ -210,17 +216,18 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
 
-        const supplier = {
-            Name: supplierName.value,
-            Phone: supplierPhone.value,
-            Email: supplierEmail.value
+        const customer = {
+            Name: customerName.value,
+            Phone: customerPhone.value,
+            Email: customerEmail.value,
+            Location: customerLocation.value
         };
 
 
         try {
 
             const response = await fetch(
-                `${API_BASE}/Supplier/AddSupplier`,
+                `${API_BASE}/Customer/AddCustomer`,
                 {
                     method: 'POST',
 
@@ -229,28 +236,28 @@ document.addEventListener('DOMContentLoaded', () => {
                         'Authorization': `Bearer ${token}`
                     },
 
-                    body: JSON.stringify(supplier)
+                    body: JSON.stringify(customer)
                 }
             );
 
 
             if (!response.ok) {
                 const message = await response.text();
-                throw new Error(message || 'Could not add supplier.');
+                throw new Error(message || 'Could not add customer.');
             }
 
 
             form.reset();
 
-            supplierId.value = '';
+            customerId.value = '';
 
-            saveButton.textContent = 'Save Supplier';
-
-
-            await loadSuppliers();
+            saveButton.textContent = 'Save Customer';
 
 
-            showStatus('Supplier added successfully.', 'success');
+            await loadCustomers();
+
+
+            showStatus('Customer added successfully.', 'success');
 
         }
         catch (error) {
@@ -261,22 +268,23 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
 
-    function editSupplier(supplier) {
+    function editCustomer(customer) {
 
-        supplierId.value = supplier.supplierId;
+        customerId.value = customer.customerId;
 
-        supplierName.value = supplier.name;
-        supplierEmail.value = supplier.email;
-        supplierPhone.value = supplier.phone;
+        customerName.value = customer.name;
+        customerEmail.value = customer.email;
+        customerPhone.value = customer.phone;
+        customerLocation.value = customer.location;
 
-        saveButton.textContent = 'Update Supplier';
+        saveButton.textContent = 'Update Customer';
 
         clearStatus();
 
     }
 
 
-    async function updateSupplier(id) {
+    async function updateCustomer(id) {
 
         const token = checkToken();
 
@@ -287,16 +295,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const parameters = new URLSearchParams({
             id: id,
-            name: supplierName.value,
-            phone: supplierPhone.value,
-            email: supplierEmail.value
+            name: customerName.value,
+            phone: customerPhone.value,
+            email: customerEmail.value,
+            location: customerLocation.value
         });
 
 
         try {
 
             const response = await fetch(
-                `${API_BASE}/Supplier/UpdateSupplier?${parameters}`,
+                `${API_BASE}/Customer/UpdateCustomer?${parameters}`,
                 {
                     method: 'PUT',
 
@@ -309,21 +318,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (!response.ok) {
                 const message = await response.text();
-                throw new Error(message || 'Could not update supplier.');
+                throw new Error(message || 'Could not update customer.');
             }
 
 
             form.reset();
 
-            supplierId.value = '';
+            customerId.value = '';
 
-            saveButton.textContent = 'Save Supplier';
-
-
-            await loadSuppliers();
+            saveButton.textContent = 'Save Customer';
 
 
-            showStatus('Supplier updated successfully.', 'success');
+            await loadCustomers();
+
+
+            showStatus('Customer updated successfully.', 'success');
 
         }
         catch (error) {
@@ -334,7 +343,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
 
-    async function deleteSupplier(id) {
+    async function deleteCustomer(id) {
 
         const token = checkToken();
 
@@ -344,7 +353,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
         const confirmDelete = confirm(
-            'Are you sure you want to delete this supplier?'
+            'Are you sure you want to delete this customer?'
         );
 
 
@@ -356,7 +365,7 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
 
             const response = await fetch(
-                `${API_BASE}/Supplier/DeleteSupplier?id=${id}`,
+                `${API_BASE}/Customer/DeleteCustomer?id=${id}`,
                 {
                     method: 'DELETE',
 
@@ -367,26 +376,31 @@ document.addEventListener('DOMContentLoaded', () => {
             );
 
 
-            if (!response.ok) {
-                const message = await response.text();
-                throw new Error(message || 'Could not delete supplier.');
+            if (response.status === 403) {
+                throw new Error('Only Manager or Admin users can delete customers.');
             }
 
 
-            if (supplierId.value == id) {
+            if (!response.ok) {
+                const message = await response.text();
+                throw new Error(message || 'Could not delete customer.');
+            }
+
+
+            if (customerId.value == id) {
 
                 form.reset();
 
-                supplierId.value = '';
+                customerId.value = '';
 
-                saveButton.textContent = 'Save Supplier';
+                saveButton.textContent = 'Save Customer';
             }
 
 
-            await loadSuppliers();
+            await loadCustomers();
 
 
-            showStatus('Supplier deleted successfully.', 'success');
+            showStatus('Customer deleted successfully.', 'success');
 
         }
         catch (error) {
@@ -397,6 +411,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
 
-    loadSuppliers();
+    loadCustomers();
 
 });
