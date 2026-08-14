@@ -1,613 +1,252 @@
-const API_BASE = 'https://localhost:7111';
-const TOKEN_KEY = 'token';
-
-document.addEventListener('DOMContentLoaded', () => {
-
-    const form = document.getElementById('supplierForm');
-
-    const supplierId = document.getElementById('supplierId');
-    const supplierName = document.getElementById('supplierName');
-    const supplierEmail = document.getElementById('supplierEmail');
-    const supplierPhone = document.getElementById('supplierPhone');
-
-    const tableBody = document.getElementById('supplierTableBody');
-    const statusBanner = document.getElementById('statusBanner');
-
-    const saveButton = document.getElementById('saveSupplierBtn');
-    const clearButton = document.getElementById('clearSupplierBtn');
-
-
-    function showStatus(message, type = 'info') {
-        statusBanner.textContent = message;
-        statusBanner.className = `status-banner ${type}`;
-        statusBanner.hidden = false;
-    }
-
-
-    function clearStatus() {
-        statusBanner.hidden = true;
-    }
-
-
-    function getToken() {
-        return localStorage.getItem(TOKEN_KEY);
-    }
-
-
-    function checkToken() {
-
-        const token = getToken();
-
-        if (!token) {
-            showStatus(
-                'Please register or sign in first.',
-                'error'
-            );
-
-            return null;
-        }
-
-        return token;
-    }
-
-
-    // Find the real SupplierId because SupplierId
-    // is hidden from JSON by [JsonIgnore]
-    async function findSupplierId(supplier, token) {
-
-        // This project has a small training database.
-        // Check possible IDs until the matching supplier is found.
-        for (let id = 1; id <= 200; id++) {
-
-            const response = await fetch(
-                `${API_BASE}/Supplier/GetSupplier?id=${id}`,
-                {
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
-                }
-            );
-
-
-            if (response.status === 404) {
-                continue;
-            }
-
-
-            if (response.status === 401) {
-                throw new Error(
-                    'Your login session is invalid or expired.'
-                );
-            }
-
-
-            if (response.status === 403) {
-                throw new Error(
-                    'Only Manager or Admin users can manage suppliers.'
-                );
-            }
-
-
-            if (!response.ok) {
-                continue;
-            }
-
-
-            const result = await response.json();
-
-
-            // Compare the supplier information
-            if (
-                result.name === supplier.name &&
-                result.email === supplier.email &&
-                result.phone === supplier.phone
-            ) {
-                return id;
-            }
-        }
-
-
-        return null;
-    }
-
-
-    // Load all suppliers
-    async function loadSuppliers() {
-
-        const token = checkToken();
-
-        if (!token) {
-            return;
-        }
-
-
-        try {
-
-            const response = await fetch(
-                `${API_BASE}/Supplier/GetAllSuppliers`,
-                {
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
-                }
-            );
-
-
-            if (response.status === 401) {
-                throw new Error(
-                    'Your login session is invalid or expired.'
-                );
-            }
-
-
-            if (response.status === 403) {
-                throw new Error(
-                    'Only Manager or Admin users can manage suppliers.'
-                );
-            }
-
-
-            if (response.status === 404) {
-
-                tableBody.innerHTML = '';
-
-                showStatus(
-                    'There are no suppliers yet.',
-                    'info'
-                );
-
-                return;
-            }
-
-
-            if (!response.ok) {
-
-                const message = await response.text();
-
-                throw new Error(
-                    message || 'Could not load suppliers.'
-                );
-            }
-
-
-            const suppliers = await response.json();
-
-
-            // Find the hidden ID for every supplier
-            for (const supplier of suppliers) {
-
-                supplier.realId =
-                    await findSupplierId(supplier, token);
-            }
-
-
-            displaySuppliers(suppliers);
-
-            clearStatus();
-
-        }
-        catch (error) {
-
-            showStatus(error.message, 'error');
-
-        }
-    }
-
-
-    // Display suppliers
-    function displaySuppliers(suppliers) {
-
-        tableBody.innerHTML = '';
-
-
-        suppliers.forEach(supplier => {
-
-            const row = document.createElement('tr');
-
-
-            const idCell = document.createElement('td');
-
-            idCell.textContent =
-                supplier.realId ?? '-';
-
-
-            const nameCell = document.createElement('td');
-
-            nameCell.textContent =
-                supplier.name;
-
-
-            const emailCell = document.createElement('td');
-
-            emailCell.textContent =
-                supplier.email;
-
-
-            const phoneCell = document.createElement('td');
-
-            phoneCell.textContent =
-                supplier.phone;
-
-
-            const actionsCell =
-                document.createElement('td');
-
-
-            // Edit button
-            const editButton =
-                document.createElement('button');
-
-            editButton.type = 'button';
-            editButton.textContent = 'Edit';
-            editButton.className = 'btn';
-
-
-            editButton.addEventListener('click', () => {
-
-                editSupplier(supplier);
-
-            });
-
-
-            // Delete button
-            const deleteButton =
-                document.createElement('button');
-
-            deleteButton.type = 'button';
-            deleteButton.textContent = 'Delete';
-            deleteButton.className = 'btn';
-
-
-            deleteButton.addEventListener('click', () => {
-
-                deleteSupplier(supplier.realId);
-
-            });
-
-
-            // Disable actions if the ID could not be found
-            if (supplier.realId === null) {
-
-                editButton.disabled = true;
-                deleteButton.disabled = true;
-
-            }
-
-
-            actionsCell.appendChild(editButton);
-            actionsCell.appendChild(deleteButton);
-
-
-            row.appendChild(idCell);
-            row.appendChild(nameCell);
-            row.appendChild(emailCell);
-            row.appendChild(phoneCell);
-            row.appendChild(actionsCell);
-
-
-            tableBody.appendChild(row);
-
-        });
-    }
-
-
-    // Form submit
-    form.addEventListener('submit', async (event) => {
-
-        event.preventDefault();
-
-        clearStatus();
-
-
-        if (supplierId.value === '') {
-
-            await addSupplier();
-
-        }
-        else {
-
-            await updateSupplier(supplierId.value);
-
-        }
-
+const API_BASE = "https://localhost:7111/Supplier";
+
+let currentSuppliers = [];
+let editingSupplierId = null;
+
+function decodeJwt(token) {
+  try {
+    const payload = token.split(".")[1];
+    const decoded = atob(payload.replace(/-/g, "+").replace(/_/g, "/"));
+    return JSON.parse(decoded);
+  } catch {
+    return null;
+  }
+}
+
+// SupplierController requires Manager/Admin at the class level, so unlike
+// Product/Customer this page is all-or-nothing: either you're a
+// Manager/Admin and see everything, or you see an access-denied wall.
+function checkAccess() {
+  const token = localStorage.getItem("token");
+  const claims = token ? decodeJwt(token) : null;
+  const role = claims?.role
+    || claims?.["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"]
+    || claims?.["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/role"];
+
+  const signedIn = Boolean(token && claims);
+  const canManage = signedIn && (role === "Manager" || role === "Admin");
+
+  document.getElementById("accessDenied").classList.toggle("hidden", canManage);
+  document.getElementById("pageContent").classList.toggle("hidden", !canManage);
+
+  const label = document.getElementById("currentUserLabel");
+  if (label && signedIn) {
+    label.textContent = `${claims.name || claims.sub || "User"} (${role || "Unknown"})`;
+  }
+
+  return canManage;
+}
+
+function showStatus(message, type = "info") {
+  const banner = document.getElementById("statusBanner");
+  banner.textContent = message;
+  banner.className = `status-banner ${type}`;
+  banner.classList.remove("hidden");
+}
+
+function clearStatus() {
+  document.getElementById("statusBanner").classList.add("hidden");
+}
+
+async function getAllSuppliers() {
+  try {
+    const token = localStorage.getItem("token");
+    const res = await fetch(`${API_BASE}/GetAllSuppliers`, {
+      headers: { "Authorization": `Bearer ${token}` }
     });
 
+    if (res.status === 401) throw new Error("Your login session is invalid or expired.");
+    if (res.status === 403) throw new Error("Only Manager or Admin users can access suppliers.");
 
-    // Clear button
-    clearButton.addEventListener('click', () => {
+    if (res.status === 404) {
+      currentSuppliers = [];
+      renderSuppliers(currentSuppliers);
+      showStatus("There are no suppliers yet.", "info");
+      return;
+    }
 
-        supplierId.value = '';
+    if (!res.ok) throw new Error("Could not load suppliers.");
 
-        saveButton.textContent =
-            'Save Supplier';
+    currentSuppliers = await res.json();
+    renderSuppliers(currentSuppliers);
+    clearStatus();
+  } catch (err) {
+    showStatus(err.message, "error");
+  }
+}
 
-        clearStatus();
+function renderSuppliers(suppliers) {
+  const tbody = document.getElementById("suppliersTableBody");
+  tbody.innerHTML = "";
 
+  suppliers.forEach(s => {
+    const row = document.createElement("tr");
+
+    const idCell = `<td>${s.supplierId}</td>`;
+    const nameCell = `<td>${s.name}</td>`;
+    const emailCell = `<td>${s.email}</td>`;
+    const phoneCell = `<td>${s.phone}</td>`;
+
+    const editBtn = `<button class="btn btn-outline btn-sm" onclick="openEditModal(${s.supplierId})" type="button">Edit</button>`;
+    const emailBtn = `<button class="btn btn-outline btn-sm" onclick="openEmailModal(${s.supplierId})" type="button">Email</button>`;
+    const deleteBtn = `<button class="btn btn-outline btn-sm" onclick="deleteSupplier(${s.supplierId})" type="button">Delete</button>`;
+
+    row.innerHTML = `${idCell}${nameCell}${emailCell}${phoneCell}<td>${editBtn} ${emailBtn} ${deleteBtn}</td>`;
+    tbody.appendChild(row);
+  });
+}
+
+// ---- Toolbar: filter / sort ----
+
+document.getElementById("applyFilterBtn")?.addEventListener("click", async () => {
+  const name = document.getElementById("nameFilter").value.trim();
+  if (name === "") { getAllSuppliers(); return; }
+
+  try {
+    const token = localStorage.getItem("token");
+    const res = await fetch(`${API_BASE}/FilterSuppliersByName?name=${encodeURIComponent(name)}`, {
+      headers: { "Authorization": `Bearer ${token}` }
     });
-
-
-    // Add supplier
-    async function addSupplier() {
-
-        const token = checkToken();
-
-        if (!token) {
-            return;
-        }
-
-
-        const supplier = {
-
-            Name: supplierName.value,
-            Phone: supplierPhone.value,
-            Email: supplierEmail.value
-
-        };
-
-
-        try {
-
-            const response = await fetch(
-                `${API_BASE}/Supplier/AddSupplier`,
-                {
-                    method: 'POST',
-
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`
-                    },
-
-                    body: JSON.stringify(supplier)
-                }
-            );
-
-
-            if (!response.ok) {
-
-                const message =
-                    await response.text();
-
-                throw new Error(
-                    message ||
-                    'Could not add supplier.'
-                );
-            }
-
-
-            form.reset();
-
-            supplierId.value = '';
-
-            saveButton.textContent =
-                'Save Supplier';
-
-
-            await loadSuppliers();
-
-
-            showStatus(
-                'Supplier added successfully.',
-                'success'
-            );
-
-        }
-        catch (error) {
-
-            showStatus(
-                error.message,
-                'error'
-            );
-
-        }
+    if (res.status === 404) {
+      currentSuppliers = [];
+      renderSuppliers(currentSuppliers);
+      showStatus("No suppliers match that name.", "info");
+      return;
     }
-
-
-    // Fill form for editing
-    function editSupplier(supplier) {
-
-        if (supplier.realId === null) {
-
-            showStatus(
-                'Could not find supplier ID.',
-                'error'
-            );
-
-            return;
-        }
-
-
-        supplierId.value =
-            supplier.realId;
-
-        supplierName.value =
-            supplier.name;
-
-        supplierEmail.value =
-            supplier.email;
-
-        supplierPhone.value =
-            supplier.phone;
-
-
-        saveButton.textContent =
-            'Update Supplier';
-
-
-        clearStatus();
-
-    }
-
-
-    // Update supplier
-    async function updateSupplier(id) {
-
-        const token = checkToken();
-
-        if (!token) {
-            return;
-        }
-
-
-        const parameters =
-            new URLSearchParams({
-
-                id: id,
-
-                name:
-                    supplierName.value,
-
-                phone:
-                    supplierPhone.value,
-
-                email:
-                    supplierEmail.value
-
-            });
-
-
-        try {
-
-            const response = await fetch(
-                `${API_BASE}/Supplier/UpdateSupplier?${parameters}`,
-                {
-                    method: 'PUT',
-
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
-                }
-            );
-
-
-            if (!response.ok) {
-
-                const message =
-                    await response.text();
-
-                throw new Error(
-                    message ||
-                    'Could not update supplier.'
-                );
-            }
-
-
-            form.reset();
-
-            supplierId.value = '';
-
-            saveButton.textContent =
-                'Save Supplier';
-
-
-            await loadSuppliers();
-
-
-            showStatus(
-                'Supplier updated successfully.',
-                'success'
-            );
-
-        }
-        catch (error) {
-
-            showStatus(
-                error.message,
-                'error'
-            );
-
-        }
-    }
-
-
-    // Delete supplier
-    async function deleteSupplier(id) {
-
-        if (id === null) {
-
-            showStatus(
-                'Could not find supplier ID.',
-                'error'
-            );
-
-            return;
-        }
-
-
-        const token = checkToken();
-
-        if (!token) {
-            return;
-        }
-
-
-        const confirmDelete = confirm(
-            'Are you sure you want to delete this supplier?'
-        );
-
-
-        if (!confirmDelete) {
-            return;
-        }
-
-
-        try {
-
-            const response = await fetch(
-                `${API_BASE}/Supplier/DeleteSupplier?id=${id}`,
-                {
-                    method: 'DELETE',
-
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
-                }
-            );
-
-
-            if (!response.ok) {
-
-                const message =
-                    await response.text();
-
-                throw new Error(
-                    message ||
-                    'Could not delete supplier.'
-                );
-            }
-
-
-            if (supplierId.value == id) {
-
-                form.reset();
-
-                supplierId.value = '';
-
-                saveButton.textContent =
-                    'Save Supplier';
-            }
-
-
-            await loadSuppliers();
-
-
-            showStatus(
-                'Supplier deleted successfully.',
-                'success'
-            );
-
-        }
-        catch (error) {
-
-            showStatus(
-                error.message,
-                'error'
-            );
-
-        }
-    }
-
-
-    // Run when page opens
-    loadSuppliers();
-
+    if (!res.ok) throw new Error("Could not filter suppliers.");
+    currentSuppliers = await res.json();
+    renderSuppliers(currentSuppliers);
+  } catch (err) {
+    showStatus(err.message, "error");
+  }
+});
+
+document.getElementById("clearFilterBtn")?.addEventListener("click", () => {
+  document.getElementById("nameFilter").value = "";
+  getAllSuppliers();
+});
+
+document.getElementById("sortByOrdersBtn")?.addEventListener("click", async () => {
+  try {
+    const token = localStorage.getItem("token");
+    const res = await fetch(`${API_BASE}/SortSuppliersByNumOfPurchaseOrders`, {
+      headers: { "Authorization": `Bearer ${token}` }
+    });
+    if (!res.ok) throw new Error("Could not sort suppliers.");
+    currentSuppliers = await res.json();
+    renderSuppliers(currentSuppliers);
+  } catch (err) {
+    showStatus(err.message, "error");
+  }
+});
+
+// ---- Add / Edit modal ----
+
+document.getElementById("addSupplierBtn")?.addEventListener("click", () => {
+  editingSupplierId = null;
+  document.getElementById("supplierModalTitle").textContent = "Add Supplier";
+  document.getElementById("supplierName").value = "";
+  document.getElementById("supplierEmail").value = "";
+  document.getElementById("supplierPhone").value = "";
+  new bootstrap.Modal(document.getElementById("supplierModal")).show();
+});
+
+function openEditModal(id) {
+  const supplier = currentSuppliers.find(s => s.supplierId === id);
+  if (!supplier) return;
+
+  editingSupplierId = id;
+  document.getElementById("supplierModalTitle").textContent = "Edit Supplier";
+  document.getElementById("supplierName").value = supplier.name;
+  document.getElementById("supplierEmail").value = supplier.email;
+  document.getElementById("supplierPhone").value = supplier.phone;
+
+  new bootstrap.Modal(document.getElementById("supplierModal")).show();
+}
+
+document.getElementById("saveSupplierBtn")?.addEventListener("click", () => {
+  const name = document.getElementById("supplierName").value.trim();
+  const email = document.getElementById("supplierEmail").value.trim();
+  const phone = document.getElementById("supplierPhone").value.trim();
+
+  if (!name) { showStatus("Name is required.", "error"); return; }
+  if (!email) { showStatus("Email is required.", "error"); return; }
+  if (!phone) { showStatus("Phone is required.", "error"); return; }
+
+  const token = localStorage.getItem("token");
+
+  if (editingSupplierId === null) {
+    fetch(`${API_BASE}/AddSupplier`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
+      body: JSON.stringify({ Name: name, Email: email, Phone: phone })
+    })
+      .then(res => res.ok ? getAllSuppliers() : Promise.reject(res.status))
+      .then(() => bootstrap.Modal.getInstance(document.getElementById("supplierModal")).hide())
+      .catch(err => showStatus("Could not add supplier: " + err, "error"));
+  } else {
+    const params = new URLSearchParams({ id: editingSupplierId, name, email, phone });
+    fetch(`${API_BASE}/UpdateSupplier?${params}`, {
+      method: "PUT",
+      headers: { "Authorization": `Bearer ${token}` }
+    })
+      .then(res => res.ok ? getAllSuppliers() : Promise.reject(res.status))
+      .then(() => bootstrap.Modal.getInstance(document.getElementById("supplierModal")).hide())
+      .catch(err => showStatus("Could not update supplier: " + err, "error"));
+  }
+});
+
+// ---- Email-only modal (second distinct update case) ----
+
+function openEmailModal(id) {
+  const supplier = currentSuppliers.find(s => s.supplierId === id);
+  if (!supplier) return;
+
+  editingSupplierId = id;
+  document.getElementById("newEmailInput").value = supplier.email;
+  new bootstrap.Modal(document.getElementById("emailModal")).show();
+}
+
+document.getElementById("saveEmailBtn")?.addEventListener("click", () => {
+  const newEmail = document.getElementById("newEmailInput").value.trim();
+  if (!newEmail) { showStatus("Enter a valid email.", "error"); return; }
+
+  const token = localStorage.getItem("token");
+  fetch(`${API_BASE}/UpdateSupplierEmail?id=${editingSupplierId}&email=${encodeURIComponent(newEmail)}`, {
+    method: "PATCH",
+    headers: { "Authorization": `Bearer ${token}` }
+  })
+    .then(res => res.ok ? getAllSuppliers() : Promise.reject(res.status))
+    .then(() => bootstrap.Modal.getInstance(document.getElementById("emailModal")).hide())
+    .catch(err => showStatus("Could not update email: " + err, "error"));
+});
+
+// ---- Delete ----
+
+function deleteSupplier(id) {
+  if (!confirm("Remove this supplier? This can't be undone.")) return;
+
+  const token = localStorage.getItem("token");
+  fetch(`${API_BASE}/DeleteSupplier?id=${id}`, {
+    method: "DELETE",
+    headers: { "Authorization": `Bearer ${token}` }
+  })
+    .then(res => res.ok ? getAllSuppliers() : Promise.reject(res.status))
+    .catch(err => showStatus("Could not delete supplier: " + err, "error"));
+}
+
+// ---- Logout ----
+
+document.getElementById("logoutBtn")?.addEventListener("click", () => {
+  localStorage.removeItem("token");
+  window.location.reload();
+});
+
+// ---- Entry point ----
+
+document.addEventListener("DOMContentLoaded", async () => {
+  const canManage = checkAccess();
+  if (canManage) {
+    await getAllSuppliers();
+  }
 });
