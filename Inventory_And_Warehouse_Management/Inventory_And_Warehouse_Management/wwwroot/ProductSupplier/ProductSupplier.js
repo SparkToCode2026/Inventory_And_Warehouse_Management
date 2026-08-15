@@ -47,10 +47,10 @@ document.addEventListener('DOMContentLoaded', () => {
       siteNav.innerHTML = `<button type="button" class="btn btn-ghost" id="signOutBtn">Sign Out</button>`;
       document.getElementById('signOutBtn').addEventListener('click', () => {
         localStorage.removeItem(TOKEN_KEY);
-        window.location.reload();
+        window.location.href = '../index.html';
       });
     } else {
-      siteNav.innerHTML = `<a href="../Auth/login.html" class="btn btn-ghost">Sign In</a>`;
+      siteNav.innerHTML = `<a href="../Register/login.html" class="btn btn-ghost">Sign In</a>`;
     }
   }
 
