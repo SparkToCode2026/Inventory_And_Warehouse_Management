@@ -25,6 +25,7 @@ namespace Inventory_And_Warehouse_Management.Controllers
         }
 
         [HttpPost("register")]
+        [Authorize(Roles = "Manager,Admin")]
         public async Task<IActionResult> Register(RegisterDto dto)
         {
             if (await _db.users.AnyAsync(u => u.Email == dto.Email))
