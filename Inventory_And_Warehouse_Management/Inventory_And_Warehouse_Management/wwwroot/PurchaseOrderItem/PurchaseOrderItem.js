@@ -3,10 +3,7 @@ const API_BASE = "https://localhost:7111/PurchaseOrderItem";
 let currentPurchaseOrderItems = [];
 let signedIn = false;
 let sortDescending = true;
-
-// ============================================================
-// JWT
-// ============================================================
+let editingItemId = null;
 
 function decodeJwt(token) {
   try {
@@ -19,10 +16,6 @@ function decodeJwt(token) {
     return null;
   }
 }
-
-// ============================================================
-// ACCESS
-// ============================================================
 
 function checkAccess() {
   const token = localStorage.getItem("token");
@@ -39,6 +32,8 @@ function checkAccess() {
 
   document.getElementById("signInLink")?.classList.toggle("hidden", signedIn);
 
+  document.getElementById("addItemBtn")?.classList.toggle("hidden", !signedIn);
+
   const label = document.getElementById("currentUserLabel");
 
   if (label) {
@@ -47,10 +42,6 @@ function checkAccess() {
       : "";
   }
 }
-
-// ============================================================
-// STATUS
-// ============================================================
 
 function showStatus(message, type = "info") {
   const banner = document.getElementById("statusBanner");
@@ -64,10 +55,6 @@ function showStatus(message, type = "info") {
 function clearStatus() {
   document.getElementById("statusBanner")?.classList.add("hidden");
 }
-
-// ============================================================
-// FRIENDLY ERROR HANDLING
-// ============================================================
 
 function getFriendlyErrorMessage(status, action) {
   switch (status) {
@@ -98,10 +85,6 @@ async function checkResponse(response, action) {
 
   throw new Error(getFriendlyErrorMessage(response.status, action));
 }
-
-// ============================================================
-// HELPERS
-// ============================================================
 
 function getItemId(item) {
   return item.purchaseOrderItemId ?? item.PurchaseOrderItemId ?? "-";
@@ -137,10 +120,6 @@ function getTotalPrice(item) {
   return Number(item.totalPrice ?? item.TotalPrice ?? 0);
 }
 
-// ============================================================
-// RENDER ITEMS
-// ============================================================
-
 function renderPurchaseOrderItems(items) {
   const tbody = document.getElementById("purchaseOrderItemsTableBody");
 
@@ -149,7 +128,7 @@ function renderPurchaseOrderItems(items) {
   if (!items || items.length === 0) {
     tbody.innerHTML = `
       <tr>
-        <td colspan="6" class="text-center">
+        <td colspan="7" class="text-center">
           No purchase order items found.
         </td>
       </tr>
@@ -161,22 +140,31 @@ function renderPurchaseOrderItems(items) {
   items.forEach((item) => {
     const row = document.createElement("tr");
 
+    const id = getItemId(item);
+
+    const editBtn = signedIn
+      ? `<button class="btn btn-outline btn-sm" onclick="openEditItemModal(${id})" type="button">Edit</button>`
+      : "";
+    const qtyBtn = signedIn
+      ? `<button class="btn btn-outline btn-sm" onclick="openQuantityModal(${id})" type="button">Quantity</button>`
+      : "";
+    const deleteBtn = signedIn
+      ? `<button class="btn btn-outline btn-sm" onclick="deleteItem(${id})" type="button">Delete</button>`
+      : "";
+
     row.innerHTML = `
-      <td>${getItemId(item)}</td>
+      <td>${id}</td>
       <td>${getPurchaseOrderId(item)}</td>
       <td>${getProductName(item)} (#${getProductId(item)})</td>
       <td>${getQuantity(item)}</td>
       <td>${getUnitPrice(item).toFixed(2)}</td>
       <td>${getTotalPrice(item).toFixed(2)}</td>
+      <td>${editBtn} ${qtyBtn} ${deleteBtn}</td>
     `;
 
     tbody.appendChild(row);
   });
 }
-
-// ============================================================
-// GET ALL ITEMS
-// ============================================================
 
 async function getAllPurchaseOrderItems() {
   if (!signedIn) {
@@ -212,9 +200,149 @@ async function getAllPurchaseOrderItems() {
   }
 }
 
-// ============================================================
-// FILTER
-// ============================================================
+document.getElementById("addItemBtn")?.addEventListener("click", () => {
+  editingItemId = null;
+  document.getElementById("itemModalTitle").textContent = "Add Item";
+  document.getElementById("itemPurchaseOrderId").value = "";
+  document.getElementById("itemProductId").value = "";
+  document.getElementById("itemQuantity").value = "";
+  document.getElementById("itemUnitPrice").value = "";
+  new bootstrap.Modal(document.getElementById("itemModal")).show();
+});
+
+function openEditItemModal(id) {
+  const item = currentPurchaseOrderItems.find((i) => getItemId(i) === id);
+  if (!item) return;
+
+  editingItemId = id;
+  document.getElementById("itemModalTitle").textContent = "Edit Item";
+  document.getElementById("itemPurchaseOrderId").value =
+    getPurchaseOrderId(item);
+  document.getElementById("itemProductId").value = getProductId(item);
+  document.getElementById("itemQuantity").value = getQuantity(item);
+  document.getElementById("itemUnitPrice").value = getUnitPrice(item);
+
+  new bootstrap.Modal(document.getElementById("itemModal")).show();
+}
+
+document.getElementById("saveItemBtn")?.addEventListener("click", async () => {
+  const purchaseOrderId = document.getElementById("itemPurchaseOrderId").value;
+  const productId = document.getElementById("itemProductId").value;
+  const quantity = document.getElementById("itemQuantity").value;
+  const unitPrice = document.getElementById("itemUnitPrice").value;
+
+  if (!purchaseOrderId || !productId || !quantity || unitPrice === "") {
+    showStatus("Please fill in all fields.", "error");
+    return;
+  }
+
+  const token = localStorage.getItem("token");
+
+  try {
+    let response;
+
+    if (editingItemId === null) {
+      response = await fetch(`${API_BASE}/AddPurchaseOrderItem`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          PurchaseOrderId: parseInt(purchaseOrderId, 10),
+          ProductId: parseInt(productId, 10),
+          Quantity: parseInt(quantity, 10),
+          UnitPrice: parseFloat(unitPrice),
+        }),
+      });
+    } else {
+      const params = new URLSearchParams({
+        id: editingItemId,
+        purchaseOrderId,
+        productId,
+        quantity,
+        unitPrice,
+      });
+
+      response = await fetch(
+        `${API_BASE}/UpdatePurchaseOrderItem?${params.toString()}`,
+        {
+          method: "PUT",
+          headers: { Authorization: `Bearer ${token}` },
+        },
+      );
+    }
+
+    await checkResponse(
+      response,
+      editingItemId === null ? "add item" : "update item",
+    );
+
+    bootstrap.Modal.getInstance(document.getElementById("itemModal")).hide();
+    await getAllPurchaseOrderItems();
+  } catch (error) {
+    showStatus(error.message, "error");
+  }
+});
+
+function openQuantityModal(id) {
+  const item = currentPurchaseOrderItems.find((i) => getItemId(i) === id);
+  if (!item) return;
+
+  editingItemId = id;
+  document.getElementById("newQuantityInput").value = getQuantity(item);
+  new bootstrap.Modal(document.getElementById("quantityModal")).show();
+}
+
+document
+  .getElementById("saveQuantityBtn")
+  ?.addEventListener("click", async () => {
+    const newQuantity = document.getElementById("newQuantityInput").value;
+
+    if (!newQuantity || Number(newQuantity) <= 0) {
+      showStatus("Please enter a valid quantity.", "error");
+      return;
+    }
+
+    const token = localStorage.getItem("token");
+
+    try {
+      const response = await fetch(
+        `${API_BASE}/UpdatePurchaseOrderItemQuantity?id=${editingItemId}&quantity=${newQuantity}`,
+        { method: "PATCH", headers: { Authorization: `Bearer ${token}` } },
+      );
+
+      await checkResponse(response, "update quantity");
+
+      bootstrap.Modal.getInstance(
+        document.getElementById("quantityModal"),
+      ).hide();
+      await getAllPurchaseOrderItems();
+    } catch (error) {
+      showStatus(error.message, "error");
+    }
+  });
+
+async function deleteItem(id) {
+  if (!confirm("Remove this item? This can't be undone.")) return;
+
+  const token = localStorage.getItem("token");
+
+  try {
+    const response = await fetch(
+      `${API_BASE}/DeletePurchaseOrderItem?id=${id}`,
+      {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token}` },
+      },
+    );
+
+    await checkResponse(response, "delete item");
+    await getAllPurchaseOrderItems();
+  } catch (error) {
+    showStatus(error.message, "error");
+  }
+}
 
 async function filterPurchaseOrderItems() {
   if (!signedIn) {
@@ -279,10 +407,6 @@ document
   .getElementById("applyFilterBtn")
   ?.addEventListener("click", filterPurchaseOrderItems);
 
-// ============================================================
-// CLEAR FILTER
-// ============================================================
-
 document
   .getElementById("clearFilterBtn")
   ?.addEventListener("click", async () => {
@@ -290,10 +414,6 @@ document
 
     await getAllPurchaseOrderItems();
   });
-
-// ============================================================
-// SORT BY QUANTITY
-// ============================================================
 
 document.getElementById("sortItemsBtn")?.addEventListener("click", () => {
   if (!signedIn) {
@@ -327,17 +447,9 @@ document.getElementById("sortItemsBtn")?.addEventListener("click", () => {
   clearStatus();
 });
 
-// ============================================================
-// PURCHASE ORDER ITEMS BY PRODUCT
-// ============================================================
-
 document
   .getElementById("itemsByProductBtn")
   ?.addEventListener("click", filterPurchaseOrderItems);
-
-// ============================================================
-// MOST ORDERED PRODUCTS
-// ============================================================
 
 document
   .getElementById("mostOrderedProductsBtn")
@@ -369,10 +481,6 @@ document
     }
   });
 
-// ============================================================
-// MOST ORDERED PRODUCTS RENDERING
-// ============================================================
-
 function renderMostOrderedProducts(data) {
   const tbody = document.getElementById("purchaseOrderItemsTableBody");
 
@@ -381,7 +489,7 @@ function renderMostOrderedProducts(data) {
   if (!Array.isArray(data) || data.length === 0) {
     tbody.innerHTML = `
       <tr>
-        <td colspan="6" class="text-center">
+        <td colspan="7" class="text-center">
           No ordered products found.
         </td>
       </tr>
@@ -407,15 +515,12 @@ function renderMostOrderedProducts(data) {
       <td>${totalQuantity}</td>
       <td>-</td>
       <td>-</td>
+      <td>-</td>
     `;
 
     tbody.appendChild(row);
   });
 }
-
-// ============================================================
-// LOGOUT
-// ============================================================
 
 document.getElementById("logoutBtn")?.addEventListener("click", () => {
   localStorage.removeItem("token");
@@ -423,17 +528,8 @@ document.getElementById("logoutBtn")?.addEventListener("click", () => {
   window.location.reload();
 });
 
-// ============================================================
-// ENTRY POINT
-// ============================================================
-
 document.addEventListener("DOMContentLoaded", async () => {
   checkAccess();
-
-  /*
-   * IMPORTANT:
-   * No API request is made when the user is signed out.
-   */
 
   if (!signedIn) {
     showStatus("Please sign in to view purchase order items.", "error");

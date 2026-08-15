@@ -1,8 +1,10 @@
 const API_BASE = "https://localhost:7111/PurchaseOrder";
+const TOKEN_KEY = "token";
 
 let currentPurchaseOrders = [];
 let signedIn = false;
 let sortDescending = true;
+let editingPurchaseOrderId = null;
 
 // ============================================================
 // JWT
@@ -11,13 +13,27 @@ let sortDescending = true;
 function decodeJwt(token) {
   try {
     const payload = token.split(".")[1];
-
     const decoded = atob(payload.replace(/-/g, "+").replace(/_/g, "/"));
-
     return JSON.parse(decoded);
   } catch {
     return null;
   }
+}
+
+function currentUserId() {
+  const token = localStorage.getItem(TOKEN_KEY);
+  if (!token) return null;
+
+  const claims = decodeJwt(token);
+  if (!claims) return null;
+
+  return (
+    claims.sub ??
+    claims[
+      "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"
+    ] ??
+    null
+  );
 }
 
 // ============================================================
@@ -25,7 +41,7 @@ function decodeJwt(token) {
 // ============================================================
 
 function checkAccess() {
-  const token = localStorage.getItem("token");
+  const token = localStorage.getItem(TOKEN_KEY);
   const claims = token ? decodeJwt(token) : null;
 
   const role =
@@ -38,6 +54,10 @@ function checkAccess() {
   document.getElementById("logoutBtn")?.classList.toggle("hidden", !signedIn);
 
   document.getElementById("signInLink")?.classList.toggle("hidden", signedIn);
+
+  document
+    .getElementById("addPurchaseOrderBtn")
+    ?.classList.toggle("hidden", !signedIn);
 
   const label = document.getElementById("currentUserLabel");
 
@@ -57,6 +77,7 @@ function showStatus(message, type = "info") {
 
   banner.textContent = message;
   banner.className = `status-banner ${type}`;
+
   banner.classList.remove("hidden");
 }
 
@@ -142,7 +163,7 @@ function renderPurchaseOrders(purchaseOrders) {
   if (!purchaseOrders || purchaseOrders.length === 0) {
     tbody.innerHTML = `
       <tr>
-        <td colspan="5" class="text-center">
+        <td colspan="6" class="text-center">
           No purchase orders found.
         </td>
       </tr>
@@ -160,12 +181,25 @@ function renderPurchaseOrders(purchaseOrders) {
     const orderDate = getOrderDate(purchaseOrder);
     const totalAmount = getTotalAmount(purchaseOrder);
 
+    const editBtn = signedIn
+      ? `<button class="btn btn-outline btn-sm" onclick="openEditPurchaseOrderModal(${id})" type="button">Edit</button>`
+      : "";
+
+    const statusBtn = signedIn
+      ? `<button class="btn btn-outline btn-sm" onclick="openStatusModal(${id})" type="button">Status</button>`
+      : "";
+
+    const deleteBtn = signedIn
+      ? `<button class="btn btn-outline btn-sm" onclick="deletePurchaseOrder(${id})" type="button">Delete</button>`
+      : "";
+
     row.innerHTML = `
       <td>${id}</td>
       <td>${supplier}</td>
       <td>${status}</td>
       <td>${orderDate}</td>
       <td>${totalAmount.toFixed(2)}</td>
+      <td>${editBtn} ${statusBtn} ${deleteBtn}</td>
     `;
 
     tbody.appendChild(row);
@@ -179,7 +213,6 @@ function renderPurchaseOrders(purchaseOrders) {
 async function getAllPurchaseOrders() {
   if (!signedIn) {
     showStatus("Please sign in to view purchase orders.", "error");
-
     return;
   }
 
@@ -201,6 +234,247 @@ async function getAllPurchaseOrders() {
 
     renderPurchaseOrders(currentPurchaseOrders);
     clearStatus();
+  } catch (error) {
+    showStatus(error.message, "error");
+  }
+}
+
+// ============================================================
+// ADD PURCHASE ORDER
+// ============================================================
+
+document
+  .getElementById("addPurchaseOrderBtn")
+  ?.addEventListener("click", () => {
+    editingPurchaseOrderId = null;
+
+    document.getElementById("purchaseOrderModalTitle").textContent =
+      "Add Purchase Order";
+
+    document.getElementById("purchaseOrderSupplierId").value = "";
+
+    document.getElementById("purchaseOrderStatusSelect").value = "Pending";
+
+    document.getElementById("purchaseOrderDate").value = "";
+
+    document.getElementById("purchaseOrderTotalAmount").value = "";
+
+    new bootstrap.Modal(document.getElementById("purchaseOrderModal")).show();
+  });
+
+// ============================================================
+// EDIT PURCHASE ORDER
+// ============================================================
+
+function openEditPurchaseOrderModal(id) {
+  const po = currentPurchaseOrders.find((p) => getPurchaseOrderId(p) === id);
+
+  if (!po) return;
+
+  editingPurchaseOrderId = id;
+
+  document.getElementById("purchaseOrderModalTitle").textContent =
+    "Edit Purchase Order";
+
+  document.getElementById("purchaseOrderSupplierId").value =
+    po.supplierId ?? po.SupplierId ?? "";
+
+  document.getElementById("purchaseOrderStatusSelect").value = getStatus(po);
+
+  document.getElementById("purchaseOrderDate").value = (
+    getOrderDate(po) || ""
+  ).split("T")[0];
+
+  document.getElementById("purchaseOrderTotalAmount").value =
+    getTotalAmount(po);
+
+  new bootstrap.Modal(document.getElementById("purchaseOrderModal")).show();
+}
+
+// ============================================================
+// SAVE PURCHASE ORDER
+// ============================================================
+
+document
+  .getElementById("savePurchaseOrderBtn")
+  ?.addEventListener("click", async () => {
+    const supplierId = document.getElementById("purchaseOrderSupplierId").value;
+
+    const status = document.getElementById("purchaseOrderStatusSelect").value;
+
+    const orderDate = document.getElementById("purchaseOrderDate").value;
+
+    const totalAmount = document.getElementById(
+      "purchaseOrderTotalAmount",
+    ).value;
+
+    // User ID comes automatically from the JWT token
+    const userId = currentUserId();
+
+    if (!userId) {
+      showStatus(
+        "Could not identify the current user. Please sign in again.",
+        "error",
+      );
+      return;
+    }
+
+    if (!supplierId || Number(supplierId) <= 0) {
+      showStatus("Please enter a valid supplier ID.", "error");
+      return;
+    }
+
+    if (!orderDate) {
+      showStatus("Please select an order date.", "error");
+      return;
+    }
+
+    if (totalAmount === "" || Number(totalAmount) < 0) {
+      showStatus("Please enter a valid total amount.", "error");
+      return;
+    }
+
+    const token = localStorage.getItem(TOKEN_KEY);
+
+    try {
+      let response;
+
+      // CREATE
+      if (editingPurchaseOrderId === null) {
+        response = await fetch(`${API_BASE}/AddPurchaseOrder`, {
+          method: "POST",
+
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+
+          body: JSON.stringify({
+            SupplierId: parseInt(supplierId, 10),
+
+            UserId: userId,
+
+            Status: status,
+
+            OrderDate: orderDate,
+
+            TotalAmount: parseFloat(totalAmount),
+          }),
+        });
+      }
+
+      // FULL UPDATE
+      else {
+        const params = new URLSearchParams({
+          id: editingPurchaseOrderId,
+          status,
+          totalAmount,
+          orderDate,
+          supplierId,
+          userId,
+        });
+
+        response = await fetch(
+          `${API_BASE}/UpdatePurchaseOrder?${params.toString()}`,
+          {
+            method: "PUT",
+
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          },
+        );
+      }
+
+      await checkResponse(
+        response,
+        editingPurchaseOrderId === null
+          ? "add purchase order"
+          : "update purchase order",
+      );
+
+      bootstrap.Modal.getInstance(
+        document.getElementById("purchaseOrderModal"),
+      ).hide();
+
+      await getAllPurchaseOrders();
+    } catch (error) {
+      showStatus(error.message, "error");
+    }
+  });
+
+// ============================================================
+// UPDATE STATUS
+// ============================================================
+
+function openStatusModal(id) {
+  const po = currentPurchaseOrders.find((p) => getPurchaseOrderId(p) === id);
+
+  if (!po) return;
+
+  editingPurchaseOrderId = id;
+
+  document.getElementById("newStatusInput").value = getStatus(po);
+
+  new bootstrap.Modal(document.getElementById("statusModal")).show();
+}
+
+document
+  .getElementById("saveStatusBtn")
+  ?.addEventListener("click", async () => {
+    const newStatus = document.getElementById("newStatusInput").value;
+
+    const token = localStorage.getItem(TOKEN_KEY);
+
+    try {
+      const response = await fetch(
+        `${API_BASE}/UpdatePurchaseOrderStatus?id=${editingPurchaseOrderId}&status=${encodeURIComponent(
+          newStatus,
+        )}`,
+        {
+          method: "PATCH",
+
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+
+      await checkResponse(response, "update status");
+
+      bootstrap.Modal.getInstance(
+        document.getElementById("statusModal"),
+      ).hide();
+
+      await getAllPurchaseOrders();
+    } catch (error) {
+      showStatus(error.message, "error");
+    }
+  });
+
+// ============================================================
+// DELETE
+// ============================================================
+
+async function deletePurchaseOrder(id) {
+  if (!confirm("Remove this purchase order? This can't be undone.")) {
+    return;
+  }
+
+  const token = localStorage.getItem(TOKEN_KEY);
+
+  try {
+    const response = await fetch(`${API_BASE}/DeletePurchaseOrder?id=${id}`, {
+      method: "DELETE",
+
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    await checkResponse(response, "delete purchase order");
+
+    await getAllPurchaseOrders();
   } catch (error) {
     showStatus(error.message, "error");
   }
@@ -255,6 +529,7 @@ document
 
       if (response.status === 404) {
         currentPurchaseOrders = [];
+
         renderPurchaseOrders([]);
 
         showStatus("No purchase orders match the selected filters.", "info");
@@ -288,7 +563,9 @@ document
   .getElementById("clearFilterBtn")
   ?.addEventListener("click", async () => {
     document.getElementById("statusFilter").value = "";
+
     document.getElementById("fromDateFilter").value = "";
+
     document.getElementById("toDateFilter").value = "";
 
     await getAllPurchaseOrders();
@@ -315,6 +592,7 @@ document
 
     currentPurchaseOrders.sort((a, b) => {
       const totalA = getTotalAmount(a);
+
       const totalB = getTotalAmount(b);
 
       return sortDescending ? totalB - totalA : totalA - totalB;
@@ -326,6 +604,7 @@ document
       sortDescending ? "Sort by Total" : "Sort by Total (Ascending)";
 
     renderPurchaseOrders(currentPurchaseOrders);
+
     clearStatus();
   });
 
@@ -378,7 +657,7 @@ function renderSupplierTotals(data) {
   if (!Array.isArray(data) || data.length === 0) {
     tbody.innerHTML = `
       <tr>
-        <td colspan="5" class="text-center">
+        <td colspan="6" class="text-center">
           No supplier purchase totals found.
         </td>
       </tr>
@@ -404,6 +683,7 @@ function renderSupplierTotals(data) {
       <td>All Orders</td>
       <td>-</td>
       <td>${total.toFixed(2)}</td>
+      <td>-</td>
     `;
 
     tbody.appendChild(row);
@@ -415,7 +695,7 @@ function renderSupplierTotals(data) {
 // ============================================================
 
 document.getElementById("logoutBtn")?.addEventListener("click", () => {
-  localStorage.removeItem("token");
+  localStorage.removeItem(TOKEN_KEY);
 
   window.location.reload();
 });
@@ -426,11 +706,6 @@ document.getElementById("logoutBtn")?.addEventListener("click", () => {
 
 document.addEventListener("DOMContentLoaded", async () => {
   checkAccess();
-
-  /*
-   * IMPORTANT:
-   * Do not call the API when the user is not signed in.
-   */
 
   if (!signedIn) {
     showStatus("Please sign in to view purchase orders.", "error");
