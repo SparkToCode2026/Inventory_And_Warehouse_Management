@@ -35,6 +35,7 @@ function updateNavigation() {
     const registerBtn = document.getElementById('registerNavBtn');
     const userInfo = document.getElementById('userInfo');
     const logoutBtn = document.getElementById('logoutBtn');
+    const changePasswordBtn = document.getElementById('changePasswordNavBtn');
 
     //If no token found in localStorage -> User is logged out
     if (!token) {
@@ -42,6 +43,7 @@ function updateNavigation() {
         if (registerBtn) registerBtn.classList.remove('hidden');
         if (userInfo) userInfo.classList.add('hidden');
         if (logoutBtn) logoutBtn.classList.add('hidden');
+        if (changePasswordBtn) changePasswordBtn.classList.add('hidden');
         return;
     }
 
@@ -54,6 +56,7 @@ function updateNavigation() {
         if (registerBtn) registerBtn.classList.remove('hidden');
         if (userInfo) userInfo.classList.add('hidden');
         if (logoutBtn) logoutBtn.classList.add('hidden');
+        if (changePasswordBtn) changePasswordBtn.classList.add('hidden');
         return;
     }
 
@@ -71,6 +74,10 @@ function updateNavigation() {
     if (logoutBtn) {
         logoutBtn.classList.remove('hidden');
         logoutBtn.onclick = handleLogout;
+    }
+
+    if (changePasswordBtn) {
+        changePasswordBtn.classList.remove('hidden');
     }
 }
 

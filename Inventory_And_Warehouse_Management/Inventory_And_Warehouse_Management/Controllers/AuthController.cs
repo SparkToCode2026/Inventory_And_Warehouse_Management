@@ -4,6 +4,9 @@ using Inventory_And_Warehouse_Management.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace Inventory_And_Warehouse_Management.Controllers
 {
@@ -55,5 +58,34 @@ namespace Inventory_And_Warehouse_Management.Controllers
 
             return Ok(new { token = _tokenService.CreateToken(user) });
         }
+
+        [Authorize] 
+        [HttpPut("ChangePassword")]
+        public async Task<IActionResult> ChangePassword(ChangePasswordDto dto)
+        {
+            // Read the caller's identity from the validated token
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value
+                 ?? User.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
+
+            if (userIdClaim == null || !int.TryParse(userIdClaim, out int userId))
+                return Unauthorized("Could not identify the logged-in user.");
+
+            var user = await _db.users.FirstOrDefaultAsync(u => u.UserId == userId);
+            if (user == null)
+                return NotFound("User not found.");
+
+            var verifyResult = _hasher.VerifyHashedPassword(user, user.PasswordHash!, dto.CurrentPassword);
+            if (verifyResult == PasswordVerificationResult.Failed)
+                return BadRequest("Current password is incorrect.");
+
+            if (string.IsNullOrEmpty(dto.NewPassword) || dto.NewPassword.Length < 6)
+                return BadRequest("New password must be at least 6 characters.");
+
+            user.PasswordHash = _hasher.HashPassword(user, dto.NewPassword);
+            await _db.SaveChangesAsync();
+
+            return Ok("Password updated successfully.");
+        }
+
     }
 }
