@@ -19,11 +19,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.getElementById('signOutBtn').addEventListener('click', () => {
       localStorage.removeItem(TOKEN_KEY);
-      window.location.href = '../Auth/login.html';
+      window.location.href = '../index.html';
     });
   } else {
     siteNav.innerHTML = `
-      <a href="../Auth/login.html" class="btn btn-ghost">
+      <a href="../Register/login.html" class="btn btn-ghost">
         Sign In
       </a>
     `;
