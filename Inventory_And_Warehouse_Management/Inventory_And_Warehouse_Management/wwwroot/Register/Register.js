@@ -3,10 +3,35 @@ const API_BASE = 'https://localhost:7111';
 const TOKEN_KEY = 'token';
  
 document.addEventListener('DOMContentLoaded', () => {
+  
+  if (!checkAccess()) return;
  
   const form = document.getElementById('registerForm');
   const statusBanner = document.getElementById('statusBanner');
   const submitBtn = document.getElementById('registerSubmitBtn');
+
+  function decodeJwt(token) {
+    try {
+        const payload = token.split('.')[1];
+        const json = decodeURIComponent(
+            atob(payload.replace(/-/g, '+').replace(/_/g, '/'))
+                .split('').map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join('')
+        );
+        return JSON.parse(json);
+    } catch { return null; }
+}
+
+function checkAccess() {
+    const token = localStorage.getItem(TOKEN_KEY);
+    const claims = token ? decodeJwt(token) : null;
+    const role = claims?.role || claims?.['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'];
+
+    if (!token || !claims || (role !== 'Manager' && role !== 'Admin')) {
+        window.location.href = '../index.html';
+        return false;
+    }
+    return true;
+}
  
   function showStatus(message, type = 'info') {
     statusBanner.textContent = message;
@@ -50,7 +75,9 @@ document.addEventListener('DOMContentLoaded', () => {
     try {
       const res = await fetch(`${API_BASE}/api/Auth/register`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem(TOKEN_KEY)}`
+         },
         body: JSON.stringify(payload)
       });
  
@@ -66,7 +93,6 @@ document.addEventListener('DOMContentLoaded', () => {
         throw new Error(typeof body === 'string' ? body : 'Registration failed.');
       }
  
-      localStorage.setItem(TOKEN_KEY, body.token);
  
       showStatus('Account created. Redirecting…', 'success');
       setTimeout(() => {
