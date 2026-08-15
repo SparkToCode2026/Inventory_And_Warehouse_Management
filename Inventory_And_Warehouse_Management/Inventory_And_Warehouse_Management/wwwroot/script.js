@@ -40,7 +40,7 @@ function updateNavigation() {
     //If no token found in localStorage -> User is logged out
     if (!token) {
         if (loginBtn) loginBtn.classList.remove('hidden');
-        if (registerBtn) registerBtn.classList.remove('hidden');
+        if (registerBtn) registerBtn.classList.add('hidden');
         if (userInfo) userInfo.classList.add('hidden');
         if (logoutBtn) logoutBtn.classList.add('hidden');
         if (changePasswordBtn) changePasswordBtn.classList.add('hidden');
@@ -53,7 +53,7 @@ function updateNavigation() {
     if (!payload || (payload.exp && payload.exp * 1000 < Date.now())) {
         localStorage.removeItem(TOKEN_KEY);
         if (loginBtn) loginBtn.classList.remove('hidden');
-        if (registerBtn) registerBtn.classList.remove('hidden');
+        if (registerBtn) registerBtn.classList.add('hidden');
         if (userInfo) userInfo.classList.add('hidden');
         if (logoutBtn) logoutBtn.classList.add('hidden');
         if (changePasswordBtn) changePasswordBtn.classList.add('hidden');
@@ -61,10 +61,14 @@ function updateNavigation() {
     }
 
     const displayName = payload['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name'] || 'User';
+    const role = payload['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'] || payload.role;
 
     //Update UI to Logged-In state
     if (loginBtn) loginBtn.classList.add('hidden');
-    if (registerBtn) registerBtn.classList.add('hidden');
+    
+    if (registerBtn) {
+        registerBtn.classList.toggle('hidden', role !== 'Manager' && role !== 'Admin');
+    }
 
     if (userInfo) {
         userInfo.textContent = `Welcome, ${displayName}`;
