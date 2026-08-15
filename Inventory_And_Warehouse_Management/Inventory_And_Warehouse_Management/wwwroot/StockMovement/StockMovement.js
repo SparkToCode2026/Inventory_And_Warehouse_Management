@@ -77,7 +77,7 @@ function getAllMovements() {
       "Authorization": `Bearer ${localStorage.getItem("token")}`
     }
   })
-    .then(response => response.json())
+    .then(res => res.ok ? res.json() : Promise.reject(res.status))
     .then(data => {
       currentMovements = data;
       renderMovements(currentMovements);
@@ -223,7 +223,7 @@ function deleteMovement(id) {
     headers: { "Authorization": `Bearer ${localStorage.getItem("token")}` }
   })
     .then(res => res.ok ? getAllMovements() : Promise.reject(res.status))
-    .catch(err => alert("Delete failed: " + err));
+    .catch(err => showStatus("Could not delete movement: " + err, "error"));
 }
 
 // Totals by movement type
