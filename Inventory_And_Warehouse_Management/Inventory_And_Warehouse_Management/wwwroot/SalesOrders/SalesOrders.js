@@ -29,8 +29,32 @@ document.addEventListener('DOMContentLoaded', () => {
     `;
   }
 
+// Decodes the JWT payload so we can read claims out of it (no verification needed client-side)
+  function decodeJwt(token) {
+    try {
+      const payload = token.split('.')[1];
+      const decoded = atob(payload.replace(/-/g, '+').replace(/_/g, '/'));
+      return JSON.parse(decoded);
+    } catch {
+      return null;
+    }
+  }
+
+  // Pull the logged-in user's own ID out of the token's "sub" claim
+  function currentUserId() {
+    const token = localStorage.getItem(TOKEN_KEY);
+    if (!token) return null;
+    const claims = decodeJwt(token);
+    if (!claims) return null;
+    return claims.sub
+      ?? claims['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier']
+      ?? null;
+  }
+
   const customerIdInput = document.getElementById('customerId');
   const userIdInput = document.getElementById('userId');
+  userIdInput.readOnly = true;
+  userIdInput.title = "Auto-filled from your login - can't be changed manually";
   const orderDateInput = document.getElementById('orderDate');
   const totalAmountInput = document.getElementById('totalAmount');
   const statusInput = document.getElementById('orderStatus');
@@ -127,6 +151,10 @@ document.addEventListener('DOMContentLoaded', () => {
     saveBtn.textContent = 'Create Order';
     formCard.hidden = false;
     clearStatus();
+
+    // Auto-fill User ID from the logged-in user's own token instead of asking them to type it
+    const myId = currentUserId();
+    if (myId !== null) userIdInput.value = myId;
   });
 
   document.getElementById('cancelOrderBtn').addEventListener('click', () => {
