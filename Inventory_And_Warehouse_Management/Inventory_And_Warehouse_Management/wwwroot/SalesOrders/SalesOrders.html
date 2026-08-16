@@ -182,6 +182,13 @@
           Sort by Total
         </button>
 
+         <button
+            type="button"
+            class="btn btn-outline"
+            id="totalPerCustomerBtn">
+            Total Sales per Customer
+          </button>
+
       </div>
 
 
@@ -210,7 +217,25 @@
     </div>
 
   </footer>
-
+  
+  
+  <!-- TOTAL SALES PER CUSTOMER MODAL -->
+  <div class="modal fade" id="totalPerCustomerModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Total Sales per Customer</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body" id="totalPerCustomerModalBody">
+          <!-- JavaScript fills this in -->
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- DELETE CONFIRMATION MODAL -->
   <div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-hidden="true">

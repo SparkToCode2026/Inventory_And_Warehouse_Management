@@ -97,8 +97,6 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // ---- ID access ----
-  // Backend no longer hides SalesOrderId via [JsonIgnore], so it comes back
-  // directly on every order. No more probing IDs 1-200 to find a match.
   function realIdOf(order) {
     return order.SalesOrderId ?? order.salesOrderId ?? null;
   }
@@ -290,6 +288,34 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('showAllBtn').addEventListener('click', () => {
     document.getElementById('statusFilter').value = '';
     loadOrders();
+  });
+
+  document.getElementById('totalPerCustomerBtn').addEventListener('click', async () => {
+    try {
+      clearStatus();
+      const results = await apiRequest(`${API_BASE}/SalesOrder/TotalSalesValuePerCustomer`);
+      const body = document.getElementById('totalPerCustomerModalBody');
+      body.innerHTML = results.length
+        ? results.map(r => {
+            const custId = r.CustomerId ?? r.customerId;
+            const total = r.TotalSalesValue ?? r.totalSalesValue ?? 0;
+            return `
+            <div class="order-card">
+            <h3>Customer #${custId}</h3>
+            <div class="order-info">
+            <div><strong>Total Sales:</strong> $${Number(total).toFixed(2)}</div>
+            </div>
+      </div>
+`;
+          })
+        
+        .join('')
+        : '<div class="empty-orders">No data yet.</div>'
+      new bootstrap.Modal(document.getElementById('totalPerCustomerModal')).show();
+    } catch (err) {
+      showStatus(err.message, 'error');
+      console.error(err);
+    }
   });
 
   // Run on start

@@ -163,5 +163,21 @@ namespace Inventory_And_Warehouse_Management.Controllers
             return Ok(orders);
         }
 
+        // 9. Total Sales Value per Customer
+        [HttpGet("TotalSalesValuePerCustomer")]
+        public IActionResult TotalSalesValuePerCustomer()
+        {
+            var result = context.salesOrders
+                .GroupBy(o => o.CustomerId)
+                .Select(g => new
+                {
+                    CustomerId = g.Key,
+                    TotalSalesValue = g.Sum(o => o.TotalAmount)
+                })
+                .ToList();
+
+            return Ok(result);
+        }
+
     }
 }
