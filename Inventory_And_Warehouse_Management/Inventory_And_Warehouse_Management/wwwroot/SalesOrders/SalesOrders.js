@@ -218,22 +218,33 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   };
 
-  window.updateOrderStatus = async function (id) {
+  window.updateOrderStatus = function (id) {
     if (!id) { showStatus("Could not find this order's ID.", 'error'); return; }
-    const newStatus = prompt('Enter status (Pending, Shipped, Delivered):');
-    if (!newStatus) return;
 
-    try {
-      clearStatus();
-      await apiRequest(
-        `${API_BASE}/SalesOrder/UpdateStatus?id=${id}&status=${encodeURIComponent(newStatus)}`,
-        { method: 'PATCH' }
-      );
-      await loadOrders();
-    } catch (err) {
-      showStatus(err.message, 'error');
-      console.error(err);
-    }
+    const modalEl = document.getElementById('updateStatusModal');
+    const modal = new bootstrap.Modal(modalEl);
+    const confirmBtn = document.getElementById('confirmStatusBtn');
+
+    const newConfirmBtn = confirmBtn.cloneNode(true);
+    confirmBtn.parentNode.replaceChild(newConfirmBtn, confirmBtn);
+
+    newConfirmBtn.addEventListener('click', async () => {
+      const newStatus = document.getElementById('newStatusSelect').value;
+      modal.hide();
+      try {
+        clearStatus();
+        await apiRequest(
+          `${API_BASE}/SalesOrder/UpdateStatus?id=${id}&status=${encodeURIComponent(newStatus)}`,
+          { method: 'PATCH' }
+        );
+        await loadOrders();
+      } catch (err) {
+        showStatus(err.message, 'error');
+        console.error(err);
+      }
+    });
+
+    modal.show();
   };
 
   window.deleteOrder = function (id) {
