@@ -2,6 +2,28 @@
 const API_BASE = "https://localhost:7111/Warehouse";
 let currentWarehouses = []; // Track loaded warehouses globally
 
+function decodeJwt(token) {
+    try {
+        const payload = token.split(".")[1];
+        const decoded = atob(payload.replace(/-/g, "+").replace(/_/g, "/"));
+        return JSON.parse(decoded);
+    } catch {
+        return null;
+    }
+}
+
+// Shows the page content if signed in, or a sign-in message if not.
+function checkAccess() {
+    const token = localStorage.getItem("token");
+    const claims = token ? decodeJwt(token) : null;
+    const signedIn = Boolean(token && claims);
+
+    document.getElementById("signedOutNotice")?.classList.toggle("hidden", signedIn);
+    document.getElementById("pageContent")?.classList.toggle("hidden", !signedIn);
+
+    return signedIn;
+}
+
 //Creates headers for API requests, including the token and JSON type if needed
 function authHeaders(withJson){
     const headers = {"Authorization": "Bearer " + localStorage.getItem("token")};
@@ -273,6 +295,7 @@ function deleteWarehouse(id) {
 
 //Loads the warehouses and displays them when the page opens
 document.addEventListener("DOMContentLoaded", () => {
-  getAllWarehouses();
+  if (checkAccess()) {
+    getAllWarehouses();
+  }
 });
-
