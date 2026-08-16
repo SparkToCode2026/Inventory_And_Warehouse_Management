@@ -28,6 +28,12 @@ function checkAccess() {
 
   signedIn = Boolean(token && claims);
 
+  document
+    .getElementById("signedOutNotice")
+    ?.classList.toggle("hidden", signedIn);
+
+  document.getElementById("pageContent")?.classList.toggle("hidden", !signedIn);
+
   document.getElementById("logoutBtn")?.classList.toggle("hidden", !signedIn);
 
   document.getElementById("signInLink")?.classList.toggle("hidden", signedIn);
@@ -174,7 +180,10 @@ async function getAllPurchaseOrderItems() {
   }
 
   try {
-    const response = await fetch(`${API_BASE}/GetPurchaseOrderItems`);
+    const token = localStorage.getItem("token");
+    const response = await fetch(`${API_BASE}/GetPurchaseOrderItems`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
 
     if (response.status === 404) {
       currentPurchaseOrderItems = [];
@@ -461,7 +470,10 @@ document
     }
 
     try {
-      const response = await fetch(`${API_BASE}/MostOrderedProducts`);
+      const token = localStorage.getItem("token");
+      const response = await fetch(`${API_BASE}/MostOrderedProducts`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
 
       if (response.status === 404) {
         showStatus("No ordered products were found.", "info");
