@@ -55,28 +55,69 @@ namespace Inventory_And_Warehouse_Management.Controllers
 
         // 2. Full Update SalesOrderItem
         [HttpPut("UpdateSalesOrderItem")]
-        public IActionResult UpdateSalesOrderItem(int id, decimal newUnitPrice, int newQuantity)
+        public IActionResult UpdateSalesOrderItem(int id, SalesOrderItem newItem)
         {
             SalesOrderItem item = context.salesOrderItems
                 .FirstOrDefault(i => i.SalesOrderItemId == id);
-
 
             if (item == null)
             {
                 return NotFound("Item not found");
             }
 
-            decimal oldTotalPrice = item.TotalPrice;
+            bool keyChanged = item.SalesOrderId != newItem.SalesOrderId || item.ProductId != newItem.ProductId;
 
-            item.Quantity = newQuantity;
-            item.UnitPrice = newUnitPrice;
-            item.TotalPrice = item.Quantity * item.UnitPrice;
+            bool conflict = context.salesOrderItems.Any(i =>
+                i.SalesOrderItemId != id &&
+                i.SalesOrderId == newItem.SalesOrderId &&
+                i.ProductId == newItem.ProductId);
 
-            SalesOrder order = context.salesOrders
-                .FirstOrDefault(o => o.SalesOrderId == item.SalesOrderId); 
-            if (order != null) {
-                order.TotalAmount = order.TotalAmount - oldTotalPrice + item.TotalPrice;
+            if (conflict)
+            {
+                return BadRequest("Another item already exists for that Sales Order and Product combination.");
             }
+
+            decimal oldTotalPrice = item.TotalPrice;
+            int oldSalesOrderId = item.SalesOrderId;
+            decimal newTotalPrice = newItem.Quantity * newItem.UnitPrice;
+
+            if (keyChanged)
+            {
+                // Can't modify a composite key in place - delete old row, insert a new one
+                context.salesOrderItems.Remove(item);
+
+                SalesOrderItem replacement = new SalesOrderItem
+                {
+                    SalesOrderId = newItem.SalesOrderId,
+                    ProductId = newItem.ProductId,
+                    Quantity = newItem.Quantity,
+                    UnitPrice = newItem.UnitPrice,
+                    TotalPrice = newTotalPrice
+                };
+                context.salesOrderItems.Add(replacement);
+            }
+            else
+            {
+                item.Quantity = newItem.Quantity;
+                item.UnitPrice = newItem.UnitPrice;
+                item.TotalPrice = newTotalPrice;
+            }
+
+            // Fix the SalesOrder total(s)
+            if (oldSalesOrderId != newItem.SalesOrderId)
+            {
+                SalesOrder oldOrder = context.salesOrders.FirstOrDefault(o => o.SalesOrderId == oldSalesOrderId);
+                if (oldOrder != null) oldOrder.TotalAmount -= oldTotalPrice;
+
+                SalesOrder newOrder = context.salesOrders.FirstOrDefault(o => o.SalesOrderId == newItem.SalesOrderId);
+                if (newOrder != null) newOrder.TotalAmount += newTotalPrice;
+            }
+            else
+            {
+                SalesOrder order = context.salesOrders.FirstOrDefault(o => o.SalesOrderId == newItem.SalesOrderId);
+                if (order != null) order.TotalAmount = order.TotalAmount - oldTotalPrice + newTotalPrice;
+            }
+
             context.SaveChanges();
 
             return Ok();
