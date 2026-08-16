@@ -32,6 +32,7 @@ function checkAccess() {
   document.getElementById("addCustomerBtn").classList.toggle("hidden", !signedIn);
 
   document.getElementById("signedOutNotice").classList.toggle("hidden", signedIn);
+  document.getElementById("customerToolbar").classList.toggle("hidden", !signedIn);
   document.getElementById("customerTableWrap").classList.toggle("hidden", !signedIn);
 
   const label = document.getElementById("currentUserLabel");
