@@ -1,221 +1,212 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Inventory Levels · Warehouse Management</title>
-  <link href="InventoryLevel.css" rel="stylesheet">
-  <link href="../style.css" rel="stylesheet">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Inventory Levels · Warehouse Management</title>
+<link href="InventoryLevel.css" rel="stylesheet">
+<link href="../style.css" rel="stylesheet">
 </head>
-
 <body>
-  <!-----------------Header------------------->
-  <!------------------------------------------>
-  <header class="site-header">
-    <div class="header-inner">
-      <div class="brand">Inventory & Warehouse Management <span class="brand-sub">Inventory</span></div>
-      <nav class="site-nav">
-        <button class="nav-link active" data-view="warehouses">Warehouses</button>
-        <button class="nav-link" data-view="lowstock">Low Stock</button>
-        <button class="nav-link" data-view="totals">Totals by Product</button>
-        <a class="nav-link" href="../index.html">Home</a>
 
-      </nav>
-    </div>
-  </header>
+<!-- Shown instead of the whole page when the user is not signed in -->
+<div id="signedOutNotice" class="hidden" style="text-align:center; padding:3rem 1rem;">
+  <h2>Sign in required</h2>
+  <p>You need to sign in to view and manage inventory levels.</p>
+  <a href="../Register/Login.html" class="btn btn-accent">Sign In</a>
+  <a href="../index.html" class="btn btn-ghost">Back to Home</a>
+</div>
 
-  <!-- Shown instead of the whole page when the user is not signed in -->
-  <div id="signedOutNotice" class="hidden" style="text-align:center; padding:3rem 1rem;">
-    <h2>Sign in required</h2>
-    <p>You need to sign in to view and manage inventory levels.</p>
-    <a href="../Register/Login.html" class="btn btn-accent">Sign In</a>
-    <a href="../index.html" class="btn btn-ghost">Back to Home</a>
+<div id="pageContent">
+
+<!-----------------Header------------------->
+<!------------------------------------------>
+<header class="site-header">
+  <div class="header-inner">
+    <div class="brand">Inventory & Warehouse Management <span class="brand-sub">Inventory</span></div>
+    <nav class="site-nav">
+      <button class="nav-link active" data-view="warehouses">Warehouses</button>
+      <button class="nav-link" data-view="lowstock">Low Stock</button>
+      <button class="nav-link" data-view="totals">Totals by Product</button>
+    <a class="nav-link" href="../index.html">Home</a>
+ 
+    </nav>
   </div>
+</header>
 
-  <div id="pageContent">
-
-    <!--------------Hero Section---------------->
-    <!------------------------------------------>
-    <section class="hero">
-      <div class="container">
-        <div class="hero-eyebrow">Warehouse Management</div>
-        <h1 class="hero-title">Inventory levels, in one place</h1>
-        <p class="hero-sub">Track quantity on hand and reorder thresholds per warehouse and product, spot what needs
-          reordering, and make updates without leaving the page.</p>
-
-        <!-- The 2 requested buttons -->
-        <div class="hero-actions">
-          <button class="btn btn-accent btn-lg" id="viewWarehousesBtn">View All Warehouses</button>
-          <button class="btn btn-outline btn-lg" id="openAddModalBtn">Add Inventory Level</button>
-        </div>
-
-        <!-- Feedback banner (success/error) - filled in by showStatus() in JS -->
-        <div class="data-controls">
-          <div class="status-msg" id="statusMsg" style="margin:0;"></div>
-        </div>
-      </div>
-    </section>
-    <main class="modules">
-      <div class="container">
-        <!-------------HouseWare View--------------->
-        <!------------------------------------------>
-
-        <div class="zone" id="view-warehouses">
-          <div class="zone-title">
-            <span>All warehouses</span>
-            <button class="btn btn-ghost btn-sm" id="refreshLevelsBtn">Refresh</button>
-          </div>
-          <p style="color:var(--text-dim); font-size:.88rem; margin: -.5rem 0 1rem;">Click a warehouse name for full
-            product detail — you can edit, adjust, or add stock right from there.</p>
-
-          <!-- The warehouse summary table gets built and inserted here by JS -->
-          <div id="warehouseGroups"></div>
-
-          <!-- Shown instead of the table when there's no data loaded yet -->
-          <div class="card-module empty-state hidden" id="levelsEmpty">No inventory levels yet.</div>
-        </div>
-        <!-------------Low Stock View--------------->
-        <!------------------------------------------>
-        <div class="zone hidden" id="view-lowstock">
-          <div class="zone-title">
-            <span>Low stock</span>
-            <button class="btn btn-ghost btn-sm" id="refreshLowStockBtn">Refresh</button>
-          </div>
-          <div class="card-module">
-            <div class="table-wrap">
-              <table>
-                <thead>
-                  <tr>
-                    <th>Warehouse</th>
-                    <th>Product</th>
-                    <th>Qty on hand</th>
-                    <th>Reorder threshold</th>
-                  </tr>
-                </thead>
-                <!-- Rows inserted here by renderLowStock() -->
-                <tbody id="lowStockBody"></tbody>
-              </table>
-              <div class="empty-state hidden" id="lowStockEmpty">Nothing is below its reorder threshold.</div>
-            </div>
-          </div>
-        </div>
-        <!------------Total by product-------------->
-        <!------------------------------------------>
-        <div class="zone hidden" id="view-totals">
-          <div class="zone-title">
-            <span>Total quantity by product</span>
-            <button class="btn btn-ghost btn-sm" id="refreshTotalsBtn">Refresh</button>
-          </div>
-          <div class="card-module">
-            <!-- Rows inserted here by renderTotals() -->
-            <div class="totals-list" id="totalsList"></div>
-            <div class="empty-state hidden" id="totalsEmpty">No totals to show yet.</div>
-          </div>
-        </div>
-      </div>
-    </main>
-
-  </div>
-
-  <!------------Footer-------------->
-  <!------------------------------------------>
-  <footer class="site-footer">
-    <div class="container footer-inner">
-      <span>Inventory & Warehouse Management</span>
-      <span>Spark to code 2026</span>
+<!--------------Hero Section---------------->
+<!------------------------------------------>
+<section class="hero">
+  <div class="container">
+    <div class="hero-eyebrow">Warehouse Management</div>
+    <h1 class="hero-title">Inventory levels, in one place</h1>
+    <p class="hero-sub">Track quantity on hand and reorder thresholds per warehouse and product, spot what needs reordering, and make updates without leaving the page.</p>
+ 
+    <!-- The 2 requested buttons -->
+    <div class="hero-actions">
+      <button class="btn btn-accent btn-lg" id="viewWarehousesBtn">View All Warehouses</button>
+      <button class="btn btn-outline btn-lg" id="openAddModalBtn">Add Inventory Level</button>
     </div>
-  </footer>
-  <!--Hold the autocomplete suggestions for the Product fields (still a native datalist) -->
-  <datalist id="productNameOptions"></datalist>
-  <!-----------Add Inventory Level------------>
-  <!------------------------------------------>
-  <div class="modal-overlay" id="addModalOverlay">
-    <div class="modal">
-      <div class="modal-header">
-        <h2 class="modal-title">Add inventory level</h2>
-        <button class="modal-close" id="closeAddModalBtn" aria-label="Close">✕</button>
+ 
+    <!-- Feedback banner (success/error) - filled in by showStatus() in JS -->
+    <div class="data-controls">
+      <div class="status-msg" id="statusMsg" style="margin:0;"></div>
+    </div>
+  </div>
+</section>
+<main class="modules">
+  <div class="container">
+<!-------------HouseWare View--------------->
+<!------------------------------------------>
+ 
+    <div class="zone" id="view-warehouses">
+      <div class="zone-title">
+        <span>All warehouses</span>
+        <button class="btn btn-ghost btn-sm" id="refreshLevelsBtn">Refresh</button>
       </div>
-      <div class="level-form-grid">
-        <!-- Warehouse field: custom autocomplete (not a native datalist) so each
+      <p style="color:var(--text-dim); font-size:.88rem; margin: -.5rem 0 1rem;">Click a warehouse name for full product detail — you can edit, adjust, or add stock right from there.</p>
+ 
+      <!-- The warehouse summary table gets built and inserted here by JS -->
+      <div id="warehouseGroups"></div>
+ 
+      <!-- Shown instead of the table when there's no data loaded yet -->
+      <div class="card-module empty-state hidden" id="levelsEmpty">No inventory levels yet.</div>
+    </div>
+<!-------------Low Stock View--------------->
+<!------------------------------------------>
+    <div class="zone hidden" id="view-lowstock">
+      <div class="zone-title">
+        <span>Low stock</span>
+        <button class="btn btn-ghost btn-sm" id="refreshLowStockBtn">Refresh</button>
+      </div>
+      <div class="card-module">
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>Warehouse</th><th>Product</th><th>Qty on hand</th><th>Reorder threshold</th></tr>
+            </thead>
+            <!-- Rows inserted here by renderLowStock() -->
+            <tbody id="lowStockBody"></tbody>
+          </table>
+          <div class="empty-state hidden" id="lowStockEmpty">Nothing is below its reorder threshold.</div>
+        </div>
+      </div>
+    </div>
+<!------------Total by product-------------->
+<!------------------------------------------>
+    <div class="zone hidden" id="view-totals">
+      <div class="zone-title">
+        <span>Total quantity by product</span>
+        <button class="btn btn-ghost btn-sm" id="refreshTotalsBtn">Refresh</button>
+      </div>
+      <div class="card-module">
+        <!-- Rows inserted here by renderTotals() -->
+        <div class="totals-list" id="totalsList"></div>
+        <div class="empty-state hidden" id="totalsEmpty">No totals to show yet.</div>
+      </div>
+    </div>
+  </div>
+</main>
+
+</div>
+
+<!------------Footer-------------->
+<!------------------------------------------>
+<footer class="site-footer">
+  <div class="container footer-inner">
+    <span>Inventory &amp; Warehouse Management System</span>
+    <span>Spark to Code 2026</span>
+  </div>
+</footer>
+<!--Hold the autocomplete suggestions for the Product fields (still a native datalist) -->
+<datalist id="productNameOptions"></datalist>
+<!-----------Add Inventory Level------------>
+<!------------------------------------------>
+<div class="modal-overlay" id="addModalOverlay">
+  <div class="modal">
+    <div class="modal-header">
+      <h2 class="modal-title">Add inventory level</h2>
+      <button class="modal-close" id="closeAddModalBtn" aria-label="Close">✕</button>
+    </div>
+    <div class="level-form-grid">
+      <!-- Warehouse field: custom autocomplete (not a native datalist) so each
            suggestion can show the warehouse's location as a second line.
            #newWarehouseSuggestions is filled in and shown/hidden by JS. -->
-        <div class="field autocomplete-field">
-          <label for="newWarehouseId">Warehouse Name</label>
-          <input id="newWarehouseId" type="text" placeholder="Start typing a warehouse name" autocomplete="off">
-          <div class="autocomplete-list hidden" id="newWarehouseSuggestions"></div>
-        </div>
-        <div class="field">
-          <label for="newProductId">Product Name</label>
-          <input id="newProductId" type="text" list="productNameOptions" placeholder="Enter Product">
-        </div>
-        <div class="field">
-          <label for="newQuantity">Quantity on hand</label>
-          <input id="newQuantity" type="number" min="0" placeholder="0">
-        </div>
-        <div class="field">
-          <label for="newThreshold">Reorder threshold</label>
-          <input id="newThreshold" type="number" min="0" placeholder="0">
-        </div>
+      <div class="field autocomplete-field">
+        <label for="newWarehouseId">Warehouse Name</label>
+        <input id="newWarehouseId" type="text" placeholder="Start typing a warehouse name" autocomplete="off">
+        <div class="autocomplete-list hidden" id="newWarehouseSuggestions"></div>
       </div>
-      <div class="form-actions">
-        <button class="btn btn-accent" id="addBtn">Add inventory level</button>
-        <button class="btn btn-ghost" id="cancelAddBtn">Cancel</button>
+      <div class="field">
+        <label for="newProductId">Product Name</label>
+        <input id="newProductId" type="text" list="productNameOptions" placeholder="Enter Product">
+      </div>
+      <div class="field">
+        <label for="newQuantity">Quantity on hand</label>
+        <input id="newQuantity" type="number" min="0" placeholder="0">
+      </div>
+      <div class="field">
+        <label for="newThreshold">Reorder threshold</label>
+        <input id="newThreshold" type="number" min="0" placeholder="0">
       </div>
     </div>
-  </div>
-  <!------------WAREHOUSE DETAIL-------------->
-  <!------------------------------------------>
-  <div class="modal-overlay" id="detailModalOverlay">
-    <div class="modal">
-      <div class="modal-header">
-        <!-- Filled in by renderWarehouseDetail(): warehouse name only, no ID -->
-        <h2 class="modal-title" id="detailTitle">Warehouse</h2>
-        <button class="modal-close" id="closeDetailModalBtn" aria-label="Close">✕</button>
-      </div>
-      <!-- Products stocked / total units / low stock, all on one line -->
-      <div class="stat-line" id="statLine">–</div>
-      <!-- Quick-add form scoped to this warehouse (warehouse Name is implied, not typed in) -->
-      <div class="zone-title" style="margin-bottom:.85rem;">Add a product to this warehouse</div>
-      <div class="level-form-grid cols-3">
-        <div class="field">
-          <label for="detailProductId">Product </label>
-          <input id="detailProductId" type="text" list="productNameOptions" placeholder="Enter Product">
-        </div>
-        <div class="field">
-          <label for="detailQuantity">Quantity on hand</label>
-          <input id="detailQuantity" type="number" min="0" placeholder="0">
-        </div>
-        <div class="field">
-          <label for="detailThreshold">Reorder threshold</label>
-          <input id="detailThreshold" type="number" min="0" placeholder="0">
-        </div>
-      </div>
-      <div class="form-actions" style="margin-bottom:1.5rem;">
-        <button class="btn btn-accent btn-sm" id="detailAddBtn">Add product</button>
-      </div>
-      <!-- Full product breakdown for this warehouse -->
-      <div class="zone-title" style="margin-bottom:.85rem;">Products in this warehouse</div>
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>Product</th>
-              <th>Qty on hand</th>
-              <th>Reorder threshold</th>
-              <th>Status</th>
-              <th>Adjust</th>
-              <th></th>
-            </tr>
-          </thead>
-          <!-- Rows inserted here by renderWarehouseDetail() -->
-          <tbody id="detailProductsBody"></tbody>
-        </table>
-        <div class="empty-state hidden" id="detailProductsEmpty">No products stocked in this warehouse yet.</div>
-      </div>
+    <div class="form-actions">
+      <button class="btn btn-accent" id="addBtn">Add inventory level</button>
+      <button class="btn btn-ghost" id="cancelAddBtn">Cancel</button>
     </div>
   </div>
-  <script src="InventoryLevel.js"></script>
+</div>
+<!------------WAREHOUSE DETAIL-------------->
+<!------------------------------------------>
+<div class="modal-overlay" id="detailModalOverlay">
+  <div class="modal">
+    <div class="modal-header">
+      <!-- Filled in by renderWarehouseDetail(): warehouse name only, no ID -->
+      <h2 class="modal-title" id="detailTitle">Warehouse</h2>
+      <button class="modal-close" id="closeDetailModalBtn" aria-label="Close">✕</button>
+    </div>
+    <!-- Products stocked / total units / low stock, all on one line -->
+    <div class="stat-line" id="statLine">–</div>
+    <!-- Quick-add form scoped to this warehouse (warehouse Name is implied, not typed in) -->
+    <div class="zone-title" style="margin-bottom:.85rem;">Add a product to this warehouse</div>
+    <div class="level-form-grid cols-3">
+      <div class="field">
+        <label for="detailProductId">Product </label>
+        <input id="detailProductId" type="text" list="productNameOptions" placeholder="Enter Product">
+      </div>
+      <div class="field">
+        <label for="detailQuantity">Quantity on hand</label>
+        <input id="detailQuantity" type="number" min="0" placeholder="0">
+      </div>
+      <div class="field">
+        <label for="detailThreshold">Reorder threshold</label>
+        <input id="detailThreshold" type="number" min="0" placeholder="0">
+      </div>
+    </div>
+    <div class="form-actions" style="margin-bottom:1.5rem;">
+      <button class="btn btn-accent btn-sm" id="detailAddBtn">Add product</button>
+    </div>
+    <!-- Full product breakdown for this warehouse -->
+    <div class="zone-title" style="margin-bottom:.85rem;">Products in this warehouse</div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Product</th>
+            <th>Qty on hand</th>
+            <th>Reorder threshold</th>
+            <th>Status</th>
+            <th>Adjust</th>
+            <th></th>
+          </tr>
+        </thead>
+        <!-- Rows inserted here by renderWarehouseDetail() -->
+        <tbody id="detailProductsBody"></tbody>
+      </table>
+      <div class="empty-state hidden" id="detailProductsEmpty">No products stocked in this warehouse yet.</div>
+    </div>
+  </div>
+</div>
+<script src="InventoryLevel.js"></script>
 </body>
-
 </html>
