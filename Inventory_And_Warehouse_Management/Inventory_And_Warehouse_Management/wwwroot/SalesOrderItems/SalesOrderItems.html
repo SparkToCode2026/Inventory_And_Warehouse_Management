@@ -37,6 +37,15 @@
     </div>
   </header>
 
+  <!-- Shown instead of the whole page when the user is not signed in -->
+  <div id="signedOutNotice" class="hidden" style="text-align:center; padding:3rem 1rem;">
+    <h2>Sign in required</h2>
+    <p>You need to sign in to view and manage sales order items.</p>
+    <a href="../Register/login.html" class="btn btn-accent">Sign In</a>
+    <a href="../index.html" class="btn btn-ghost">Back to Home</a>
+  </div>
+
+  <div id="pageContent">
 
   <!-- MAIN -->
   <main class="salesorderitems-page">
@@ -176,6 +185,8 @@
     </div>
 
   </main>
+
+  </div>
 
 
   <!-- FOOTER -->

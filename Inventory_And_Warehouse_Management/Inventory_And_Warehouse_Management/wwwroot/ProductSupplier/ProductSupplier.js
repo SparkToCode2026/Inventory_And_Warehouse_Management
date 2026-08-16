@@ -41,6 +41,9 @@ document.addEventListener('DOMContentLoaded', () => {
     signedIn = Boolean(token && claims);
     canManage = signedIn && (role === 'Manager' || role === 'Admin');
 
+    document.getElementById('signedOutNotice')?.classList.toggle('hidden', signedIn);
+    document.getElementById('pageContent')?.classList.toggle('hidden', !signedIn);
+
     addLinkBtn.classList.toggle('hidden', !canManage);
 
     if (signedIn) {
@@ -52,6 +55,8 @@ document.addEventListener('DOMContentLoaded', () => {
     } else {
       siteNav.innerHTML = `<a href="../Register/login.html" class="btn btn-ghost">Sign In</a>`;
     }
+
+    return signedIn;
   }
 
   function showStatus(message, type = 'info') {
@@ -288,6 +293,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // Run on start
-  checkAccess();
-  loadLinks();
+  if (checkAccess()) {
+    loadLinks();
+  }
 });

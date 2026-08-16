@@ -10,8 +10,13 @@ document.addEventListener('DOMContentLoaded', () => {
   const itemsContainer = document.getElementById('itemsContainer');
   const siteNav = document.getElementById('siteNav');
 
+  const signedIn = Boolean(localStorage.getItem(TOKEN_KEY));
+
+  document.getElementById('signedOutNotice')?.classList.toggle('hidden', signedIn);
+  document.getElementById('pageContent')?.classList.toggle('hidden', !signedIn);
+
   // Show Sign In or Sign Out depending on whether a token is saved
-  if (localStorage.getItem(TOKEN_KEY)) {
+  if (signedIn) {
     siteNav.innerHTML = `
       <button type="button" class="btn btn-ghost" id="signOutBtn">
         Sign Out
@@ -28,6 +33,8 @@ document.addEventListener('DOMContentLoaded', () => {
         Sign In
       </a>
     `;
+
+    return;
   }
 
   const salesOrderIdInput = document.getElementById('salesOrderId');
