@@ -10,7 +10,12 @@ document.addEventListener('DOMContentLoaded', () => {
   const ordersContainer = document.getElementById('ordersContainer');
   const siteNav = document.getElementById('siteNav');
 
-  if (localStorage.getItem(TOKEN_KEY)) {
+  const signedIn = Boolean(localStorage.getItem(TOKEN_KEY));
+
+  document.getElementById('signedOutNotice')?.classList.toggle('hidden', signedIn);
+  document.getElementById('pageContent')?.classList.toggle('hidden', !signedIn);
+
+  if (signedIn) {
     siteNav.innerHTML = `
       <button type="button" class="btn btn-ghost" id="signOutBtn">
         Sign Out
@@ -27,6 +32,8 @@ document.addEventListener('DOMContentLoaded', () => {
         Sign In
       </a>
     `;
+
+    return;
   }
 
 // Decodes the JWT payload so we can read claims out of it (no verification needed client-side)
