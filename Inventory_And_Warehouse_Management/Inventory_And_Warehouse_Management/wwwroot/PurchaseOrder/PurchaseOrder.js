@@ -51,6 +51,12 @@ function checkAccess() {
 
   signedIn = Boolean(token && claims);
 
+  document
+    .getElementById("signedOutNotice")
+    ?.classList.toggle("hidden", signedIn);
+
+  document.getElementById("pageContent")?.classList.toggle("hidden", !signedIn);
+
   document.getElementById("logoutBtn")?.classList.toggle("hidden", !signedIn);
 
   document.getElementById("signInLink")?.classList.toggle("hidden", signedIn);
@@ -217,7 +223,10 @@ async function getAllPurchaseOrders() {
   }
 
   try {
-    const response = await fetch(`${API_BASE}/GetPurchaseOrders`);
+    const token = localStorage.getItem(TOKEN_KEY);
+    const response = await fetch(`${API_BASE}/GetPurchaseOrders`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
 
     if (response.status === 404) {
       currentPurchaseOrders = [];
@@ -625,7 +634,10 @@ document
     }
 
     try {
-      const response = await fetch(`${API_BASE}/TotalPurchaseValuePerSupplier`);
+      const token = localStorage.getItem(TOKEN_KEY);
+      const response = await fetch(`${API_BASE}/TotalPurchaseValuePerSupplier`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
 
       if (response.status === 404) {
         showStatus("No supplier purchase totals were found.", "info");
