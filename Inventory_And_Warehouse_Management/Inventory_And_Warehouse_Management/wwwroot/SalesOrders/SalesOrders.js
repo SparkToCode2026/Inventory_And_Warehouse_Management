@@ -97,8 +97,6 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // ---- ID access ----
-  // Backend no longer hides SalesOrderId via [JsonIgnore], so it comes back
-  // directly on every order. No more probing IDs 1-200 to find a match.
   function realIdOf(order) {
     return order.SalesOrderId ?? order.salesOrderId ?? null;
   }
@@ -220,22 +218,33 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   };
 
-  window.updateOrderStatus = async function (id) {
+  window.updateOrderStatus = function (id) {
     if (!id) { showStatus("Could not find this order's ID.", 'error'); return; }
-    const newStatus = prompt('Enter status (Pending, Shipped, Delivered):');
-    if (!newStatus) return;
 
-    try {
-      clearStatus();
-      await apiRequest(
-        `${API_BASE}/SalesOrder/UpdateStatus?id=${id}&status=${encodeURIComponent(newStatus)}`,
-        { method: 'PATCH' }
-      );
-      await loadOrders();
-    } catch (err) {
-      showStatus(err.message, 'error');
-      console.error(err);
-    }
+    const modalEl = document.getElementById('updateStatusModal');
+    const modal = new bootstrap.Modal(modalEl);
+    const confirmBtn = document.getElementById('confirmStatusBtn');
+
+    const newConfirmBtn = confirmBtn.cloneNode(true);
+    confirmBtn.parentNode.replaceChild(newConfirmBtn, confirmBtn);
+
+    newConfirmBtn.addEventListener('click', async () => {
+      const newStatus = document.getElementById('newStatusSelect').value;
+      modal.hide();
+      try {
+        clearStatus();
+        await apiRequest(
+          `${API_BASE}/SalesOrder/UpdateStatus?id=${id}&status=${encodeURIComponent(newStatus)}`,
+          { method: 'PATCH' }
+        );
+        await loadOrders();
+      } catch (err) {
+        showStatus(err.message, 'error');
+        console.error(err);
+      }
+    });
+
+    modal.show();
   };
 
   window.deleteOrder = function (id) {
@@ -290,6 +299,32 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('showAllBtn').addEventListener('click', () => {
     document.getElementById('statusFilter').value = '';
     loadOrders();
+  });
+
+  document.getElementById('totalPerCustomerBtn').addEventListener('click', async () => {
+    try {
+      clearStatus();
+      const results = await apiRequest(`${API_BASE}/SalesOrder/TotalSalesValuePerCustomer`);
+      if (!results.length) {
+        ordersContainer.innerHTML = `<div class="empty-orders">No data yet.</div>`;
+        return;
+      }
+      ordersContainer.innerHTML = results.map(r => {
+        const custId = r.CustomerId ?? r.customerId;
+        const total = r.TotalSalesValue ?? r.totalSalesValue ?? 0;
+        return `
+          <div class="order-card">
+            <h3>Customer #${custId}</h3>
+            <div class="order-info">
+              <div><strong>Total Sales:</strong> $${Number(total).toFixed(2)}</div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    } catch (err) {
+      showStatus(err.message, 'error');
+      console.error(err);
+    }
   });
 
   // Run on start

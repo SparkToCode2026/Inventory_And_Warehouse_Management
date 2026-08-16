@@ -208,7 +208,7 @@ document.addEventListener('DOMContentLoaded', () => {
         </div>
         <div class="item-actions">
           <button class="btn btn-outline" onclick="editItem(${itemId})" ${disabled} ${title}>Edit</button>
-          <button class="btn btn-outline" onclick="updateItemQuantity(${itemId})" ${disabled} ${title}>Update Qty</button>
+          <button class="btn btn-outline" onclick="updateItemQuantity(${itemId})" ${disabled} ${title}>Update Quantity</button>
           <button class="btn btn-outline" onclick="deleteItem(${itemId})" ${disabled} ${title}>Delete</button>
         </div>
       `;
@@ -276,24 +276,38 @@ document.addEventListener('DOMContentLoaded', () => {
     formCard.hidden = false;
     clearStatus();
   };
-
-  window.updateItemQuantity = async function (id) {
+window.updateItemQuantity = function (id) {
     if (!id) { showStatus("Could not find this item's ID.", 'error'); return; }
-    const newQuantity = prompt('Enter new quantity:');
-    if (!newQuantity) return;
-    if (isNaN(newQuantity) || Number(newQuantity) < 1) { showStatus('Quantity must be a positive number.', 'error'); return; }
 
-    try {
-      clearStatus();
-      await apiRequest(
-        `${API_BASE}/SalesOrderItem/UpdateQuantity?id=${id}&newQuantity=${Number(newQuantity)}`,
-        { method: 'PATCH' }
-      );
-      await loadItems();
-    } catch (err) {
-      showStatus(err.message, 'error');
-      console.error(err);
-    }
+    const item = currentItems.find(i => i.realId === id);
+    const modalEl = document.getElementById('updateQuantityModal');
+    const modal = new bootstrap.Modal(modalEl);
+    const quantityInput = document.getElementById('newQuantityInput');
+    quantityInput.value = item ? quantityOf(item) : '';
+
+    const confirmBtn = document.getElementById('confirmQuantityBtn');
+    const newConfirmBtn = confirmBtn.cloneNode(true);
+    confirmBtn.parentNode.replaceChild(newConfirmBtn, confirmBtn);
+
+    newConfirmBtn.addEventListener('click', async () => {
+      const newQuantity = quantityInput.value;
+      if (isNaN(newQuantity) || Number(newQuantity) < 1) { showStatus('Quantity must be a positive number.', 'error'); return; }
+      modal.hide();
+
+      try {
+        clearStatus();
+        await apiRequest(
+          `${API_BASE}/SalesOrderItem/UpdateQuantity?id=${id}&newQuantity=${Number(newQuantity)}`,
+          { method: 'PATCH' }
+        );
+        await loadItems();
+      } catch (err) {
+        showStatus(err.message, 'error');
+        console.error(err);
+      }
+    });
+
+    modal.show();
   };
 
   // Custom confirm popup instead of the browser's default confirm()
