@@ -33,8 +33,12 @@ function checkAccess(){
   const claims = token ? decodeJwt(token) : null;
   const role = claims?.role
     || claims?.['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'];
-  if (!token || !claims){
-    showStatus('You need to be logged in to load inventory data. Log in on another page first.', true);
+  const signedIn = Boolean(token && claims);
+
+  document.getElementById('signedOutNotice')?.classList.toggle('hidden', signedIn);
+  document.getElementById('pageContent')?.classList.toggle('hidden', !signedIn);
+
+  if (!signedIn){
     return false;
   }
   currentUserRole = role;
