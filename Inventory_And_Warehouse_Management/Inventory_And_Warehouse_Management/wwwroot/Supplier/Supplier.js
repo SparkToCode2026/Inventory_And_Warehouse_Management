@@ -86,12 +86,14 @@ function renderSuppliers(suppliers) {
     const nameCell = `<td>${s.name}</td>`;
     const emailCell = `<td>${s.email}</td>`;
     const phoneCell = `<td>${s.phone}</td>`;
+    const ordersCount = s.purchaseOrders ? s.purchaseOrders.length : (s.purchaseOrderCount || 0);
+    const ordersCell = `<td>${ordersCount}</td>`;
 
     const editBtn = `<button class="btn btn-outline btn-sm" onclick="openEditModal(${s.supplierId})" type="button">Edit</button>`;
     const emailBtn = `<button class="btn btn-outline btn-sm" onclick="openEmailModal(${s.supplierId})" type="button">Email</button>`;
     const deleteBtn = `<button class="btn btn-outline btn-sm" onclick="deleteSupplier(${s.supplierId})" type="button">Delete</button>`;
 
-    row.innerHTML = `${idCell}${nameCell}${emailCell}${phoneCell}<td>${editBtn} ${emailBtn} ${deleteBtn}</td>`;
+    row.innerHTML = `${idCell}${nameCell}${emailCell}${phoneCell}${ordersCell}<td>${editBtn} ${emailBtn} ${deleteBtn}</td>`;
     tbody.appendChild(row);
   });
 }
