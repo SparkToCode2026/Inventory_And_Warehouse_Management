@@ -532,9 +532,15 @@ document
     }
 
     try {
-      const response = await fetch(
-        `${API_BASE}/FilterPurchaseOrders?${params.toString()}`,
-      );
+  const token = localStorage.getItem(TOKEN_KEY);
+  const response = await fetch(
+    `${API_BASE}/FilterPurchaseOrders?${params.toString()}`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
 
       if (response.status === 404) {
         currentPurchaseOrders = [];

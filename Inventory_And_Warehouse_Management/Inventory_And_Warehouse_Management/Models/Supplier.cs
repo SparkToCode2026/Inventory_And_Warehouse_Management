@@ -21,7 +21,7 @@ namespace Inventory_And_Warehouse_Management.Models
 
 
         // One Supplier can have many PurchaseOrders.
-        [JsonIgnore]
+        
         public List<PurchaseOrder>? PurchaseOrders { get; set; }
 
         // Link back to ProductSupplier
