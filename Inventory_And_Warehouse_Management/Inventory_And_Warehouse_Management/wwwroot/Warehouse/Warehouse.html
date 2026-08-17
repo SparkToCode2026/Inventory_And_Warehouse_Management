@@ -17,19 +17,19 @@
 <!------------------------------------------>
 
 <header class="site-header">
-    <div class="container header-inner">
-        <!-- Website Name -->
-        <div class="brand name">
-            Inventory & Warehouse Management
-            <span class="brand-sub"> Warehouse Management  </span>
-        </div>
+  <div class="header-inner container">
+    <a href="../index.html" class="brand">HOME</a>
 
-        <!-- Navigation Menu -->
-        <nav class="site-nav" id="siteNav">
-            <!-- Link To Home  -->
-            <a class="nav-link" href="../index.html">Home</a>
-        </nav>
-    </div>
+    <nav class="site-nav" id="siteNav">
+      <a href="Warehouse.html" class="nav-link">Warehouse</a>
+      <span class="user-info" id="currentUserLabel"></span>
+      <button class="btn btn-ghost" id="logoutBtn" type="button">Log Out</button>
+    </nav>
+
+    <button class="nav-toggle" id="navToggle" type="button" aria-label="Toggle menu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
 </header>
 
 <!-- Shown instead of the whole page when the user is not signed in -->

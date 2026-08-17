@@ -94,6 +94,7 @@ function renderCategories(categories) {
     const idCell = `<td>${c.realId ?? "-"}</td>`;
     const nameCell = `<td>${c.name}</td>`;
     const descCell = `<td>${c.description ?? "-"}</td>`;
+    const productsCell = `<td>${c.products?.length ?? 0}</td>`;
 
     const disabled = c.realId === null ? "disabled" : "";
     const editBtn = signedIn
@@ -106,7 +107,7 @@ function renderCategories(categories) {
       ? `<button class="btn btn-outline btn-sm" onclick="deleteCategory(${c.realId})" ${disabled} type="button">Delete</button>`
       : "";
 
-    row.innerHTML = `${idCell}${nameCell}${descCell}<td>${editBtn} ${descriptionBtn} ${deleteBtn}</td>`;
+    row.innerHTML = `${idCell}${nameCell}${descCell}${productsCell}<td>${editBtn} ${descriptionBtn} ${deleteBtn}</td>`;
     tbody.appendChild(row);
   });
 }

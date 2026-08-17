@@ -96,7 +96,7 @@ function checkAccess() {
  
       showStatus('Account created. Redirecting…', 'success');
       setTimeout(() => {
-        window.location.href = '../index.html';
+        window.location.href ='../User/Users.html';
       }, 900);
  
     } catch (err) {

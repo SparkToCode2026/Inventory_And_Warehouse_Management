@@ -130,7 +130,7 @@ namespace Inventory_And_Warehouse_Management.Controllers
         [HttpGet("SortCategoriesByNumOfProducts")]
         public IActionResult SortCategoriesByNumOfProducts()
         {
-            List<Category> categories = context.categories.OrderBy(c => c.products.Count()).ToList();
+            List<Category> categories = context.categories.Include(c => c.products).OrderBy(c => c.products.Count()).ToList();
             if (categories.Count == 0)
             {
                 return NotFound("There are no categorys");
