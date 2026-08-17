@@ -1,4 +1,3 @@
-
 # Inventory and Warehouse Management System
 
 ## 📌 Project Overview
@@ -31,22 +30,24 @@ This system provides a centralized digital solution that allows authorized users
 ## ✨ Main Features
 
 - User registration and login
-- JWT authentication and authorization
+- JWT authentication and authorization with role-based access (Staff, Manager, Admin)
 - Product management
 - Category management
 - Supplier management
 - Customer management
-- Inventory level management
-- Purchase order management
+- Warehouse management
+- Inventory level management with automated low-stock email alerts
+- Purchase order management with automated supplier confirmation emails
 - Sales order management
 - Stock movement tracking
 - Product-supplier relationship management
-- Add, view, update, and delete operations
-- Filtering and sorting
+- Add, view, update, and delete operations for every model
+- Filtering and sorting/aggregate reporting per model
 - Input validation
 - Duplicate email and phone number validation
 - Protected API endpoints
 - Database persistence
+- Full frontend interface for every module, with role-based UI
 
 ---
 
@@ -63,7 +64,7 @@ This system provides a centralized digital solution that allows authorized users
 | Git | Version control |
 | GitHub | Team collaboration |
 | Visual Studio | Development environment |
-| Frontend | To be added once the frontend technology is finalized |
+| Frontend | HTML, CSS, JavaScript, Bootstrap |
 
 ---
 
@@ -145,7 +146,9 @@ Swagger should open and display the available API endpoints.
 
 ## 🗄️ Final ERD
 
+The final Entity Relationship Diagram covers all 13 models (Category, Product, Supplier, Customer, User, Warehouse, InventoryLevel, StockMovement, PurchaseOrder, PurchaseOrderItem, SalesOrder, SalesOrderItem, and ProductSupplier) and their relationships.
 
+The diagram is available at `ERD & Mapping/ERD.png`, with the editable source file at `ERD & Mapping/ERD.drawio`, and the full field-level mapping at `ERD & Mapping/mapping.drawio`.
 
 ---
 
@@ -153,10 +156,12 @@ Swagger should open and display the available API endpoints.
 
 | Team Member | Responsibility |
 |-------------|----------------|
-|               |                  |
-|               |                  |
-|               |                  |
-|               |                  |
+| Abdullah Al Shamsi (Team Lead) | Category & Product (backend + frontend); code review, merges, and architecture decisions across the whole project |
+| Issa Al Sibani (Co-Lead) | Supplier & Customer (backend + frontend); README documentation |
+| Sara Al Hinai | User, Stock Movement & Product-Supplier (backend + frontend); JWT Authentication and Email Service |
+| Reham Al Barwani | Warehouse & Inventory Level (backend + frontend) |
+| Aseel Al Wardi | Purchase Order & Purchase Order Item (backend + frontend) |
+| Zuwaina Al Rashdi | Sales Order & Sales Order Item (backend + frontend); ERD and database mapping |
 
 
 
@@ -164,7 +169,13 @@ Swagger should open and display the available API endpoints.
 
 ## 📮 Postman Collection
 
+A Postman collection covering all Controllers (all CRUD, filter, and sort/aggregate cases, plus Authentication) is available at:
 
+```text
+postman/Inventory_Warehouse_API.postman_collection.json
+```
+
+Import it into Postman and set the `token` variable after logging in via `POST /api/Auth/login` to test protected endpoints.
 
 ---
 
@@ -172,19 +183,24 @@ Swagger should open and display the available API endpoints.
 
 ### Completed
 
-- Backend API development
-- Database integration
-- JWT authentication and authorization
-- Swagger API testing
-- CRUD testing
-- Supplier controller testing
-- Customer controller testing
-- Validation testing
-- Duplicate email and phone number validation
-- Database persistence testing
-- Filtering and sorting testing
+**Backend**
+- All 13 models with correct relationships, keys, and migrations
+- All 13 Controllers (Category, Product, Supplier, Customer, User, Warehouse, InventoryLevel, StockMovement, PurchaseOrder, PurchaseOrderItem, SalesOrder, SalesOrderItem, ProductSupplier), each covering Create, two distinct Update cases, Delete, Get-all with Include, Get-by-id, Filter, and Sort/Aggregate
+- JWT Authentication (Register, Login, Change Password) with role-based authorization (`Staff`, `Manager`, `Admin`) enforced on every endpoint
+- Email Service: low-stock alerts to managers and purchase order confirmations to suppliers
+- Swagger documentation with a working Bearer-token Authorize flow
+- Input validation, duplicate email/phone checks, and consistent error handling across all Controllers
+- Database persistence verified end to end
 
+**Frontend**
+- Login, Register, and Change Password pages
+- One page per model (13 total), each with list view, create, full update, a second distinct update case, delete, filter, and sort/aggregate, wired to the live API
+- Role-based UI: actions are shown or hidden based on the signed-in user's role, matching backend permissions exactly
+- Sign-in gating on every page that requires authentication
 
+**Testing**
+- Full manual testing via Swagger and the live UI across all Controllers and pages
+- Postman collection covering all endpoints
 
 ---
 
