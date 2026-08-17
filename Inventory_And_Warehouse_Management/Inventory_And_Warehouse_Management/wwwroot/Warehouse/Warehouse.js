@@ -21,6 +21,12 @@ function checkAccess() {
     document.getElementById("signedOutNotice")?.classList.toggle("hidden", signedIn);
     document.getElementById("pageContent")?.classList.toggle("hidden", !signedIn);
 
+    if (signedIn) {
+        const role = claims?.role || claims?.["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"];
+        const label = document.getElementById("currentUserLabel");
+        if (label) label.textContent = `${claims.name || claims.sub || "User"} (${role})`;
+    }
+
     return signedIn;
 }
 
@@ -298,4 +304,10 @@ document.addEventListener("DOMContentLoaded", () => {
   if (checkAccess()) {
     getAllWarehouses();
   }
+});
+
+//logout
+document.getElementById("logoutBtn")?.addEventListener("click", () => {
+    localStorage.removeItem("token");
+    window.location.href = "../index.html";
 });
